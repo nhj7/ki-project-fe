@@ -13,9 +13,6 @@
                             </v-col>
                         </v-row>
                         
-
-                        
-                        
                         <!--v-icon class="float-right">mdi-close</v-icon-->
                     </v-list-item-title>
                     <v-list-item-subtitle>
@@ -39,18 +36,45 @@
 
                 <v-divider></v-divider>
                 <v-divider></v-divider>
-                <v-list-item  v-for="(item, i) in items" :key="i" v-on:click="setCurrentView(item.to, this)" :to="item.to">
-                    <v-list-item-action>
+                <v-list-item  v-for="(item, i) in items" :key="i" :to="item.to">
+                    
+                    <v-list-item-action v-if="!item.items">
                         <v-icon>{{ item.icon }}</v-icon>
                     </v-list-item-action>
-                    <v-list-item-content>
-                        <v-list-item-title :inner-text.prop="item.title" />
+                    <v-list-item-content v-if="!item.items">
+                        <v-list-item-title>
+                            {{ item.title }}
+                        </v-list-item-title>
                     </v-list-item-content>
+
+                    <v-list-group  v-else :key="item.title" no-action>
+                        <template v-slot:activator >                            
+                            <v-list-item-action>
+                                <v-icon>{{ item.icon }}</v-icon>
+                            </v-list-item-action>
+                            <v-list-item-content>
+                                <v-list-item-title>{{ item.title }}</v-list-item-title>
+                            </v-list-item-content>
+                        </template>
+
+                        <v-list-item 
+                            v-for="sublink in item.items"
+                            :to="sublink.to"
+                            :key="sublink.title"
+                        >
+                            <v-list-item-title >{{ sublink.title }}</v-list-item-title>
+                        </v-list-item>
+                        
+                        
+                    </v-list-group>
+
                 </v-list-item>
+
+
             </v-list>
         </v-navigation-drawer>
 
-        <v-app-bar :clipped-left="clipped" fixed app flat>
+        <v-app-bar :clipped-left="clipped" fixed app flat color="white" class="app-bar-with-border">
             <v-row>
                 <v-col cols="auto" class="d-flex align-center">                
                     <v-img src="/assets/ci3.jpg" :width="200" @click.stop="drawer = !drawer"/>                    
@@ -62,7 +86,7 @@
                 </v-col>
             </v-row>
         </v-app-bar>
-
+        
         <v-main>
             <v-container>
                 <!--component :is="currentView"></component-->
@@ -84,15 +108,11 @@
                 <v-list-item @click="setDarkTheme">
                     <v-list-item-action>
                         <v-icon>
-                            {{
-            $vuetify.theme.dark ? "mdi-lightbulb-off" : "mdi-lightbulb-on"
-        }}
+                            {{ isDark ? "mdi-lightbulb-off" : "mdi-lightbulb-on"}}
                         </v-icon>
                     </v-list-item-action>
                     <v-list-item-title>
-                        {{
-                $vuetify.theme.dark ? "dark" : "light"
-            }}
+                        {{ isDark ? "dark" : "light" }}
                     </v-list-item-title>
                 </v-list-item>
 
@@ -128,6 +148,7 @@
 
 const data = {
     currentView: '',
+    isDark : false,
     clipped: true,
     drawer: true,
     fixed: true,
@@ -158,7 +179,13 @@ const data = {
         , {
             icon: "mdi-application",
             title: "환경설정",
-            to: "/page5"
+            items : [
+                {
+                    icon: "mdi-dev-to",
+                    title: "환경1",
+                    to: "/page5"
+                }
+            ]
         }
     ],
     miniVariant: false,
@@ -173,32 +200,21 @@ const comp = module.exports = {
         return data;
     } // end data
     , methods: {
-        setDarkTheme: () => {
-            //goClick(link);
-        }, setCurrentView: function (name, item) {
-            console.log("setCurrentView", name, item);
-            data.currentView = name.trim();
-
-            item.active = true;
-            //gtag('config', 'UA-109501118-1', { 'page_path': name });
-            //setToggle(li);
+        setDarkTheme(){
+            data.isDark = !data.isDark;
+            this.$vuetify.theme.dark = data.isDark;
+            console.log(this.$vuetify.theme.dark);
         }
     }
-    , mounted: function () {
-        console.log("App mounted");
+    , mounted() {
+        console.log("App.vue mounted");
     }
     , components: {
         
     }, created(){
-        console.log("app created", this, this.$options.components);
-        
+        console.log("app.vue created", this, this.$options.components);        
     }
 }
-
-
-
-
-
 </script>
 
 <style scoped>
@@ -206,7 +222,18 @@ const comp = module.exports = {
         color : rgb(33, 150, 243);
         /* color : rgb(var(--v-primary-lighten1)); */
     }
-    .v-navigation-drawer--is-mouseover{
-        /* background-color : rgb(66, 200, 250); */ 
+    .pa-0{
+        padding : 0px;
+    }
+    .v-list-group{
+        width:100%;
+    }
+    .v-list-group__header{
+        padding : 0px;
+        width:100%;
+        display:flex;
+    }
+    .app-bar-with-border{
+        border-bottom: 2px solid silver !important; /* 두께와 색상 지정 */
     }
 </style>
