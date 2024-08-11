@@ -50,19 +50,12 @@
             </v-list>
         </v-navigation-drawer>
 
-        <v-app-bar :clipped-left="clipped" fixed app dense hide-on-scroll>
+        <v-app-bar :clipped-left="clipped" fixed app flat>
             <v-row>
-                <v-col>                
+                <v-col cols="auto" class="d-flex align-center">                
                     <v-img src="/assets/ci3.jpg" :width="200" @click.stop="drawer = !drawer"/>                    
                 </v-col>
-                <v-col>
-                
-                </v-col>
-                <v-col>
-                
-                </v-col>
-                <v-col>
-                    <v-icon>mdi-magnify</v-icon>
+                <v-col cols="auto" class="d-flex align-right">
                     <v-btn icon @click.stop="rightDrawer = !rightDrawer">
                         <v-icon>mdi-cog</v-icon>
                     </v-btn>
