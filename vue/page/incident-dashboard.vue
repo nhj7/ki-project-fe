@@ -4,11 +4,11 @@
             <v-col>
                 <!-- 조회 조건 -->
                 <v-card class="mb-4 pb-0">
-                    <v-card-text dense class="mb-2 pb-0">
-                        <v-row dense class="">
+                    <v-card-text dense>
+                        <v-row dense>
                             <v-col cols="12" sm="8" md="6">
-                                <v-select v-model="filters.systems" :items="systems" label="시스템" outlined dense multiple
-                                    chips hide-details>
+                                <v-select v-model="filters.systems" :items="systems" label="시스템" outlined multiple chips
+                                    dense hide-details>
 
                                     <template v-slot:prepend-item>
                                         <v-list-item ripple @mousedown.prevent @click="toggleAll('systems')">
@@ -23,10 +23,13 @@
                                         </v-list-item>
                                         <v-divider class="mt-2"></v-divider>
                                     </template>
-                                    <template v-slot:selection="{ item }">
-                                        <v-chip color="primary lighten-2">
+                                    <template
+                                        v-slot:selection="{ item, index }"><!-- eslint-disable-line vue/no-unused-vars -->
+                                        <!--v-chip color="primary lighten-2">
                                             {{ item }}
-                                        </v-chip>
+                                        </v-chip-->
+                                        <span class="primary--text" v-if="index === 0">{{ filters.systems.join(', ')
+                                            }}</span>
                                     </template>
                                 </v-select>
                             </v-col>
@@ -46,21 +49,24 @@
                                         </v-list-item>
                                         <v-divider class="mt-2"></v-divider>
                                     </template>
-                                    <template v-slot:selection="{ item }">
-                                        <v-chip :color="getSeverityColor(item)">
+                                    <template
+                                        v-slot:selection="{ item, index }"><!-- eslint-disable-line vue/no-unused-vars -->
+                                        <!--v-chip :color="getSeverityColor(item)">
                                             {{ item }}
-                                        </v-chip>
+                                        </v-chip-->
+                                        <span class="primary--text" v-if="index === 0">{{ filters.severities.join(', ')
+                                            }}</span>
                                     </template>
                                 </v-select>
                             </v-col>
                         </v-row>
-                        <v-row dense class="mt-2">
+                        <v-row dense class="mt-3">
                             <v-col cols="12" sm="6" md="3">
                                 <v-menu v-model="startDateMenu" :close-on-content-click="false"
                                     transition="scale-transition" offset-y max-width="290px" min-width="290px">
                                     <template v-slot:activator="{ on, attrs }">
                                         <v-text-field v-model="startDate" label="시작 날짜" readonly v-bind="attrs"
-                                            v-on="on" outlined dense></v-text-field>
+                                            v-on="on" outlined dense hide-details></v-text-field>
                                     </template>
                                     <v-date-picker v-model="startDate" no-title
                                         @input="startDateMenu = false"></v-date-picker>
@@ -71,14 +77,14 @@
                                     transition="scale-transition" offset-y max-width="290px" min-width="290px">
                                     <template v-slot:activator="{ on, attrs }">
                                         <v-text-field v-model="endDate" label="종료 날짜" readonly v-bind="attrs" v-on="on"
-                                            outlined dense></v-text-field>
+                                            outlined dense hide-details></v-text-field>
                                     </template>
                                     <v-date-picker v-model="endDate" no-title
                                         @input="endDateMenu = false"></v-date-picker>
                                 </v-menu>
                             </v-col>
                             <v-col cols="12" sm="12" md="6" class="d-flex justify-end align-center">
-                                <v-btn color="primary" @click="search">조회</v-btn>
+                                <v-btn color="primary" @click="search" small dense>조회</v-btn>
                             </v-col>
                         </v-row>
 
@@ -87,21 +93,25 @@
 
 
                 <!-- 장애 현황 요약 -->
-                <v-row dense class="mb-4">
-                    <v-col v-for="(item, index) in summaryItems" :key="index" cols="12" sm="6" md="3">
-                        <v-card>
-                            <v-card-text class="pa-2">
-                                <div class="d-flex justify-space-between align-center">
-                                    <span class="text-subtitle-1 font-weight-bold pl-6" :class="item.color">{{
+                <!--v-card outlined class="mb-2 pa-0">
+                    <v-card-text class="pb-0 pt-3"-->
+                        <v-row dense class="mb-2">
+                            <v-col v-for="(item, index) in summaryItems" :key="index" cols="12" sm="6" md="3">
+                                <v-card>
+                                    <v-card-text class="pa-2">
+                                        <div class="d-flex justify-space-between align-center">
+                                            <span class="text-subtitle-1 font-weight-bold pl-6" :class="item.color">{{
                                     item.label
                                 }}</span>
-                                    <span class="text-subtitle-1 font-weight-bold pr-6" :class="item.color">{{
+                                            <span class="text-subtitle-1 font-weight-bold pr-6" :class="item.color">{{
                                     item.value }}</span>
-                                </div>
-                            </v-card-text>
-                        </v-card>
-                    </v-col>
-                </v-row>
+                                        </div>
+                                    </v-card-text>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+                    <!--/v-card-text>
+                </v-card-->
 
                 <!-- 장애 목록 -->
                 <v-data-table :headers="headers" :items="incidents" :items-per-page="10"
@@ -157,7 +167,7 @@ const comp = module.exports = {
             totalIncidents: 0,
             criticalIncidents: 0,
             warningIncidents: 0,
-            infoIncidents: 0,            
+            infoIncidents: 0,
         }
     },
 
@@ -189,7 +199,7 @@ const comp = module.exports = {
                 this.infoIncidents = 0;
                 this.incidents = [];
 
-                await new Promise(resolve => setTimeout(resolve, 750)); // 예시: 0.5초 지연
+                await new Promise(resolve => setTimeout(resolve, 500)); // 예시: 0.5초 지연
 
                 // 실제로는 API 호출을 통해 데이터를 가져와야 합니다.
                 // 여기서는 예시 데이터를 사용합니다.
@@ -267,11 +277,6 @@ const comp = module.exports = {
 @media (max-width: 600px) {
     .v-data-table .v-data-table__wrapper {
         overflow-x: auto;
-    }
-}
-
-.custom-table {
-    border-top: 2px solid var(--v-primary-lighten3);
-    }
+    }  }
     
 </style>

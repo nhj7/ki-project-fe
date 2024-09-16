@@ -6,7 +6,7 @@
                     <v-list-item-title class="title">
                         <v-row>
                             <v-col cols="6" md="6" class="text-right">
-                                <v-list-item>{{ title }}</v-list-item>
+                                <v-list-item @click.stop="drawer = !drawer">{{ title }}</v-list-item>
                                 <!--v-img src="/assets/ci.png" :width="30" cover /-->
                             </v-col>
                             <v-col cols="6" md="6" d-flex justify-start>
@@ -27,19 +27,19 @@
                     <v-btn icon @click.stop="miniVariant = !miniVariant">
                         <v-icon>mdi-{{ `chevron-${miniVariant ? "right" : "left"}` }}</v-icon>
                     </v-btn>
-                    <v-btn icon @click.stop="clipped = !clipped">
+                    <!--v-btn icon @click.stop="clipped = !clipped">
                         <v-icon>mdi-application</v-icon>
-                    </v-btn>
-                    <v-btn icon @click.stop="fixed = !fixed">
+                    </v-btn-->
+                    <!--v-btn icon @click.stop="fixed = !fixed">
                         <v-icon>mdi-minus</v-icon>
-                    </v-btn>
+                    </v-btn-->
                 </v-list-item>
 
                 <v-divider></v-divider>
-                <v-divider></v-divider>
+                
                 <v-list-item
                     v-for="(route, i) in this.$router.options.routes.filter(route => route.meta && route.meta.showInMenu)"
-                    :key="i" :to="route.path">
+                    :key="i" :to="route.path" class="lnb-item rounded-lg">
 
                     <v-list-item-action>
                         <v-icon>{{ route.meta.icon }}</v-icon>
@@ -49,34 +49,19 @@
                             {{ route.meta.title }}
                         </v-list-item-title>
                     </v-list-item-content>
-
-                    <!--v-list-group v-else :key="item.title" no-action>
-                        <template v-slot:activator>
-                            <v-list-item-action>
-                                <v-icon>{{ item.icon }}</v-icon>
-                            </v-list-item-action>
-                            <v-list-item-content>
-                                <v-list-item-title>{{ item.title }}</v-list-item-title>
-                            </v-list-item-content>
-                        </template>
-
-<v-list-item v-for="sublink in item.items" :to="sublink.to" :key="sublink.title">
-    <v-list-item-title>{{ sublink.title }}</v-list-item-title>
-</v-list-item>
-
-
-</v-list-group-->
-
+                    
                 </v-list-item>
 
 
             </v-list>
         </v-navigation-drawer>
 
-        <v-app-bar :clipped-left="clipped" fixed app flat color="white" class="app-bar-with-border">
+        <v-app-bar :clipped-left="clipped" fixed app flat class="app-bar-with-border">
             <v-row>
-                <v-col cols="auto" class="d-flex align-center">
-                    <v-img src="/assets/ci3.jpg" :width="200" @click.stop="drawer = !drawer" />
+                <v-col cols="auto" class="d-flex align-center cursor-pointer" @click.stop="drawer = !drawer">
+                    <v-app-bar-nav-icon></v-app-bar-nav-icon>
+                    <!--v-img src="/assets/ci4.jpg" :width="150" @click.stop="drawer = !drawer" /-->
+                    <h1 class="text-h6">한국투자</h1>
                 </v-col>
                 <v-col cols="auto" class="d-flex align-right">
                     <v-btn icon @click.stop="rightDrawer = !rightDrawer">
@@ -88,15 +73,13 @@
 
         <v-main>
             <v-container>
-                <h2 class="text-h6 mb-2 d-flex align-center">
-                    <v-icon size="32" :color="this.$route.meta.iconColor || 'primary'" class="mr-2">{{
+                <h2 class="text-subtitle-2 mb-2 d-flex align-center">
+                    <v-icon size="24" :color="this.$route.meta.iconColor || 'primary'" class="mr-2">{{
             this.$route.meta.icon
         }}</v-icon>
                     {{ this.$route.meta.title }}
                 </h2>
-
                 <v-divider class=""></v-divider>
-
                 <!--component :is="currentView"></component-->
                 <router-view></router-view>
             </v-container>
@@ -171,41 +154,6 @@ const data = {
     drawer: true,
     fixed: true,
     isCoinSrchHide: true,
-    items: [
-        {
-            icon: "mdi-chat-processing",
-            title: "대화형",
-            to: "/chat"
-        }
-
-        , {
-            icon: "mdi-playlist-check",
-            title: "서비스탐지현황",
-            to: "/incident-dashboard"
-        }
-        , {
-            icon: "mdi-newspaper-variant",
-            title: "분석",
-            to: "/page3"
-        }
-
-        , {
-            icon: "mdi-dev-to",
-            title: "룰셋관리",
-            to: "/page4"
-        }
-        , {
-            icon: "mdi-application",
-            title: "환경설정",
-            items: [
-                {
-                    icon: "mdi-dev-to",
-                    title: "환경1",
-                    to: "/page5"
-                }
-            ]
-        }
-    ],
     miniVariant: false,
     right: true,
     rightDrawer: false,
@@ -239,32 +187,32 @@ const comp = module.exports = {
 
 const globalMethods = {
     setLastWeekDates() {
-    const today = new Date();
-    const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-    return {
-      endDate: this.formatDate(today),
-      startDate: this.formatDate(lastWeek)
-    };
-  },
-  formatDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  },
-  toggleAll(array, selectedArray) {
-    if (selectedArray.length === array.length) {
-      return [];
-    } else {
-      return [...array];
+        const today = new Date();
+        const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return {
+            endDate: this.formatDate(today),
+            startDate: this.formatDate(lastWeek)
+        };
+    },
+    formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    },
+    toggleAll(array, selectedArray) {
+        if (selectedArray.length === array.length) {
+            return [];
+        } else {
+            return [...array];
+        }
+    },
+    isAllSelected(array, selectedArray) {
+        return selectedArray.length === array.length;
+    },
+    getIcon(isSelected) {
+        return isSelected ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline';
     }
-  },
-  isAllSelected(array, selectedArray) {
-    return selectedArray.length === array.length;
-  },
-  getIcon(isSelected) {
-    return isSelected ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline';
-  }
 };
 
 Vue.prototype.$util = globalMethods;
@@ -273,7 +221,7 @@ Vue.prototype.$util = globalMethods;
 
 <style scoped>
 .theme--dark .v-list-item--active {
-    color : rgb(33, 150, 243);
+    color: rgb(33, 150, 243);
     /* color: burlywood; */
     /* color : rgb(var(--v-primary-lighten1)); */
 }
@@ -302,4 +250,92 @@ Vue.prototype.$util = globalMethods;
     border-bottom: 2px solid silver !important;
     /* 두께와 색상 지정 */
 }
+
+.v-text-field input {
+    color: var(--v-primary-base) !important;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+
+.v-data-table-header th {
+    background-color: var(--v-accent-lighten5) !important;
+    
+    font-weight: bold !important;
+    cursor: pointer !important;
+    transition: background-color 0.2s, color 0.2s !important;
+}
+
+.v-data-table-header th:hover {
+    background-color: var(--v-accent-lighten4) !important;
+}
+
+.v-data-table-header th.active {
+    background-color: var(--v-accent-lighten3) !important;
+}
+
+.v-data-table-header th .v-data-table-header__icon {
+    color: var(--v-accent-base) !important;
+}
+/* 다크 테마 대응 */
+.theme--dark .v-data-table-header th {
+    background-color: var(--v-grey-darken4) !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    color: var(--v-grey-lighten5) !important;
+    transition: background-color 0.2s, color 0.2s !important;
+}
+
+.theme--dark .v-data-table-header th:hover {
+    background-color: var(--v-grey-darken3) !important;
+}
+
+.theme--dark .v-data-table-header th.active {
+    background-color: var(--v-grey-darken2) !important;
+}
+
+.theme--dark .v-data-table-header th .v-data-table-header__icon {
+    color: var(--v-grey-lighten1) !important;
+}
+
+/* 점선 스타일의 divider 추가 */
+.v-divider.theme--light {
+  border-style: dashed !important;
+  border-width: 1px !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+.v-divider.theme--dark {
+  border-style: dashed !important;
+  border-width: 1px !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+
+
+.custom-table {
+    border-top: 1px solid var(--v-primary-lighten5);
+}
+
+.custom-table .v-data-table__wrapper > table > tbody > tr > td {
+  /* border-bottom: none !important; */
+}
+
+.lnb-item {
+  margin-bottom: 4px; /* 원하는 간격 크기로 조정 가능 */
+  border-radius: 8px !important; /* 모서리 둥글기 정도 */
+  /* transition: background-color 0.3s ease;  부드러운 배경색 전환 효과 */
+}
+
+/* v-list 자체의 패딩 조정 */
+.v-list {
+  padding: 8px; /* v-list의 내부 여백 조정 */
+  border-radius: 8px !important; /* 모서리 둥글기 정도 */
+}
+
+.v-list-item--link:before {
+  border-radius: 8px !important; /* 모서리 둥글기 정도 */
+}    
 </style>

@@ -82,12 +82,16 @@ const comp = module.exports = {
                 // Clear the input field
                 this.inputMessage = '';
 
+                this.$loading.show("보고서 응답을 준비 중입니다");
+
                 // Simulate a bot response (you can replace this with an API call)
                 setTimeout(() => {
-                this.messages.push({
-                    text: '가상의 보고서 응답입니다. 다운로드 링크',
-                    sent: false,
-                });
+                    this.messages.push({
+                        text: '가상의 보고서 응답입니다. 다운로드 링크',
+                        sent: false,
+                    });
+
+                    this.$loading.hide();
                 }, 1000);
             }
         },
@@ -117,5 +121,9 @@ const comp = module.exports = {
 
 v-list-item {
   margin-bottom: 10px;
+}
+
+.custom-table {
+    border-top: 2px solid var(--v-primary-lighten3);
 }
 </style>

@@ -47,7 +47,22 @@
             , data1: 'data22'
         }
 
-        const opts = {
+        const vuetifyOptions = {
+            defaults: {
+                VSelect: {
+                    hideDetails: true,
+                    "hide-details": true,
+                    dense: true,
+                    density: "compact",
+                }
+                , VTextField: {
+                    hideDetails: true,
+                    dense: true,
+                }
+                , VBtn: {
+                    dense: true,
+                }
+            },
             theme: {
                 dark: false
                 , options: { customProperties: true }
@@ -60,6 +75,7 @@
                         , secondary: "#424242"
                         , success: "#4CAF50"
                         , warning: "#FB8C00"
+                        , skyBlue: '#4FC3F7',  // 연한 하늘색
                     }, dark: {
                         accent: "#FF4081"
                         , error: "#FF5252"
@@ -68,6 +84,18 @@
                         , secondary: "#424242"
                         , success: "#4CAF50"
                         , warning: "#FB8C00"
+                        , grey: {
+                            base: '#9E9E9E',
+                            lighten5: '#FAFAFA',
+                            lighten4: '#F5F5F5',
+                            lighten3: '#EEEEEE',
+                            lighten2: '#E0E0E0',
+                            lighten1: '#BDBDBD',
+                            darken1: '#757575',
+                            darken2: '#616161',
+                            darken3: '#424242',
+                            darken4: '#212121',
+                        }
                     }, ocean: {
                         primary: '#0277bd', // 파란색 계열                        
                         secondary: '#26c6da', // 밝은 파란색
@@ -86,9 +114,41 @@
                         warning: '#ffa726', // 노란 주황색
                     },
                 }
+            },
+
+        };
+        const vuetify = new Vuetify(vuetifyOptions);
+
+        Vue.mixin({
+            beforeCreate() {
+                this.$vuetify.preset = {
+                    VTextField: { dense: true, hideDetails: true },
+                    VSelect: { dense: true, hideDetails: true },
+                    VTextarea: { dense: true, hideDetails: true },
+                    VCombobox: { dense: true, hideDetails: true },
+                    // 필요한 다른 컴포넌트들에 대해서도 같은 방식으로 추가
+                }
+            }
+        });
+
+        // 믹스인 정의
+        const denseMixin = {
+            props: {
+                dense: {
+                    type: Boolean,
+                    default: true
+                },
+                hideDetails: {
+                    type: Boolean,
+                    default: true
+                }
             }
         };
-        const vuetify = new Vuetify(opts);
+
+        // 믹스인 전역 등록
+        Vue.mixin(denseMixin);
+
+
         vuetify.framework.theme.themes.ocean = {
             primary: '#0277bd', // 파란색 계열                        
             secondary: '#26c6da', // 밝은 파란색
@@ -107,14 +167,14 @@
                     path: '/', name: 'Home', component: Home, meta: {
                         showInMenu: false,
                         title: "홈",
-                        icon: "mdi-home",                        
+                        icon: "mdi-home",
                     }
                 }
                 , {
                     path: '/chat', name: 'chat', component: loadVue('./page/chat'), meta: {
                         showInMenu: true,
                         icon: "mdi-chat-processing",
-                        title: "대화형 보고서 생성",                        
+                        title: "대화형 보고서 생성",
                     }
                 }
                 , {
@@ -122,34 +182,37 @@
                         showInMenu: true,
                         icon: "mdi-lan-check",
                         iconColor: "orange",
-                        title: "장애탐지현황",                        
+                        title: "장애탐지현황",
                     }
                 }
-                , { path: '/page3', name: 'page3', component: loadVue('./page/page3') , meta: {
+                , {
+                    path: '/page3', name: 'page3', component: loadVue('./page/page3'), meta: {
                         showInMenu: true,
                         icon: "mdi-clipboard-check-outline",
                         iconColor: "green",
                         title: "테스트 자동화 수행 현황",
                     }
                 }
-                , { path: '/page4', name: 'page4', component: loadVue('./page/page4') , meta: {
+                , {
+                    path: '/page4', name: 'page4', component: loadVue('./page/page4'), meta: {
                         showInMenu: true,
                         icon: "mdi-dev-to",
                         iconColor: "info",
-                        title: "룰셋관리",                        
+                        title: "룰셋관리",
                     }
 
                 }
-                , { path: '/page5', name: 'page5', component: loadVue('./page/page5') , meta : {
+                , {
+                    path: '/page5', name: 'page5', component: loadVue('./page/page5'), meta: {
                         showInMenu: true,
                         icon: "mdi-application",
-                        title: "환경설정",                        
+                        title: "환경설정",
                     }
                 }
             ]
         });
 
-        
+
 
         const app = new Vue({
             'el': '#app'
@@ -175,6 +238,10 @@
                     this.$vuetify.theme.themes.light = this.$vuetify.theme.themes[themeName];
                     this.$vuetify.theme.dark = false;
                 },
+            }
+            , beforeCreate() {
+                console.log("beforeCreate", this.$vuetify);
+
             }
             , created() {
                 console.log("created");
@@ -220,7 +287,7 @@
         };
 
         Vue.use(LoadingPlugin);
-        
+
         /*
         const { createApp, ref, defineAsyncComponent } = Vue;
 
