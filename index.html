@@ -13,11 +13,11 @@
     <meta http-equiv="pragma" content="no-cache" />
     <meta name="msapplication-TileColor" content="#FFFFFF">
 
-    <title>KI-FDS</title>
+    <title>KI-CFRS</title>
 
     <link href="https://cdn.jsdelivr.net/npm/vuetify@2/dist/vuetify.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet">
-    
+
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2/dist/vuetify.min.js"></script>
@@ -25,9 +25,10 @@
     <script src="https://unpkg.com/http-vue-loader"></script>
     <script src="https://unpkg.com/vue-router@2/dist/vue-router.js"></script>
 
-    
 
-    
+
+
+
 </head>
 
 <body>
@@ -50,24 +51,24 @@
             theme: {
                 dark: false
                 , options: { customProperties: true }
-                , themes : {
-                    light : {
+                , themes: {
+                    light: {
                         accent: "#82B1FF"
-                        ,error: "#FF5252"
-                        ,info: "#2196F3"
-                        ,primary: "#1976D2"
-                        ,secondary: "#424242"
-                        ,success: "#4CAF50"
-                        ,warning: "#FB8C00"
-                    }, dark : {
+                        , error: "#FF5252"
+                        , info: "#2196F3"
+                        , primary: "#1976D2"
+                        , secondary: "#424242"
+                        , success: "#4CAF50"
+                        , warning: "#FB8C00"
+                    }, dark: {
                         accent: "#FF4081"
-                        ,error: "#FF5252"
-                        ,info: "#2196F3"
-                        ,primary: "#2196F3"
-                        ,secondary: "#424242"
-                        ,success: "#4CAF50"
-                        ,warning: "#FB8C00"
-                    }, ocean : {
+                        , error: "#FF5252"
+                        , info: "#2196F3"
+                        , primary: "#2196F3"
+                        , secondary: "#424242"
+                        , success: "#4CAF50"
+                        , warning: "#FB8C00"
+                    }, ocean: {
                         primary: '#0277bd', // 파란색 계열                        
                         secondary: '#26c6da', // 밝은 파란색
                         accent: '#00acc1', // 청록색 계열
@@ -89,46 +90,85 @@
         };
         const vuetify = new Vuetify(opts);
         vuetify.framework.theme.themes.ocean = {
-                        primary: '#0277bd', // 파란색 계열                        
-                        secondary: '#26c6da', // 밝은 파란색
-                        accent: '#00acc1', // 청록색 계열
-                        error: '#c62828', // 어두운 빨간색
-                        info: '#0288d1', // 파란색 계열
-                        success: '#2e7d32', // 초록색 계열
-                        warning: '#f57c00', // 오렌지색 계열
-                    }
-        
-        const Home = { template: '<div>Home</div>'}
-        
+            primary: '#0277bd', // 파란색 계열                        
+            secondary: '#26c6da', // 밝은 파란색
+            accent: '#00acc1', // 청록색 계열
+            error: '#c62828', // 어두운 빨간색
+            info: '#0288d1', // 파란색 계열
+            success: '#2e7d32', // 초록색 계열
+            warning: '#f57c00', // 오렌지색 계열
+        }
+
+        const Home = { template: '<div>Home</div>' }
         const router = new VueRouter({
             // mode: 'history',
             routes: [
-                { path: '/', name : 'Home', component: Home }
-                , { path: '/page1', name : 'page1', component: loadVue('./page/page1') }
-                , { path: '/page2', name : 'page2', component: loadVue('./page/page2') }
-                , { path: '/page3', name : 'page3', component: loadVue('./page/page3') }
-                , { path: '/page4', name : 'page4', component: loadVue('./page/page4') }
-                , { path: '/page5', name : 'page5', component: loadVue('./page/page5') }
+                {
+                    path: '/', name: 'Home', component: Home, meta: {
+                        showInMenu: false,
+                        title: "홈",
+                        icon: "mdi-home",                        
+                    }
+                }
+                , {
+                    path: '/chat', name: 'chat', component: loadVue('./page/chat'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-chat-processing",
+                        title: "대화형 보고서 생성",                        
+                    }
+                }
+                , {
+                    path: '/incident-dashboard', name: 'incident-dashboard', component: loadVue('./page/incident-dashboard'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-lan-check",
+                        iconColor: "orange",
+                        title: "장애탐지현황",                        
+                    }
+                }
+                , { path: '/page3', name: 'page3', component: loadVue('./page/page3') , meta: {
+                        showInMenu: true,
+                        icon: "mdi-clipboard-check-outline",
+                        iconColor: "green",
+                        title: "테스트 자동화 수행 현황",
+                    }
+                }
+                , { path: '/page4', name: 'page4', component: loadVue('./page/page4') , meta: {
+                        showInMenu: true,
+                        icon: "mdi-dev-to",
+                        iconColor: "info",
+                        title: "룰셋관리",                        
+                    }
+
+                }
+                , { path: '/page5', name: 'page5', component: loadVue('./page/page5') , meta : {
+                        showInMenu: true,
+                        icon: "mdi-application",
+                        title: "환경설정",                        
+                    }
+                }
             ]
-        });        
+        });
+
+        
 
         const app = new Vue({
             'el': '#app'
             , vuetify: vuetify
-            , router : router
-            , data : {
+            , router: router
+            , data: {
                 currentView: ''
             }
             , data() {
                 return {
-                currentView: ''
-                , message: '@nhj12311'
-                , data1: 'data22'
+                    currentView: ''
+                    , message: '@nhj12311'
+                    , data1: 'data22'
                 }
             }
             , components: {
                 'App': loadVue('App')
                 , 'Dashboard': loadVue('Dashboard')
+                //, 'page-title': PageTitle
             }
             , methods: {
                 changeTheme(themeName) {
@@ -156,11 +196,31 @@
             } // end mounted
 
         });
-        
-        
-        
 
+        const LoadingPlugin = {
+            install(Vue) {
+                const loading = new Vue({
+                    data: {
+                        isLoading: false,
+                        loadingText: '로딩 중...'
+                    },
+                    methods: {
+                        show(text = '로딩 중...') {
+                            this.isLoading = true;
+                            this.loadingText = text;
+                        },
+                        hide() {
+                            this.isLoading = false;
+                        }
+                    }
+                });
 
+                Vue.prototype.$loading = loading;
+            }
+        };
+
+        Vue.use(LoadingPlugin);
+        
         /*
         const { createApp, ref, defineAsyncComponent } = Vue;
 

@@ -7,13 +7,14 @@
                     <v-card-text dense class="mb-2 pb-0">
                         <v-row dense class="">
                             <v-col cols="12" sm="8" md="6">
-                                <v-select v-model="filters.projects" :items="projects" label="프로젝트" outlined dense
-                                    multiple chips hide-details>
+                                <v-select v-model="filters.systems" :items="systems" label="시스템" outlined dense multiple
+                                    chips hide-details>
+
                                     <template v-slot:prepend-item>
-                                        <v-list-item ripple @mousedown.prevent @click="toggleAll('projects')">
+                                        <v-list-item ripple @mousedown.prevent @click="toggleAll('systems')">
                                             <v-list-item-action>
-                                                <v-icon :color="isAllSelected('projects') ? 'primary darken-4' : ''">
-                                                    {{ getIcon('projects') }}
+                                                <v-icon :color="isAllSelected('systems') ? 'primary darken-4' : ''">
+                                                    {{ getIcon('systems') }}
                                                 </v-icon>
                                             </v-list-item-action>
                                             <v-list-item-content>
@@ -30,13 +31,13 @@
                                 </v-select>
                             </v-col>
                             <v-col cols="12" sm="8" md="6">
-                                <v-select v-model="filters.testTypes" :items="testTypes" label="테스트 유형" outlined dense
+                                <v-select v-model="filters.severities" :items="severities" label="심각도" outlined dense
                                     multiple chips hide-details>
                                     <template v-slot:prepend-item>
-                                        <v-list-item ripple @mousedown.prevent @click="toggleAll('testTypes')">
+                                        <v-list-item ripple @mousedown.prevent @click="toggleAll('severities')">
                                             <v-list-item-action>
-                                                <v-icon :color="isAllSelected('testTypes') ? 'indigo darken-4' : ''">
-                                                    {{ getIcon('testTypes') }}
+                                                <v-icon :color="isAllSelected('severities') ? 'indigo darken-4' : ''">
+                                                    {{ getIcon('severities') }}
                                                 </v-icon>
                                             </v-list-item-action>
                                             <v-list-item-content>
@@ -46,7 +47,7 @@
                                         <v-divider class="mt-2"></v-divider>
                                     </template>
                                     <template v-slot:selection="{ item }">
-                                        <v-chip :color="getTestTypeColor(item)">
+                                        <v-chip :color="getSeverityColor(item)">
                                             {{ item }}
                                         </v-chip>
                                     </template>
@@ -80,10 +81,12 @@
                                 <v-btn color="primary" @click="search">조회</v-btn>
                             </v-col>
                         </v-row>
+
                     </v-card-text>
                 </v-card>
 
-                <!-- 테스트 수행 현황 요약 -->
+
+                <!-- 장애 현황 요약 -->
                 <v-row dense class="mb-4">
                     <v-col v-for="(item, index) in summaryItems" :key="index" cols="12" sm="6" md="3">
                         <v-card>
@@ -100,12 +103,12 @@
                     </v-col>
                 </v-row>
 
-                <!-- 테스트 수행 목록 -->
-                <v-data-table :headers="headers" :items="testResults" :items-per-page="10"
+                <!-- 장애 목록 -->
+                <v-data-table :headers="headers" :items="incidents" :items-per-page="10"
                     class="elevation-1 custom-table" :mobile-breakpoint="0">
-                    <template v-slot:[`item.testType`]="{ item }">
-                        <v-chip :color="getTestTypeColor(item.testType)" dark small>
-                            {{ item.testType }}
+                    <template v-slot:[`item.severity`]="{ item }">
+                        <v-chip :color="getSeverityColor(item.severity)" dark small>
+                            {{ item.severity }}
                         </v-chip>
                     </template>
                     <template v-slot:[`item.status`]="{ item }">
@@ -116,14 +119,17 @@
                 </v-data-table>
             </v-col>
         </v-row>
+
     </v-container>
 </template>
 
 <script>
-const projects = ['소비자금융시스템', '일반여신시스템', '모바일앱', '통합웹'];
-const testTypes = ['단위 테스트', '통합 테스트', 'E2E 테스트', '성능 테스트'];
-const testTypes_color = ['blue', 'green', 'purple', 'orange'];
-const statuses = ['성공', '실패', '진행 중', '대기 중'];
+
+
+const systems = ['소비자금융시스템', '일반여신시스템', '모바일앱', '통합웹'];
+const severities = ['심각', '경고', '정보'];
+const severities_color = ['red', 'orange', 'blue'];
+const status = ['조치중', '모니터링중', '완료'];
 
 const comp = module.exports = {
     data() {
@@ -132,121 +138,124 @@ const comp = module.exports = {
             endDate: '',
             startDateMenu: false,
             endDateMenu: false,
-            projects: projects,
-            testTypes: testTypes,
-            statuses: statuses,
+            systems: systems,
+            severities: severities,
+            status: status,
             filters: {
-                projects: projects,
-                testTypes: testTypes,
-                statuses: statuses
+                systems: systems,
+                severities: severities.slice(0, 2),
+                status: status
             },
             headers: [
-                { text: '실행 시간', align: 'start', sortable: true, value: 'executionTime' },
-                { text: '프로젝트', value: 'project' },
-                { text: '테스트 유형', value: 'testType' },
-                { text: '테스트 스위트', value: 'testSuite' },
+                { text: '발생시간', align: 'start', sortable: true, value: 'timestamp' },
+                { text: '시스템', value: 'system' },
+                { text: '심각도', value: 'severity' },
+                { text: '장애내용', value: 'description' },
                 { text: '상태', value: 'status' },
-                { text: '성공률', value: 'successRate' },
-                { text: '소요 시간', value: 'duration' },
             ],
-            testResults: [],
-            totalTests: 0,
-            successfulTests: 0,
-            failedTests: 0,
-            inProgressTests: 0,
-            loading: false,
-            loadingText: '',
-            loadingInterval: null,
+            incidents: [],
+            totalIncidents: 0,
+            criticalIncidents: 0,
+            warningIncidents: 0,
+            infoIncidents: 0,            
         }
+    },
+
+    watch: {
+
     },
     computed: {
         summaryItems() {
             return [
-                { label: '전체 테스트', value: this.totalTests, color: '' },
-                { label: '성공', value: this.successfulTests, color: 'green--text' },
-                { label: '실패', value: this.failedTests, color: 'red--text' },
-                { label: '진행 중', value: this.inProgressTests, color: 'orange--text' },
+                { label: '전체 장애', value: this.totalIncidents, color: '' },
+                { label: '심각', value: this.criticalIncidents, color: 'red--text' },
+                { label: '경고', value: this.warningIncidents, color: 'orange--text' },
+                { label: '정보', value: this.infoIncidents, color: 'blue--text' },
             ];
         },
     },
     methods: {
         async search() {
-            this.fetchTestResults();
+            // 실제 검색 로직 구현
+            this.fetchIncidents();
         },
-        setLastWeekDates() {
-            const today = new Date();
-            const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+        async fetchIncidents() {
 
-            this.endDate = this.formatDate(today);
-            this.startDate = this.formatDate(lastWeek);
-        },
-        formatDate(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        },
-        async fetchTestResults() {            
             try {
-                this.$loading.show('테스트 결과를 불러오는 중입니다...');
-                this.totalTests = 0;
-                this.successfulTests = 0;
-                this.failedTests = 0;
-                this.inProgressTests = 0;
-                this.testResults = [];
+                this.$loading.show('장애 목록을 불러오는 중입니다...');
+                this.totalIncidents = 0;
+                this.criticalIncidents = 0;
+                this.warningIncidents = 0;
+                this.infoIncidents = 0;
+                this.incidents = [];
 
-                await new Promise(resolve => setTimeout(resolve, 750));
+                await new Promise(resolve => setTimeout(resolve, 750)); // 예시: 0.5초 지연
 
-                this.testResults = [
-                    { executionTime: '2023-05-01 10:30:00', project: '소비자금융시스템', testType: '단위 테스트', testSuite: '로그인 기능', status: '성공', successRate: '100%', duration: '2m 30s' },
-                    { executionTime: '2023-05-01 11:15:00', project: '소비자금융시스템', testType: '통합 테스트', testSuite: '결제 프로세스', status: '실패', successRate: '80%', duration: '5m 45s' },
-                    { executionTime: '2023-05-02 09:00:00', project: '일반여신시스템', testType: 'E2E 테스트', testSuite: '사용자 등록 플로우', status: '진행 중', successRate: 'N/A', duration: '10m 20s' },
-                    { executionTime: '2023-05-02 14:30:00', project: '모바일앱', testType: '성능 테스트', testSuite: '데이터베이스 조회', status: '성공', successRate: '95%', duration: '15m 10s' },
-                    { executionTime: '2023-05-03 08:45:00', project: '통합웹', testType: '통합 테스트', testSuite: '알림 시스템', status: '대기 중', successRate: 'N/A', duration: 'N/A' },
+                // 실제로는 API 호출을 통해 데이터를 가져와야 합니다.
+                // 여기서는 예시 데이터를 사용합니다.
+                this.incidents = [
+                    { timestamp: '2023-05-01 10:30:00', system: '소비자금융시스템', severity: '심각', description: '대출 한도조회 오류', status: '조치중' },
+                    { timestamp: '2023-05-01 10:25:00', system: '소비자금융시스템', severity: '심각', description: '1원 송금 오류', status: '완료' },
+                    { timestamp: '2023-05-01 10:27:00', system: '소비자금융시스템', severity: '심각', description: '네이버페이 한도조회 오류', status: '완료' },
+                    { timestamp: '2023-05-02 14:15:00', system: '일반여신시스템', severity: '경고', description: '스크래핑 오류', status: '모니터링중' },
+
+                    { timestamp: '2023-05-03 09:00:00', system: '모바일앱', severity: '경고', description: '일반 점검', status: '완료' },
+                    { timestamp: '2023-05-03 07:33:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
+                    { timestamp: '2023-05-03 07:23:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
+                    { timestamp: '2023-05-03 07:13:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
+                    { timestamp: '2023-05-03 07:03:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
+                    { timestamp: '2023-05-03 06:53:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
+                    { timestamp: '2023-05-03 06:43:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
+                    { timestamp: '2023-05-03 06:33:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
+                    { timestamp: '2023-05-03 06:23:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
+                    { timestamp: '2023-05-03 06:13:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
+                    { timestamp: '2023-05-03 06:03:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
+                    { timestamp: '2023-05-03 05:53:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
                 ];
-                this.updateTestSummary();
+                this.updateIncidentSummary();
+
             } finally {
                 this.$loading.hide();
             }
         },
-        updateTestSummary() {
-            this.totalTests = this.testResults.length;
-            this.successfulTests = this.testResults.filter(t => t.status === '성공').length;
-            this.failedTests = this.testResults.filter(t => t.status === '실패').length;
-            this.inProgressTests = this.testResults.filter(t => t.status === '진행 중').length;
+        updateIncidentSummary() {
+            this.totalIncidents = this.incidents.length;
+            this.criticalIncidents = this.incidents.filter(i => i.severity === '심각').length;
+            this.warningIncidents = this.incidents.filter(i => i.severity === '경고').length;
+            this.infoIncidents = this.incidents.filter(i => i.severity === '정보').length;
         },
-        getTestTypeColor(testType) {
-            const index = testTypes.indexOf(testType);
+        getSeverityColor(severity) {
+            const index = severities.indexOf(severity);
+
             if (index >= 0)
-                return testTypes_color[index];
+                return severities_color[index];
             else
                 return 'grey';
         },
         getStatusColor(status) {
+
             switch (status) {
-                case '성공': return 'green';
-                case '실패': return 'red';
-                case '진행 중': return 'orange';
-                case '대기 중': return 'grey';
+                case '조치중': return 'red';
+                case '모니터링중': return 'orange';
+                case '완료': return 'green';
                 default: return 'grey';
             }
         },
         toggleAll(filterType) {
-            if (this.filters[filterType].length === this[filterType].length) {
-                this.filters[filterType] = [];
-            } else {
-                this.filters[filterType] = [...this[filterType]];
-            }
+            this.filters[filterType] = this.$util.toggleAll(this[filterType], this.filters[filterType]);
         },
         isAllSelected(filterType) {
-            return this.filters[filterType].length === this[filterType].length;
+            return this.$util.isAllSelected(this[filterType], this.filters[filterType]);
         },
         getIcon(filterType) {
-            return this.isAllSelected(filterType) ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline';
+            return this.$util.getIcon(this.isAllSelected(filterType));
         },
+
     },
     created() {
-        this.setLastWeekDates();
+        const dates = this.$util.setLastWeekDates();
+        this.startDate = dates.startDate;
+        this.endDate = dates.endDate;
     },
     mounted() {
         this.search();
@@ -254,7 +263,7 @@ const comp = module.exports = {
 }
 </script>
 
-<style scoped>
+<<style scoped>
 @media (max-width: 600px) {
     .v-data-table .v-data-table__wrapper {
         overflow-x: auto;
@@ -263,5 +272,6 @@ const comp = module.exports = {
 
 .custom-table {
     border-top: 2px solid var(--v-primary-lighten3);
-}
+    }
+    
 </style>
