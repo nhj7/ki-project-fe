@@ -61,10 +61,10 @@
                                 <v-menu v-model="startDateMenu" :close-on-content-click="false"
                                     transition="scale-transition" offset-y max-width="290px" min-width="290px">
                                     <template v-slot:activator="{ on, attrs }">
-                                        <v-text-field v-model="startDate" label="시작 날짜" readonly v-bind="attrs"
+                                        <v-text-field v-model="filters.startDate" label="시작 날짜" readonly v-bind="attrs"
                                             v-on="on" outlined dense hide-details ></v-text-field>
                                     </template>
-                                    <v-date-picker v-model="startDate" no-title
+                                    <v-date-picker v-model="filters.startDate" no-title
                                         @input="startDateMenu = false"></v-date-picker>
                                 </v-menu>
                             </v-col>
@@ -72,10 +72,10 @@
                                 <v-menu v-model="endDateMenu" :close-on-content-click="false"
                                     transition="scale-transition" offset-y max-width="290px" min-width="290px">
                                     <template v-slot:activator="{ on, attrs }">
-                                        <v-text-field v-model="endDate" label="종료 날짜" readonly v-bind="attrs" v-on="on"
+                                        <v-text-field v-model="filters.endDate" label="종료 날짜" readonly v-bind="attrs" v-on="on"
                                             outlined dense hide-details class="primary--text"></v-text-field>
                                     </template>
-                                    <v-date-picker v-model="endDate" no-title
+                                    <v-date-picker v-model="filters.endDate" no-title
                                         @input="endDateMenu = false"></v-date-picker>
                                 </v-menu>
                             </v-col>
@@ -130,9 +130,7 @@ const statuses = ['성공', '실패', '진행 중', '대기 중'];
 
 const comp = module.exports = {
     data() {
-        return {
-            startDate: '',
-            endDate: '',
+        return {            
             startDateMenu: false,
             endDateMenu: false,
             projects: projects,
@@ -141,7 +139,9 @@ const comp = module.exports = {
             filters: {
                 projects: projects,
                 testTypes: testTypes,
-                statuses: statuses
+                statuses: statuses,
+                startDate : '',
+                endDate : ''
             },
             headers: [
                 { text: '실행 시간', align: 'start', sortable: true, value: 'executionTime' },
@@ -185,7 +185,9 @@ const comp = module.exports = {
                 this.inProgressTests = 0;
                 this.testResults = [];
 
-                await new Promise(resolve => setTimeout(resolve, 500));
+                console.log('조회 요청 : ', this.filters);
+
+                await new Promise(resolve => setTimeout(resolve, 300));
 
                 this.testResults = [
                     { executionTime: '2023-05-01 10:30:00', project: '소비자금융시스템', testType: '단위 테스트', testSuite: '로그인 기능', status: '성공', successRate: '100%', duration: '2m 30s' },
@@ -194,6 +196,9 @@ const comp = module.exports = {
                     { executionTime: '2023-05-02 14:30:00', project: '모바일앱', testType: '성능 테스트', testSuite: '데이터베이스 조회', status: '성공', successRate: '95%', duration: '15m 10s' },
                     { executionTime: '2023-05-03 08:45:00', project: '통합웹', testType: '통합 테스트', testSuite: '알림 시스템', status: '대기 중', successRate: 'N/A', duration: 'N/A' },
                 ];
+
+                console.log('조회 응답 : ', this.testResults);
+
                 this.updateTestSummary();
             } finally {
                 this.$loading.hide();
@@ -237,8 +242,8 @@ const comp = module.exports = {
     },
     created() {
         const dates = this.$util.setLastWeekDates();
-        this.startDate = dates.startDate;
-        this.endDate = dates.endDate;
+        this.filters.startDate = dates.startDate;
+        this.filters.endDate = dates.endDate;
     },
     mounted() {
         this.search();

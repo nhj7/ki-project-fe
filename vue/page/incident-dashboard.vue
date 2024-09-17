@@ -65,10 +65,10 @@
                                 <v-menu v-model="startDateMenu" :close-on-content-click="false"
                                     transition="scale-transition" offset-y max-width="290px" min-width="290px">
                                     <template v-slot:activator="{ on, attrs }">
-                                        <v-text-field v-model="startDate" label="시작 날짜" readonly v-bind="attrs"
+                                        <v-text-field v-model="filters.startDate" label="시작 날짜" readonly v-bind="attrs"
                                             v-on="on" outlined dense hide-details></v-text-field>
                                     </template>
-                                    <v-date-picker v-model="startDate" no-title
+                                    <v-date-picker v-model="filters.startDate" no-title
                                         @input="startDateMenu = false"></v-date-picker>
                                 </v-menu>
                             </v-col>
@@ -76,10 +76,10 @@
                                 <v-menu v-model="endDateMenu" :close-on-content-click="false"
                                     transition="scale-transition" offset-y max-width="290px" min-width="290px">
                                     <template v-slot:activator="{ on, attrs }">
-                                        <v-text-field v-model="endDate" label="종료 날짜" readonly v-bind="attrs" v-on="on"
+                                        <v-text-field v-model="filters.endDate" label="종료 날짜" readonly v-bind="attrs" v-on="on"
                                             outlined dense hide-details></v-text-field>
                                     </template>
-                                    <v-date-picker v-model="endDate" no-title
+                                    <v-date-picker v-model="filters.endDate" no-title
                                         @input="endDateMenu = false"></v-date-picker>
                                 </v-menu>
                             </v-col>
@@ -144,8 +144,7 @@ const status = ['조치중', '모니터링중', '완료'];
 const comp = module.exports = {
     data() {
         return {
-            startDate: '',
-            endDate: '',
+            
             startDateMenu: false,
             endDateMenu: false,
             systems: systems,
@@ -154,7 +153,9 @@ const comp = module.exports = {
             filters: {
                 systems: systems,
                 severities: severities.slice(0, 2),
-                status: status
+                status: status,
+                startDate: '',
+                endDate: '',
             },
             headers: [
                 { text: '발생시간', align: 'start', sortable: true, value: 'timestamp' },
@@ -199,7 +200,9 @@ const comp = module.exports = {
                 this.infoIncidents = 0;
                 this.incidents = [];
 
-                await new Promise(resolve => setTimeout(resolve, 500)); // 예시: 0.5초 지연
+                console.log('조회 요청 : ', this.filters);
+
+                await new Promise(resolve => setTimeout(resolve, 300)); // 예시: 0.5초 지연
 
                 // 실제로는 API 호출을 통해 데이터를 가져와야 합니다.
                 // 여기서는 예시 데이터를 사용합니다.
@@ -222,6 +225,10 @@ const comp = module.exports = {
                     { timestamp: '2023-05-03 06:03:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
                     { timestamp: '2023-05-03 05:53:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
                 ];
+
+                console.log('조회 응답 : ', this.incidents);
+
+
                 this.updateIncidentSummary();
 
             } finally {
@@ -264,8 +271,8 @@ const comp = module.exports = {
     },
     created() {
         const dates = this.$util.setLastWeekDates();
-        this.startDate = dates.startDate;
-        this.endDate = dates.endDate;
+        this.filters.startDate = dates.startDate;
+        this.filters.endDate = dates.endDate;
     },
     mounted() {
         this.search();

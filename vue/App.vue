@@ -36,7 +36,7 @@
                 </v-list-item>
 
                 <v-divider></v-divider>
-                
+
                 <v-list-item
                     v-for="(route, i) in this.$router.options.routes.filter(route => route.meta && route.meta.showInMenu)"
                     :key="i" :to="route.path" class="lnb-item rounded-lg">
@@ -49,7 +49,7 @@
                             {{ route.meta.title }}
                         </v-list-item-title>
                     </v-list-item-content>
-                    
+
                 </v-list-item>
 
 
@@ -72,7 +72,7 @@
         </v-app-bar>
 
         <v-main>
-            <v-container>
+            <v-container lass="fill-height pa-0" fluid>
                 <h2 class="text-subtitle-2 mb-2 d-flex align-center">
                     <v-icon size="24" :color="this.$route.meta.iconColor || 'primary'" class="mr-2">{{
             this.$route.meta.icon
@@ -81,7 +81,17 @@
                 </h2>
                 <v-divider class=""></v-divider>
                 <!--component :is="currentView"></component-->
-                <router-view></router-view>
+                <div class="router-view-container">
+                    <router-view></router-view>
+                    <v-overlay :value="$loading.isLoading" :opacity="0.05" absolute>
+                        <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
+                            <v-icon size="40" color="primary">mdi-magnify</v-icon>
+                        </v-progress-circular>
+                        <div class="loading-text mt-4 primary--text">
+                            {{ $loading.loadingText }}
+                        </div>
+                    </v-overlay>
+                </div>
             </v-container>
         </v-main>
 
@@ -134,14 +144,7 @@
             </template>
         </v-snackbar>
 
-        <v-overlay :value="$loading.isLoading" :opacity="0.5">
-            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
-                <v-icon size="40" color="white">mdi-magnify</v-icon>
-            </v-progress-circular>
-            <div class="loading-text mt-4">
-                {{ $loading.loadingText }}
-            </div>
-        </v-overlay>
+
 
     </v-app>
 </template>
@@ -175,12 +178,12 @@ const comp = module.exports = {
         }
     }
     , mounted() {
-        console.log("App.vue mounted");
+        //console.log("App.vue mounted");
     }
     , components: {
 
     }, created() {
-        console.log("app.vue created", this, this.$options.components);
+        //console.log("app.vue created", this, this.$options.components);
         //this.$router.addRoutes(router);
     }
 }
@@ -220,6 +223,23 @@ Vue.prototype.$util = globalMethods;
 </script>
 
 <style scoped>
+
+.router-view-container {
+  position: relative;
+  height: calc(100vh - 128px); /* 예상 상단 바 높이를 뺀 값 */
+  overflow-y: auto;
+  
+}
+
+.v-main {
+  padding-top: 64px !important; /* 상단 바 높이에 맞춰 조정 */
+}
+
+.v-main > .container {
+  height: calc(100vh - 64px); /* 상단 바 높이를 뺀 전체 높이 */
+}
+
+
 .theme--dark .v-list-item--active {
     color: rgb(33, 150, 243);
     /* color: burlywood; */
@@ -262,7 +282,7 @@ Vue.prototype.$util = globalMethods;
 
 .v-data-table-header th {
     background-color: var(--v-accent-lighten5) !important;
-    
+
     font-weight: bold !important;
     cursor: pointer !important;
     transition: background-color 0.2s, color 0.2s !important;
@@ -279,6 +299,7 @@ Vue.prototype.$util = globalMethods;
 .v-data-table-header th .v-data-table-header__icon {
     color: var(--v-accent-base) !important;
 }
+
 /* 다크 테마 대응 */
 .theme--dark .v-data-table-header th {
     background-color: var(--v-grey-darken4) !important;
@@ -302,15 +323,15 @@ Vue.prototype.$util = globalMethods;
 
 /* 점선 스타일의 divider 추가 */
 .v-divider.theme--light {
-  border-style: dashed !important;
-  border-width: 1px !important;
-  border-color: rgba(0, 0, 0, 0.12) !important;
+    border-style: dashed !important;
+    border-width: 1px !important;
+    border-color: rgba(0, 0, 0, 0.12) !important;
 }
 
 .v-divider.theme--dark {
-  border-style: dashed !important;
-  border-width: 1px !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
+    border-style: dashed !important;
+    border-width: 1px !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 
@@ -319,23 +340,30 @@ Vue.prototype.$util = globalMethods;
     border-top: 1px solid var(--v-primary-lighten5);
 }
 
-.custom-table .v-data-table__wrapper > table > tbody > tr > td {
-  /* border-bottom: none !important; */
+.custom-table .v-data-table__wrapper>table>tbody>tr>td {
+    /* border-bottom: none !important; */
 }
 
 .lnb-item {
-  margin-bottom: 4px; /* 원하는 간격 크기로 조정 가능 */
-  border-radius: 8px !important; /* 모서리 둥글기 정도 */
-  /* transition: background-color 0.3s ease;  부드러운 배경색 전환 효과 */
+    margin-bottom: 4px;
+    /* 원하는 간격 크기로 조정 가능 */
+    border-radius: 8px !important;
+    /* 모서리 둥글기 정도 */
+    /* transition: background-color 0.3s ease;  부드러운 배경색 전환 효과 */
 }
 
 /* v-list 자체의 패딩 조정 */
 .v-list {
-  padding: 8px; /* v-list의 내부 여백 조정 */
-  border-radius: 8px !important; /* 모서리 둥글기 정도 */
+    padding: 8px;
+    /* v-list의 내부 여백 조정 */
+    border-radius: 8px !important;
+    /* 모서리 둥글기 정도 */
 }
 
 .v-list-item--link:before {
-  border-radius: 8px !important; /* 모서리 둥글기 정도 */
-}    
+    border-radius: 8px !important;
+    /* 모서리 둥글기 정도 */
+}
+
+
 </style>

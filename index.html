@@ -240,17 +240,17 @@
                 },
             }
             , beforeCreate() {
-                console.log("beforeCreate", this.$vuetify);
+                //console.log("beforeCreate", this.$vuetify);
 
             }
             , created() {
-                console.log("created");
+                //console.log("created");
             }
             , mounted: function () {
-                console.log("mounted");
+                //console.log("mounted");
                 //steem.api.setOptions({url: 'https://api.steemitstage.com/'});
 
-                console.log(this.$route) // outputs 'yay'
+                //console.log(this.$route) // outputs 'yay'
                 if (this.$route && this.$route.hash != "") {
                     //var vueName = this.$route.hash.substring(1);
                     //this.$data.currentView = vueName;
