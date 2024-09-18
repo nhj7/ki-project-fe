@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+    <v-container fluid>
         <v-row>
             <v-col>
                 <!-- 조회 조건 -->
@@ -76,8 +76,8 @@
                                 <v-menu v-model="endDateMenu" :close-on-content-click="false"
                                     transition="scale-transition" offset-y max-width="290px" min-width="290px">
                                     <template v-slot:activator="{ on, attrs }">
-                                        <v-text-field v-model="filters.endDate" label="종료 날짜" readonly v-bind="attrs" v-on="on"
-                                            outlined dense hide-details></v-text-field>
+                                        <v-text-field v-model="filters.endDate" label="종료 날짜" readonly v-bind="attrs"
+                                            v-on="on" outlined dense hide-details></v-text-field>
                                     </template>
                                     <v-date-picker v-model="filters.endDate" no-title
                                         @input="endDateMenu = false"></v-date-picker>
@@ -95,27 +95,27 @@
                 <!-- 장애 현황 요약 -->
                 <!--v-card outlined class="mb-2 pa-0">
                     <v-card-text class="pb-0 pt-3"-->
-                        <v-row dense class="mb-2">
-                            <v-col v-for="(item, index) in summaryItems" :key="index" cols="12" sm="6" md="3">
-                                <v-card>
-                                    <v-card-text class="pa-2">
-                                        <div class="d-flex justify-space-between align-center">
-                                            <span class="text-subtitle-1 font-weight-bold pl-6" :class="item.color">{{
+                <v-row dense class="mb-2">
+                    <v-col v-for="(item, index) in summaryItems" :key="index" cols="12" sm="6" md="3">
+                        <v-card>
+                            <v-card-text class="pa-2">
+                                <div class="d-flex justify-space-between align-center">
+                                    <span class="text-subtitle-1 font-weight-bold pl-6" :class="item.color">{{
                                     item.label
                                 }}</span>
-                                            <span class="text-subtitle-1 font-weight-bold pr-6" :class="item.color">{{
+                                    <span class="text-subtitle-1 font-weight-bold pr-6" :class="item.color">{{
                                     item.value }}</span>
-                                        </div>
-                                    </v-card-text>
-                                </v-card>
-                            </v-col>
-                        </v-row>
-                    <!--/v-card-text>
+                                </div>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                </v-row>
+                <!--/v-card-text>
                 </v-card-->
 
                 <!-- 장애 목록 -->
                 <v-data-table :headers="headers" :items="incidents" :items-per-page="10"
-                    class="elevation-1 custom-table" :mobile-breakpoint="0">
+                    class="elevation-1 custom-table" :mobile-breakpoint="0" @click:row="showDetails">
                     <template v-slot:[`item.severity`]="{ item }">
                         <v-chip :color="getSeverityColor(item.severity)" dark small>
                             {{ item.severity }}
@@ -126,9 +126,59 @@
                             {{ item.status }}
                         </v-chip>
                     </template>
+                    <template v-slot:[`item.actions`]="{ item }">
+                        <v-btn small color="primary" @click="showDetails(item)">상세</v-btn>
+                    </template>
                 </v-data-table>
             </v-col>
         </v-row>
+
+        <!-- 상세 정보 팝업 -->
+        <v-dialog v-model="detailDialog" max-width="80%">
+            <v-card>
+                <v-card-title>
+                    <v-icon>mdi-information-outline</v-icon>
+                    &nbsp;&nbsp; 장애 상세 정보
+                </v-card-title>
+                <v-divider></v-divider>
+                <v-card-text>
+                    <v-simple-table class="fixed-table mb-2">
+                        <template v-slot:default>
+                            <tbody>
+                                <tr v-for="(row, index) in groupedIncidentDetails" :key="index">
+                                    <template v-for="(value, key) in row">
+                                        <td class="label-column">{{ getHeaderText(key) }}<!--eslint-disable-line-->
+                                        </td>
+                                        <td class="value-column"><!--eslint-disable-line-->
+                                            <template v-if="key !== 'status'">{{ value }}</template>
+                                            <v-select v-else v-model="selectedIncident.status" :items="status" dense
+                                                outlined hide-details class="small-select"></v-select>
+                                        </td>
+                                    </template>
+                                </tr>
+                            </tbody>
+                        </template>
+                    </v-simple-table>
+                    <v-divider></v-divider>
+                    <v-card-subtitle>
+                        <v-icon>mdi-list-box</v-icon>
+                        &nbsp;&nbsp; 장애 상세 거래 목록
+                    </v-card-subtitle>
+                    <v-data-table :headers="detailTransactionHeaders" :items="detailTransactions" :items-per-page="5"
+                        class="elevation-1" dense :height="200" fixed-header>
+                        <template v-slot:[`item.status`]="{ item }">
+                            <v-chip :color="getStatusColor(item.status)" small>
+                                {{ item.status }}
+                            </v-chip>
+                        </template>
+                    </v-data-table>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" text @click="detailDialog = false">닫기</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
 
     </v-container>
 </template>
@@ -144,7 +194,7 @@ const status = ['조치중', '모니터링중', '완료'];
 const comp = module.exports = {
     data() {
         return {
-            
+
             startDateMenu: false,
             endDateMenu: false,
             systems: systems,
@@ -163,12 +213,25 @@ const comp = module.exports = {
                 { text: '심각도', value: 'severity' },
                 { text: '장애내용', value: 'description' },
                 { text: '상태', value: 'status' },
+                { text: '상세', value: 'actions', sortable: false },
             ],
             incidents: [],
             totalIncidents: 0,
             criticalIncidents: 0,
             warningIncidents: 0,
             infoIncidents: 0,
+            detailDialog: false,
+            selectedIncident: null,
+            detailTransactionHeaders: [
+                { text: 'GUID', value: 'guid' },
+                { text: '프로그램 ID', value: 'programId' },
+                { text: '거래 시간', value: 'transactionTime' },
+                { text: '거래 유형', value: 'transactionType' },
+                { text: '사용자 ID', value: 'userId' },
+                { text: '금액', value: 'amount' },
+                { text: '상태', value: 'status' },
+            ],
+            detailTransactions: [],
         }
     },
 
@@ -184,8 +247,28 @@ const comp = module.exports = {
                 { label: '정보', value: this.infoIncidents, color: 'blue--text' },
             ];
         },
+        groupedIncidentDetails() {
+            const grouped = [];
+            const keys = Object.keys(this.selectedIncident);
+            for (let i = 0; i < keys.length; i += 3) {
+                const row = {};
+                row[keys[i]] = this.selectedIncident[keys[i]];
+                if (i + 1 < keys.length) {
+                    row[keys[i + 1]] = this.selectedIncident[keys[i + 1]];
+                }
+                if (i + 2 < keys.length) {
+                    row[keys[i + 2]] = this.selectedIncident[keys[i + 2]];
+                }
+                grouped.push(row);
+            }
+            return grouped;
+        }
     },
     methods: {
+        getHeaderText(key) {
+            const header = this.headers.find(h => h.value === key);
+            return header ? header.text : key;
+        },
         async search() {
             // 실제 검색 로직 구현
             this.fetchIncidents();
@@ -250,7 +333,7 @@ const comp = module.exports = {
                 return 'grey';
         },
         getStatusColor(status) {
-
+            if (true) return 'grey';
             switch (status) {
                 case '조치중': return 'red';
                 case '모니터링중': return 'orange';
@@ -266,6 +349,29 @@ const comp = module.exports = {
         },
         getIcon(filterType) {
             return this.$util.getIcon(this.isAllSelected(filterType));
+        },
+        showDetails(item) {
+            this.selectedIncident = item;
+            this.fetchDetailTransactions(item.guid);
+            this.detailDialog = true;
+        },
+        fetchDetailTransactions(incidentGuid) {
+            // 실제로는 API를 호출하여 데이터를 가져와야 합니다.
+            // 여기서는 예시 데이터를 사용합니다.
+            this.detailTransactions = [
+                { guid: 'tx001', programId: 'PROG001', transactionTime: '2023-05-01 10:30:15', transactionType: '입금', userId: 'user123', amount: 50000, status: '성공' },
+                { guid: 'tx002', programId: 'PROG002', transactionTime: '2023-05-01 10:31:20', transactionType: '출금', userId: 'user456', amount: 30000, status: '실패' },
+                { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
+                { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
+                { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
+                { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
+                { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
+                { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
+                { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
+                { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
+                { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
+                // ... 더 많은 거래 데이터 ...
+            ];
         },
 
     },
@@ -284,6 +390,11 @@ const comp = module.exports = {
 @media (max-width: 600px) {
     .v-data-table .v-data-table__wrapper {
         overflow-x: auto;
-    }  }
+    }
+}
+
+
+
+
     
 </style>

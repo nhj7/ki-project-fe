@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+    <v-container fluid>
         <v-row>
             <v-col>
                 <!-- 조회 조건 -->
@@ -22,12 +22,14 @@
                                         </v-list-item>
                                         <v-divider class="mt-2"></v-divider>
                                     </template>
-                                    
-                                    <template v-slot:selection="{ item, index }"><!-- eslint-disable-line vue/no-unused-vars -->
+
+                                    <template
+                                        v-slot:selection="{ item, index }"><!-- eslint-disable-line vue/no-unused-vars -->
                                         <!--v-chip color="primary">
                                             {{ item }}
                                         </v-chip-->
-                                        <span class="primary--text" v-if="index === 0">{{ filters.projects.join(', ') }}</span>
+                                        <span class="primary--text" v-if="index === 0">{{ filters.projects.join(', ')
+                                            }}</span>
                                     </template>
                                 </v-select>
                             </v-col>
@@ -47,11 +49,13 @@
                                         </v-list-item>
                                         <v-divider class="mt-2"></v-divider>
                                     </template>
-                                    <template v-slot:selection="{ item, index }"><!-- eslint-disable-line vue/no-unused-vars -->
+                                    <template
+                                        v-slot:selection="{ item, index }"><!-- eslint-disable-line vue/no-unused-vars -->
                                         <!--v-chip color="primary">
                                             {{ item }}
-                                        </v-chip--> 
-                                        <span class="primary--text" v-if="index === 0">{{ filters.testTypes.join(', ') }}</span>
+                                        </v-chip-->
+                                        <span class="primary--text" v-if="index === 0">{{ filters.testTypes.join(', ')
+                                            }}</span>
                                     </template>
                                 </v-select>
                             </v-col>
@@ -62,7 +66,7 @@
                                     transition="scale-transition" offset-y max-width="290px" min-width="290px">
                                     <template v-slot:activator="{ on, attrs }">
                                         <v-text-field v-model="filters.startDate" label="시작 날짜" readonly v-bind="attrs"
-                                            v-on="on" outlined dense hide-details ></v-text-field>
+                                            v-on="on" outlined dense hide-details></v-text-field>
                                     </template>
                                     <v-date-picker v-model="filters.startDate" no-title
                                         @input="startDateMenu = false"></v-date-picker>
@@ -72,8 +76,8 @@
                                 <v-menu v-model="endDateMenu" :close-on-content-click="false"
                                     transition="scale-transition" offset-y max-width="290px" min-width="290px">
                                     <template v-slot:activator="{ on, attrs }">
-                                        <v-text-field v-model="filters.endDate" label="종료 날짜" readonly v-bind="attrs" v-on="on"
-                                            outlined dense hide-details class="primary--text"></v-text-field>
+                                        <v-text-field v-model="filters.endDate" label="종료 날짜" readonly v-bind="attrs"
+                                            v-on="on" outlined dense hide-details class="primary--text"></v-text-field>
                                     </template>
                                     <v-date-picker v-model="filters.endDate" no-title
                                         @input="endDateMenu = false"></v-date-picker>
@@ -130,7 +134,7 @@ const statuses = ['성공', '실패', '진행 중', '대기 중'];
 
 const comp = module.exports = {
     data() {
-        return {            
+        return {
             startDateMenu: false,
             endDateMenu: false,
             projects: projects,
@@ -140,8 +144,8 @@ const comp = module.exports = {
                 projects: projects,
                 testTypes: testTypes,
                 statuses: statuses,
-                startDate : '',
-                endDate : ''
+                startDate: '',
+                endDate: ''
             },
             headers: [
                 { text: '실행 시간', align: 'start', sortable: true, value: 'executionTime' },
@@ -176,7 +180,7 @@ const comp = module.exports = {
         async search() {
             this.fetchTestResults();
         },
-        async fetchTestResults() {            
+        async fetchTestResults() {
             try {
                 this.$loading.show('테스트 결과를 불러오는 중입니다...');
                 this.totalTests = 0;
@@ -259,8 +263,6 @@ const comp = module.exports = {
 }
 
 .custom-primary-text input {
-  color: var(--v-primary-base) !important;
+    color: var(--v-primary-base) !important;
 }
-
-
 </style>

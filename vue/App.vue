@@ -1,12 +1,18 @@
 <template>
-    <v-app>
-        <v-navigation-drawer v-model="drawer" :mini-variant="miniVariant" :clipped="clipped" fixed app>
+    <v-app dark>
+        <v-navigation-drawer v-model="drawer" :mini-variant="miniVariant" :clipped="clipped" fixed app class="custom-nav-drawer">
             <v-list-item @click.stop="drawer = !drawer">
                 <v-list-item-content>
                     <v-list-item-title class="title">
                         <v-row>
                             <v-col cols="6" md="6" class="text-right">
-                                <v-list-item @click.stop="drawer = !drawer">{{ title }}</v-list-item>
+                                <v-tooltip bottom >
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-list-item v-bind="attrs" v-on="on" @click.stop="drawer = !drawer">{{ "KI-CMS" }}</v-list-item>
+                                    </template>
+                                    <span>Korea Investment Competition Mock System</span>
+                                </v-tooltip>
+
                                 <!--v-img src="/assets/ci.png" :width="30" cover /-->
                             </v-col>
                             <v-col cols="6" md="6" d-flex justify-start>
@@ -17,7 +23,7 @@
                         <!--v-icon class="float-right">mdi-close</v-icon-->
                     </v-list-item-title>
                     <v-list-item-subtitle>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 대화형 금융 분석 보고서 생성 시스템
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 한국투자 경진대회 모의 시스템
                     </v-list-item-subtitle>
                 </v-list-item-content>
             </v-list-item>
@@ -27,19 +33,19 @@
                     <v-btn icon @click.stop="miniVariant = !miniVariant">
                         <v-icon>mdi-{{ `chevron-${miniVariant ? "right" : "left"}` }}</v-icon>
                     </v-btn>
-                    <!--v-btn icon @click.stop="clipped = !clipped">
+                    <v-btn icon @click.stop="clipped = !clipped">
                         <v-icon>mdi-application</v-icon>
-                    </v-btn-->
-                    <!--v-btn icon @click.stop="fixed = !fixed">
+                    </v-btn>
+                    <v-btn icon @click.stop="fixed = !fixed">
                         <v-icon>mdi-minus</v-icon>
-                    </v-btn-->
+                    </v-btn>
                 </v-list-item>
 
                 <v-divider></v-divider>
 
                 <v-list-item
                     v-for="(route, i) in this.$router.options.routes.filter(route => route.meta && route.meta.showInMenu)"
-                    :key="i" :to="route.path" class="lnb-item rounded-lg">
+                    :key="i" :to="route.path" class="lnb-item rounded-lg  " dense>
 
                     <v-list-item-action>
                         <v-icon>{{ route.meta.icon }}</v-icon>
@@ -57,18 +63,16 @@
         </v-navigation-drawer>
 
         <v-app-bar :clipped-left="clipped" fixed app flat class="app-bar-with-border">
-            <v-row>
-                <v-col cols="auto" class="d-flex align-center cursor-pointer" @click.stop="drawer = !drawer">
-                    <v-app-bar-nav-icon></v-app-bar-nav-icon>
-                    <!--v-img src="/assets/ci4.jpg" :width="150" @click.stop="drawer = !drawer" /-->
-                    <h1 class="text-h6">한국투자</h1>
-                </v-col>
-                <v-col cols="auto" class="d-flex align-right">
-                    <v-btn icon @click.stop="rightDrawer = !rightDrawer">
+            <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+            <!--v-img src="/assets/ci4.jpg" :width="150" @click.stop="drawer = !drawer" /-->
+            <v-toolbar-title class="text-h6 cursor-pointer" @click.stop="drawer = !drawer">한국투자</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <!--v-btn icon @click.stop="rightDrawer = !rightDrawer">
                         <v-icon>mdi-cog</v-icon>
-                    </v-btn>
-                </v-col>
-            </v-row>
+                    </v-btn-->
+            <v-btn icon @click="toggleDarkTheme">
+                <v-icon>{{ themeIcon }}</v-icon>
+            </v-btn>
         </v-app-bar>
 
         <v-main>
@@ -81,14 +85,16 @@
                 </h2>
                 <v-divider class=""></v-divider>
                 <!--component :is="currentView"></component-->
-                <div class="router-view-container">
+                <div class="router-view-container flex-grow-1">
                     <router-view></router-view>
-                    <v-overlay :value="$loading.isLoading" :opacity="0.05" absolute>
-                        <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
-                            <v-icon size="40" color="primary">mdi-magnify</v-icon>
-                        </v-progress-circular>
-                        <div class="loading-text mt-4 primary--text">
-                            {{ $loading.loadingText }}
+                    <v-overlay :value="$loading.isLoading" :opacity="0.05" absolute class="loading-overlay">
+                        <div class="loading-content">
+                            <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
+                                <v-icon size="40" color="primary">mdi-magnify</v-icon>
+                            </v-progress-circular>
+                            <div class="loading-text mt-4 primary--text">
+                                {{ $loading.loadingText }}
+                            </div>
                         </div>
                     </v-overlay>
                 </div>
@@ -106,7 +112,7 @@
 
                 <v-divider></v-divider>
 
-                <v-list-item @click="setDarkTheme">
+                <v-list-item @click="toggleDarkTheme">
                     <v-list-item-action>
                         <v-icon>
                             {{ isDark ? "mdi-lightbulb-off" : "mdi-lightbulb-on" }}
@@ -169,22 +175,34 @@ const comp = module.exports = {
     name: "App"
     , data() {
         return data;
-    } // end data
-    , methods: {
-        setDarkTheme() {
+    }, // end data
+    computed: {
+        themeIcon() {
+            return this.isDark ? 'mdi-weather-night' : 'mdi-weather-sunny';
+        }
+    },
+    methods: {
+        toggleDarkTheme() {
             data.isDark = !data.isDark;
             this.$vuetify.theme.dark = data.isDark;
             console.log(this.$vuetify.theme.dark);
+            localStorage.setItem('darkTheme', this.isDark);
         }
     }
     , mounted() {
         //console.log("App.vue mounted");
+
     }
     , components: {
 
     }, created() {
         //console.log("app.vue created", this, this.$options.components);
         //this.$router.addRoutes(router);
+        const savedTheme = localStorage.getItem('darkTheme');
+        if (savedTheme !== null) {
+            this.isDark = JSON.parse(savedTheme);
+            this.$vuetify.theme.dark = this.isDark;
+        }
     }
 }
 
@@ -215,28 +233,46 @@ const globalMethods = {
     },
     getIcon(isSelected) {
         return isSelected ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline';
+    },
+    numberWithComma(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 };
 
 Vue.prototype.$util = globalMethods;
-
 </script>
 
 <style scoped>
-
 .router-view-container {
-  position: relative;
-  height: calc(100vh - 128px); /* 예상 상단 바 높이를 뺀 값 */
-  overflow-y: auto;
-  
+    position: relative;
+    height: calc(100vh - 28px);
+    /* 예상 상단 바 높이를 뺀 값 */
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.loading-overlay {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.loading-content {
+    margin-top: 85%;
+    /* 상단에서의 거리를 조절 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .v-main {
-  padding-top: 64px !important; /* 상단 바 높이에 맞춰 조정 */
+    padding-top: 64px !important;
+    /* 상단 바 높이에 맞춰 조정 */
 }
 
-.v-main > .container {
-  height: calc(100vh - 64px); /* 상단 바 높이를 뺀 전체 높이 */
+.v-main>.container {
+    height: calc(100vh - 64px);
+    /* 상단 바 높이를 뺀 전체 높이 */
 }
 
 
@@ -267,8 +303,11 @@ Vue.prototype.$util = globalMethods;
 }
 
 .app-bar-with-border {
-    border-bottom: 2px solid silver !important;
-    /* 두께와 색상 지정 */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important; /* 라이트 모드 */
+}
+
+.theme--dark .app-bar-with-border {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important; /* 다크 모드 */
 }
 
 .v-text-field input {
@@ -331,7 +370,7 @@ Vue.prototype.$util = globalMethods;
 .v-divider.theme--dark {
     border-style: dashed !important;
     border-width: 1px !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
+    
 }
 
 
@@ -340,9 +379,11 @@ Vue.prototype.$util = globalMethods;
     border-top: 1px solid var(--v-primary-lighten5);
 }
 
+/*
 .custom-table .v-data-table__wrapper>table>tbody>tr>td {
-    /* border-bottom: none !important; */
+    /* border-bottom: none !important;
 }
+*/
 
 .lnb-item {
     margin-bottom: 4px;
@@ -350,6 +391,11 @@ Vue.prototype.$util = globalMethods;
     border-radius: 8px !important;
     /* 모서리 둥글기 정도 */
     /* transition: background-color 0.3s ease;  부드러운 배경색 전환 효과 */
+    
+}
+
+.lnb-item .v-list-item__title{
+    font-size: 0.75rem;
 }
 
 /* v-list 자체의 패딩 조정 */
@@ -365,5 +411,71 @@ Vue.prototype.$util = globalMethods;
     /* 모서리 둥글기 정도 */
 }
 
+.small-select {
+    font-size: 0.85rem;
+    width: 80%;
+}
+
+.small-select ::v-deep .v-input__control {
+    max-height: 20px;
+}
+
+.small-select ::v-deep .v-input__slot {
+    max-height: 20px;
+}
+
+.small-select ::v-deep .v-select__selection {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.fixed-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.fixed-table .label-column {
+    width: 70px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background-color: var(--v-primary-lighten5);
+    color: var(--v-primary-darken1);
+}
+
+.fixed-table .value-column {
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+}
+
+/* 다크 모드 대응 */
+.theme--dark .fixed-table .label-column {
+    background-color: var(--v-primary-darken4);
+    color: var(--v-primary-lighten4);
+}
+
+.theme--dark .fixed-table .value-column {
+    background-color: #333333;
+}
+
+/* 새로운 스타일 추가 */
+.theme--dark .custom-nav-drawer {
+  background-color: #121212 !important; /* v-app-bar의 기본 다크모드 색상 */
+}
+
+.v-data-table__wrapper table tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.02) !important;
+    /* 라이트 테마 */
+    cursor: pointer;
+}
+
+/* 다크 테마 대응 */
+.theme--dark .v-data-table__wrapper table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.03)!important;
+}
 
 </style>

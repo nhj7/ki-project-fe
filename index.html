@@ -12,7 +12,7 @@
     <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
     <meta http-equiv="pragma" content="no-cache" />
     <meta name="msapplication-TileColor" content="#FFFFFF">
-
+    <link rel="icon" href="/assets/ci.png" type="image/x-icon">
     <title>KI-CFRS</title>
 
     <link href="https://cdn.jsdelivr.net/npm/vuetify@2/dist/vuetify.min.css" rel="stylesheet">
@@ -25,10 +25,12 @@
     <script src="https://unpkg.com/http-vue-loader"></script>
     <script src="https://unpkg.com/vue-router@2/dist/vue-router.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-apexcharts"></script>
 
-
-
-
+    <script src="https://cdn.jsdelivr.net/npm/echarts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-echarts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
 </head>
 
 <body>
@@ -178,11 +180,26 @@
                     }
                 }
                 , {
+                    path: '/live-transaction-analytics', name: 'live-transaction-analytics', component: loadVue('./page/live-transaction-analytics'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-clock-fast",
+                        title: "실시간 트랜잭션 분석",
+                    }
+                }
+                , {
                     path: '/incident-dashboard', name: 'incident-dashboard', component: loadVue('./page/incident-dashboard'), meta: {
                         showInMenu: true,
                         icon: "mdi-lan-check",
                         iconColor: "orange",
-                        title: "장애탐지현황",
+                        title: "서비스이상탐지현황",
+                    }
+                }
+                , {
+                    path: '/rule-configuration', name: 'rule-configuration', component: loadVue('./page/rule-configuration'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-clipboard-check-outline",
+                        iconColor: "green",
+                        title: "룰셋 설정",
                     }
                 }
                 , {
@@ -205,10 +222,25 @@
                 , {
                     path: '/page5', name: 'page5', component: loadVue('./page/page5'), meta: {
                         showInMenu: true,
-                        icon: "mdi-application",
-                        title: "환경설정",
+                        icon: "mdi-chart-line",
+                        title: "대시보드(샘플-apexcharts)",
                     }
                 }
+                , {
+                    path: '/page6', name: 'page6', component: loadVue('./page/page6'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-chart-line",
+                        title: "대시보드(샘플-echarts)",
+                    }
+                }
+                , {
+                    path: '/page7', name: 'page7', component: loadVue('./page/page7'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-monitor",
+                        title: "모니터링(샘플-echarts)",
+                    }
+                }
+                
             ]
         });
 
@@ -288,6 +320,8 @@
 
         Vue.use(LoadingPlugin);
 
+        
+
         /*
         const { createApp, ref, defineAsyncComponent } = Vue;
 
@@ -326,6 +360,7 @@
 
         */
     </script>
+    
 </body>
 
 </html>

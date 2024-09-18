@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+    <v-container fluid>
         <v-row>
             <v-col cols="12" md="6">
                 <v-text-field v-model="logoText" label="로고 텍스트" outlined></v-text-field>
