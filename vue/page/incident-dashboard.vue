@@ -138,7 +138,7 @@
             <v-card>
                 <v-card-title>
                     <v-icon>mdi-information-outline</v-icon>
-                    &nbsp;&nbsp; 장애 상세 정보
+                    &nbsp;&nbsp; 서비스 상세 정보
                 </v-card-title>
                 <v-divider></v-divider>
                 <v-card-text>
@@ -162,7 +162,7 @@
                     <v-divider></v-divider>
                     <v-card-subtitle>
                         <v-icon>mdi-list-box</v-icon>
-                        &nbsp;&nbsp; 장애 상세 거래 목록
+                        &nbsp;&nbsp; 서비스 상세 거래 목록
                     </v-card-subtitle>
                     <v-data-table :headers="detailTransactionHeaders" :items="detailTransactions" :items-per-page="5"
                         class="elevation-1" dense :height="200" fixed-header>
@@ -211,7 +211,7 @@ const comp = module.exports = {
                 { text: '발생시간', align: 'start', sortable: true, value: 'timestamp' },
                 { text: '시스템', value: 'system' },
                 { text: '심각도', value: 'severity' },
-                { text: '장애내용', value: 'description' },
+                { text: '서비스내용', value: 'description' },
                 { text: '상태', value: 'status' },
                 { text: '상세', value: 'actions', sortable: false },
             ],
@@ -241,7 +241,7 @@ const comp = module.exports = {
     computed: {
         summaryItems() {
             return [
-                { label: '전체 장애', value: this.totalIncidents, color: '' },
+                { label: '전체 건수', value: this.totalIncidents, color: '' },
                 { label: '심각', value: this.criticalIncidents, color: 'red--text' },
                 { label: '경고', value: this.warningIncidents, color: 'orange--text' },
                 { label: '정보', value: this.infoIncidents, color: 'blue--text' },

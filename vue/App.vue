@@ -1,16 +1,19 @@
 <template>
     <v-app dark>
-        <v-navigation-drawer v-model="drawer" :mini-variant="miniVariant" :clipped="clipped" fixed app class="custom-nav-drawer">
+        <v-navigation-drawer v-model="drawer" :mini-variant="miniVariant" :clipped="clipped" fixed app
+            class="custom-nav-drawer">
             <v-list-item @click.stop="drawer = !drawer">
                 <v-list-item-content>
                     <v-list-item-title class="title">
                         <v-row>
                             <v-col cols="6" md="6" class="text-right">
-                                <v-tooltip bottom >
+                                <v-tooltip bottom>
                                     <template v-slot:activator="{ on, attrs }">
-                                        <v-list-item v-bind="attrs" v-on="on" @click.stop="drawer = !drawer">{{ "KI-CMS" }}</v-list-item>
+                                        <v-list-item v-bind="attrs" v-on="on" @click.stop="drawer = !drawer">{{
+            "KI-SQMS"
+        }}</v-list-item>
                                     </template>
-                                    <span>Korea Investment Competition Mock System</span>
+                                    <span>Korea Investment Service Quality Management System</span>
                                 </v-tooltip>
 
                                 <!--v-img src="/assets/ci.png" :width="30" cover /-->
@@ -23,7 +26,7 @@
                         <!--v-icon class="float-right">mdi-close</v-icon-->
                     </v-list-item-title>
                     <v-list-item-subtitle>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 한국투자 경진대회 모의 시스템
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 한국투자 서비스 품질 관리 시스템
                     </v-list-item-subtitle>
                 </v-list-item-content>
             </v-list-item>
@@ -43,21 +46,42 @@
 
                 <v-divider></v-divider>
 
-                <v-list-item
-                    v-for="(route, i) in this.$router.options.routes.filter(route => route.meta && route.meta.showInMenu)"
-                    :key="i" :to="route.path" class="lnb-item rounded-lg  " dense>
 
-                    <v-list-item-action>
-                        <v-icon>{{ route.meta.icon }}</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                        <v-list-item-title>
-                            {{ route.meta.title }}
-                        </v-list-item-title>
-                    </v-list-item-content>
+                <template
+                    v-for="(route, i) in this.$router.options.routes.filter(route => route.meta && route.meta.showInMenu)">
 
-                </v-list-item>
+                    <v-list-group v-model="groupStates[i]" v-if="route.subRoutes" :key="i"
+                        :prepend-icon="route.meta.icon" no-action @input="updateGroupState(route.name, $event)">
+                        <template v-slot:activator>
+                            <v-list-item-content class="lnb-item rounded-lg  ">
+                                <v-list-item-title>{{ route.meta.title }}</v-list-item-title>
+                            </v-list-item-content>
+                        </template>
 
+                        <v-list-item v-for="subItem in route.subRoutes" :key="subItem.path" :to="subItem.path" link
+                            class="lnb-subItem rounded-lg pl-4 ">
+                            <v-list-item-action>
+                                <v-icon>{{ findRouteByPath(subItem.path).meta.icon }}</v-icon>
+                            </v-list-item-action>
+                            <v-list-item-content>
+                                <v-list-item-title>{{ findRouteByPath(subItem.path).meta.title }}</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list-group>
+
+                    <v-list-item v-else :key="route.path" :to="route.path" class="lnb-item rounded-lg  " dense>
+
+                        <v-list-item-action>
+                            <v-icon>{{ route.meta.icon }}</v-icon>
+                        </v-list-item-action>
+                        <v-list-item-content>
+                            <v-list-item-title>
+                                {{ route.meta.title }}
+                            </v-list-item-title>
+                        </v-list-item-content>
+
+                    </v-list-item>
+                </template>
 
             </v-list>
         </v-navigation-drawer>
@@ -167,6 +191,7 @@ const data = {
     right: true,
     rightDrawer: false,
     title: "KI-RS",
+    groupStates: [true, true]
 }
 
 
@@ -187,7 +212,14 @@ const comp = module.exports = {
             this.$vuetify.theme.dark = data.isDark;
             console.log(this.$vuetify.theme.dark);
             localStorage.setItem('darkTheme', this.isDark);
-        }
+        },
+        findRouteByPath(path) {
+            return this.$router.options.routes.find(route => route.path === path);
+        },
+        updateGroupState(group, value) {
+            console.log("updateGroupState", this.groupStates, group, value);
+            this.groupStates[0] = value;
+        },
     }
     , mounted() {
         //console.log("App.vue mounted");
@@ -303,11 +335,13 @@ Vue.prototype.$util = globalMethods;
 }
 
 .app-bar-with-border {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important; /* 라이트 모드 */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+    /* 라이트 모드 */
 }
 
 .theme--dark .app-bar-with-border {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important; /* 다크 모드 */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    /* 다크 모드 */
 }
 
 .v-text-field input {
@@ -370,7 +404,7 @@ Vue.prototype.$util = globalMethods;
 .v-divider.theme--dark {
     border-style: dashed !important;
     border-width: 1px !important;
-    
+
 }
 
 
@@ -391,11 +425,24 @@ Vue.prototype.$util = globalMethods;
     border-radius: 8px !important;
     /* 모서리 둥글기 정도 */
     /* transition: background-color 0.3s ease;  부드러운 배경색 전환 효과 */
-    
+
 }
 
-.lnb-item .v-list-item__title{
+.lnb-item .v-list-item__title {
     font-size: 0.75rem;
+}
+
+.lnb-subItem {
+    margin-bottom: 2px;
+    /* 원하는 간격 크기로 조정 가능 */
+    border-radius: 8px !important;
+    /* 모서리 둥글기 정도 */
+    /* transition: background-color 0.3s ease;  부드러운 배경색 전환 효과 */
+
+}
+
+.lnb-subItem .v-list-item__title {
+    font-size: 0.5rem !important;
 }
 
 /* v-list 자체의 패딩 조정 */
@@ -464,7 +511,8 @@ Vue.prototype.$util = globalMethods;
 
 /* 새로운 스타일 추가 */
 .theme--dark .custom-nav-drawer {
-  background-color: #121212 !important; /* v-app-bar의 기본 다크모드 색상 */
+    background-color: #121212 !important;
+    /* v-app-bar의 기본 다크모드 색상 */
 }
 
 .v-data-table__wrapper table tbody tr:hover {
@@ -475,7 +523,6 @@ Vue.prototype.$util = globalMethods;
 
 /* 다크 테마 대응 */
 .theme--dark .v-data-table__wrapper table tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.03)!important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
 }
-
 </style>

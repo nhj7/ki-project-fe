@@ -13,7 +13,7 @@
     <meta http-equiv="pragma" content="no-cache" />
     <meta name="msapplication-TileColor" content="#FFFFFF">
     <link rel="icon" href="/assets/ci.png" type="image/x-icon">
-    <title>KI-CFRS</title>
+    <title>KI-SQMS</title>
 
     <link href="https://cdn.jsdelivr.net/npm/vuetify@2/dist/vuetify.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet">
@@ -162,6 +162,8 @@
         }
 
         const Home = { template: '<div>Home</div>' }
+
+        
         const router = new VueRouter({
             // mode: 'history',
             routes: [
@@ -172,18 +174,12 @@
                         icon: "mdi-home",
                     }
                 }
-                , {
-                    path: '/chat', name: 'chat', component: loadVue('./page/chat'), meta: {
-                        showInMenu: true,
-                        icon: "mdi-chat-processing",
-                        title: "대화형 보고서 생성",
-                    }
-                }
+                
                 , {
                     path: '/live-transaction-analytics', name: 'live-transaction-analytics', component: loadVue('./page/live-transaction-analytics'), meta: {
                         showInMenu: true,
                         icon: "mdi-clock-fast",
-                        title: "실시간 트랜잭션 분석",
+                        title: "실시간 서비스 모니터링",
                     }
                 }
                 , {
@@ -191,7 +187,7 @@
                         showInMenu: true,
                         icon: "mdi-lan-check",
                         iconColor: "orange",
-                        title: "서비스이상탐지현황",
+                        title: "서비스 품질 이력 조회",
                     }
                 }
                 , {
@@ -202,45 +198,113 @@
                         title: "룰셋 설정",
                     }
                 }
-                , {
-                    path: '/page3', name: 'page3', component: loadVue('./page/page3'), meta: {
-                        showInMenu: true,
-                        icon: "mdi-clipboard-check-outline",
-                        iconColor: "green",
-                        title: "테스트 자동화 수행 현황",
-                    }
-                }
+                
                 , {
                     path: '/page4', name: 'page4', component: loadVue('./page/page4'), meta: {
-                        showInMenu: true,
+                        showInMenu: false,
                         icon: "mdi-dev-to",
                         iconColor: "info",
-                        title: "룰셋관리",
+                        title: "룰셋 관리",
                     }
 
                 }
+                
+                , {
+                    path: '#1', name: 'test', meta: {
+                        showInMenu: true,
+                        icon: "mdi-view-dashboard",
+                        title: "서비스 품질 테스트 센터",  
+                        isGroupOpen: true,
+                    }, subRoutes: [
+                        {
+                            path: '/page8'
+                        }
+                        , {
+                            path: '/page9'
+                        }
+                    ]
+                }
+
+                , {
+                    path: '#', name: 'sample', meta: {
+                        showInMenu: true,
+                        icon: "mdi-view-dashboard-outline",
+                        title: "샘플 페이지",  
+                        isGroupOpen: true,
+                    }, subRoutes: [
+                        {
+                            path: '/page5'
+                        }
+                        , {
+                            path: '/page6'
+                        }
+                        , {
+                            path: '/page7'
+                        }
+                        , {
+                            path: '/chat'
+                        }
+                        , {
+                            path: '/page3'
+                        }
+                        , {
+                            path: '/page4'
+                        }
+                    ]
+                }
+                
                 , {
                     path: '/page5', name: 'page5', component: loadVue('./page/page5'), meta: {
-                        showInMenu: true,
+                        showInMenu: false,
                         icon: "mdi-chart-line",
                         title: "대시보드(샘플-apexcharts)",
                     }
                 }
                 , {
                     path: '/page6', name: 'page6', component: loadVue('./page/page6'), meta: {
-                        showInMenu: true,
+                        showInMenu: false,
                         icon: "mdi-chart-line",
                         title: "대시보드(샘플-echarts)",
                     }
                 }
                 , {
                     path: '/page7', name: 'page7', component: loadVue('./page/page7'), meta: {
-                        showInMenu: true,
+                        showInMenu: false,
                         icon: "mdi-monitor",
                         title: "모니터링(샘플-echarts)",
                     }
                 }
-                
+                , {
+                    path: '/chat', name: 'chat', component: loadVue('./page/chat'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-chat-processing",
+                        title: "대화형 보고서 생성",
+                    }
+                }
+                , {
+                    path: '/page3', name: 'page3', component: loadVue('./page/page3'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-clipboard-check-outline",
+                        iconColor: "green",
+                        title: "테스트 자동화 수행 현황",
+                    }
+                }
+                , {
+                    path: '/page8', name: 'page8', component: loadVue('./page/page8'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-clipboard-check-outline",
+                        iconColor: "green",
+                        title: "모바일뱅킹 간편이체",
+                    }
+                }
+                , {
+                    path: '/page9', name: 'page9', component: loadVue('./page/page9'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-clipboard-check-outline",
+                        iconColor: "green",
+                        title: "모바일뱅킹 대출신청",
+                    }
+                }
             ]
         });
 
@@ -261,8 +325,7 @@
                 }
             }
             , components: {
-                'App': loadVue('App')
-                , 'Dashboard': loadVue('Dashboard')
+                'App': loadVue('App')                
                 //, 'page-title': PageTitle
             }
             , methods: {
@@ -320,7 +383,7 @@
 
         Vue.use(LoadingPlugin);
 
-        
+
 
         /*
         const { createApp, ref, defineAsyncComponent } = Vue;
@@ -360,7 +423,7 @@
 
         */
     </script>
-    
+
 </body>
 
 </html>
