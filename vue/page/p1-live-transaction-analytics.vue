@@ -207,6 +207,7 @@ const comp = module.exports = {
         this.startUpdating();
     },
     beforeDestroy: function () {
+        //console.log(`${this.$route.meta.title} beforeDestroy`);
         this.stopUpdating();
     }
 };

@@ -277,7 +277,7 @@ Vue.prototype.$util = globalMethods;
 <style scoped>
 .router-view-container {
     position: relative;
-    height: calc(100vh - 28px);
+    /* height: calc(100vh - 28px); */
     /* 예상 상단 바 높이를 뺀 값 */
     overflow-y: auto;
     flex-grow: 1;

@@ -176,14 +176,14 @@
                 }
                 
                 , {
-                    path: '/live-transaction-analytics', name: 'live-transaction-analytics', component: loadVue('./page/live-transaction-analytics'), meta: {
+                    path: '/live-transaction-analytics', name: 'live-transaction-analytics', component: loadVue('./page/p1-live-transaction-analytics'), meta: {
                         showInMenu: true,
                         icon: "mdi-clock-fast",
                         title: "실시간 서비스 모니터링",
                     }
                 }
                 , {
-                    path: '/incident-dashboard', name: 'incident-dashboard', component: loadVue('./page/incident-dashboard'), meta: {
+                    path: '/incident-dashboard', name: 'incident-dashboard', component: loadVue('./page/p2-incident-dashboard'), meta: {
                         showInMenu: true,
                         icon: "mdi-lan-check",
                         iconColor: "orange",
@@ -191,32 +191,35 @@
                     }
                 }
                 , {
-                    path: '/rule-configuration', name: 'rule-configuration', component: loadVue('./page/rule-configuration'), meta: {
+                    path: '/rule-configuration', name: 'rule-configuration', component: loadVue('./page/p3-rule-configuration'), meta: {
                         showInMenu: true,
                         icon: "mdi-clipboard-check-outline",
                         iconColor: "green",
                         title: "룰셋 설정",
                     }
                 }
-                
-                , {
-                    path: '/page4', name: 'page4', component: loadVue('./page/page4'), meta: {
-                        showInMenu: false,
-                        icon: "mdi-dev-to",
-                        iconColor: "info",
-                        title: "룰셋 관리",
-                    }
 
-                }
-                
                 , {
-                    path: '/page10', name: 'page10', component: loadVue('./page/page10'), meta: {
+                    path: '/api-list', name: 'api-list', component: loadVue('./page/p5-api-list'), meta: {
                         showInMenu: true,
                         icon: "mdi-dev-to",
                         iconColor: "info",
                         title: "API 명세",
                     }
                 }
+
+                
+                , {
+                    path: '/logo-generator', name: 'logo-generator', component: loadVue('./page/page4-logo-generator'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-dev-to",
+                        iconColor: "info",
+                        title: "로고 생성기",
+                    }
+
+                }
+                
+                
                 
                 , {
                     path: '#1', name: 'test', meta: {
@@ -226,10 +229,10 @@
                         isGroupOpen: true,
                     }, subRoutes: [
                         {
-                            path: '/page8'
+                            path: '/mobile-banking-transfer'
                         }
                         , {
-                            path: '/page9'
+                            path: '/mobile-banking-loan'
                         }
                     ]
                 }
@@ -242,56 +245,56 @@
                         isGroupOpen: true,
                     }, subRoutes: [
                         {
-                            path: '/page5'
+                            path: '/sample-apexcharts'
                         }
                         , {
-                            path: '/page6'
+                            path: '/sample-echarts'
                         }
                         , {
-                            path: '/page7'
+                            path: '/sample-transaction-flow'
                         }
                         , {
-                            path: '/chat'
+                            path: '/sample-chat'
                         }
                         , {
-                            path: '/page3'
+                            path: '/test-automation'
                         }
                         , {
-                            path: '/page4'
+                            path: '/logo-generator'
                         }
                     ]
                 }
                 
                 , {
-                    path: '/page5', name: 'page5', component: loadVue('./page/page5'), meta: {
+                    path: '/sample-apexcharts', name: 'sample-apexcharts', component: loadVue('./page/page5-sample-apexcharts'), meta: {
                         showInMenu: false,
                         icon: "mdi-chart-line",
                         title: "대시보드(샘플-apexcharts)",
                     }
                 }
                 , {
-                    path: '/page6', name: 'page6', component: loadVue('./page/page6'), meta: {
+                    path: '/sample-echarts', name: 'sample-echarts', component: loadVue('./page/page6-sample-echarts'), meta: {
                         showInMenu: false,
                         icon: "mdi-chart-line",
                         title: "대시보드(샘플-echarts)",
                     }
                 }
                 , {
-                    path: '/page7', name: 'page7', component: loadVue('./page/page7'), meta: {
+                    path: '/sample-transaction-flow', name: 'sample-transaction-flow', component: loadVue('./page/page7-sample-transaction-flow'), meta: {
                         showInMenu: false,
                         icon: "mdi-monitor",
                         title: "모니터링(샘플-echarts)",
                     }
                 }
                 , {
-                    path: '/chat', name: 'chat', component: loadVue('./page/chat'), meta: {
+                    path: '/sample-chat', name: 'sample-chat', component: loadVue('./page/page10-chat'), meta: {
                         showInMenu: false,
                         icon: "mdi-chat-processing",
                         title: "대화형 보고서 생성",
                     }
                 }
                 , {
-                    path: '/page3', name: 'page3', component: loadVue('./page/page3'), meta: {
+                    path: '/test-automation', name: 'test-automation', component: loadVue('./page/page3-test-automation'), meta: {
                         showInMenu: false,
                         icon: "mdi-clipboard-check-outline",
                         iconColor: "green",
@@ -299,7 +302,7 @@
                     }
                 }
                 , {
-                    path: '/page8', name: 'page8', component: loadVue('./page/page8'), meta: {
+                    path: '/mobile-banking-transfer', name: 'mobile-banking-transfer', component: loadVue('./page/p11-mobile-banking-transfer'), meta: {
                         showInMenu: false,
                         icon: "mdi-clipboard-check-outline",
                         iconColor: "green",
@@ -307,7 +310,7 @@
                     }
                 }
                 , {
-                    path: '/page9', name: 'page9', component: loadVue('./page/page9'), meta: {
+                    path: '/mobile-banking-loan', name: 'mobile-banking-loan', component: loadVue('./page/p12-mobile-banking-loan'), meta: {
                         showInMenu: false,
                         icon: "mdi-clipboard-check-outline",
                         iconColor: "green",

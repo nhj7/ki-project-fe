@@ -65,15 +65,36 @@
                         </v-card>
 
                         <v-row>
-                            <v-col>
-                                <v-subheader class="mt-4">응답 형식</v-subheader>
+                            <v-col cols="12" md="6">
+                                <!--v-subheader class="mt-4">응답 형식</v-subheader>
                                 <v-card outlined>
                                     <v-card-text>
                                         <pre><code>{{ selectedApiDetails.responseExample }}</code></pre>
                                     </v-card-text>
-                                </v-card>
+                                </v-card-->
+                                <v-subheader class="mt-4">응답 형식</v-subheader>
+                                <v-simple-table v-if="selectedApiDetails.responseFormat?.length">
+                                    <template v-slot:default>
+                                        <thead>
+                                            <tr>
+                                                <th class="text-left">필드</th>
+                                                <th class="text-left">타입</th>
+                                                <th class="text-left">필수</th>
+                                                <th class="text-left">설명</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="param in selectedApiDetails.responseFormat" :key="param.name">
+                                                <td><code>{{ param.name }}</code></td>
+                                                <td>{{ param.type }}</td>
+                                                <td>{{ param.required ? '예' : '아니오' }}</td>
+                                                <td>{{ param.description }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </template>
+                                </v-simple-table>
                             </v-col>
-                            <v-col>
+                            <v-col cols="12" md="6">
                                 <v-subheader class="mt-4">응답 샘플</v-subheader>
                                 <v-card outlined>
                                     <v-card-text>
@@ -82,7 +103,7 @@
                                 </v-card>
                             </v-col>
                         </v-row>
-                        
+
                     </v-card-text>
                 </v-card>
             </v-card-text>
@@ -115,7 +136,7 @@ const comp = module.exports = {
                         { name: 'endDate', type: 'String', required: true, description: '조회 종료 날짜 (YYYY-MM-DD 형식)' },
                         { name: 'status', type: 'String', required: false, description: '인시던트 상태 (예: "open", "closed")' }
                     ],
-                    curlExample: 'curl -X GET "https://api.example.com/api/incidents?startDate=2023-01-01&endDate=2023-12-31&status=open" \\\n     -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\\n     -H "Content-Type: application/json"',
+                    curlExample: 'curl -X POST "https://api.example.com/api/incidents" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"startDate": "2023-01-01", "endDate": "2023-12-31", "status": "open"}\'',
                     responseExample: '{\n  "incidents": [\n    {\n      "id": "string",\n      "title": "string",\n      "description": "string",\n      "status": "string",\n      "createdAt": "string",\n      "updatedAt": "string"\n    }\n  ],\n  "totalCount": "number"\n}',
                     responseSample: {
                         incidents: [
@@ -124,22 +145,32 @@ const comp = module.exports = {
                                 title: '시스템 다운',
                                 description: '결제 시스템 10분간 다운',
                                 status: 'closed',
-                                createdAt: '2023-05-01T10:30:00Z',
-                                updatedAt: '2023-05-01T11:00:00Z'
+                                createdAt: '20230501143000',
+                                updatedAt: '20230501145000'
                             }
                         ],
                         totalCount: 1
-                    }
+                    },
+                    responseFormat: [
+                        { name: 'incidents', type: 'Array', required: true, description: '인시던트 목록' },
+                        { name: 'incidents[].id', type: 'String', required: true, description: '인시던트 ID' },
+                        { name: 'incidents[].title', type: 'String', required: true, description: '인시던트 제목' },
+                        { name: 'incidents[].description', type: 'String', required: false, description: '인시던트 설명' },
+                        { name: 'incidents[].status', type: 'String', required: true, description: '인시던트 상태' },
+                        { name: 'incidents[].createdAt', type: 'String', required: true, description: '생성 시간 (yyyymmddhh24miss 형식)' },
+                        { name: 'incidents[].updatedAt', type: 'String', required: true, description: '수정 시간 (yyyymmddhh24miss 형식)' },
+                        { name: 'totalCount', type: 'Number', required: true, description: '전체 인시던트 수' }
+                    ],
                 },
                 getLiveTransactions: {
                     name: '실시간 거래 분석',
                     endpoint: '/api/live-transactions',
-                    method: 'GET',
+                    method: 'POST',
                     description: '실시간 거래 데이터를 분석하여 제공합니다.',
                     parameters: [
                         { name: 'duration', type: 'Number', required: false, description: '조회 기간 (분 단위, 기본값: 5)' }
                     ],
-                    curlExample: 'curl -X GET "https://api.example.com/api/live-transactions?duration=10" \\\n     -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\\n     -H "Content-Type: application/json"',
+                    curlExample: 'curl -X POST "https://api.example.com/api/live-transactions" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"duration": 10}\'',
                     responseExample: '{\n  "normalTransactions": [\n    { "timestamp": "string", "value": "number" }\n  ],\n  "anomalyTransactions": [\n    { "timestamp": "string", "value": "number" }\n  ],\n  "kpi": {\n    "totalTransactions": "number",\n    "transactionsPerMinute": "number",\n    "errorRate": "number",\n    "averageResponseTime": "number"\n  }\n}',
                     responseSample: {
                         normalTransactions: [
@@ -155,15 +186,28 @@ const comp = module.exports = {
                             errorRate: 2.38,
                             averageResponseTime: 0.5
                         }
-                    }
+                    },
+                    responseFormat: [
+                        { name: 'normalTransactions', type: 'Array', required: true, description: '정상 거래 목록' },
+                        { name: 'normalTransactions[].timestamp', type: 'String', required: true, description: '거래 시간 (yyyymmddhh24miss 형식)' },
+                        { name: 'normalTransactions[].value', type: 'Number', required: true, description: '거래 금액' },
+                        { name: 'anomalyTransactions', type: 'Array', required: true, description: '이상 거래 목록' },
+                        { name: 'anomalyTransactions[].timestamp', type: 'String', required: true, description: '거래 시간 (yyyymmddhh24miss 형식)' },
+                        { name: 'anomalyTransactions[].value', type: 'Number', required: true, description: '거래 금액' },
+                        { name: 'kpi', type: 'Object', required: true, description: '주요 성과 지표' },
+                        { name: 'kpi.totalTransactions', type: 'Number', required: true, description: '전체 거래 수' },
+                        { name: 'kpi.transactionsPerMinute', type: 'Number', required: true, description: '분당 거래 수' },
+                        { name: 'kpi.errorRate', type: 'Number', required: true, description: '오류율 (%)' },
+                        { name: 'kpi.averageResponseTime', type: 'Number', required: true, description: '평균 응답 시간 (초)' }
+                    ],
                 },
                 getRules: {
                     name: '룰셋 조회',
                     endpoint: '/api/rules',
-                    method: 'GET',
+                    method: 'POST',
                     description: '설정된 룰셋 목록을 조회합니다.',
                     parameters: [],
-                    curlExample: 'curl -X GET "https://api.example.com/api/rules" \\\n     -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\\n     -H "Content-Type: application/json"',
+                    curlExample: 'curl -X POST "https://api.example.com/api/rules" \\\n     -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\\n     -H "Content-Type: application/json" \\\n     -d \'{}\'',
                     responseExample: '{\n  "rules": [\n    {\n      "id": "string",\n      "name": "string",\n      "type": "string",\n      "condition": "string",\n      "action": "string"\n    }\n  ]\n}',
                     responseSample: {
                         rules: [
@@ -175,7 +219,17 @@ const comp = module.exports = {
                                 action: '시스템 관리자에게 알림 발송'
                             }
                         ]
-                    }
+                    },
+                    responseFormat: [
+                        { name: 'rules', type: 'Array', required: true, description: '룰셋 목록' },
+                        { name: 'rules[].id', type: 'String', required: true, description: '룰 ID' },
+                        { name: 'rules[].name', type: 'String', required: true, description: '룰 이름' },
+                        { name: 'rules[].type', type: 'String', required: true, description: '룰 타입' },
+                        { name: 'rules[].condition', type: 'String', required: true, description: '룰 조건' },
+                        { name: 'rules[].action', type: 'String', required: true, description: '룰 액션' },
+                        { name: 'rules[].createdAt', type: 'String', required: true, description: '생성 시간 (yyyymmddhh24miss 형식)' },
+                        { name: 'rules[].updatedAt', type: 'String', required: true, description: '수정 시간 (yyyymmddhh24miss 형식)' }
+                    ],
                 },
                 applyLoan: {
                     name: '대출 신청',
@@ -198,23 +252,40 @@ const comp = module.exports = {
                         applicationId: 'LOAN-001',
                         status: '승인',
                         message: '대출 신청이 승인되었습니다.'
-                    }
+                    },
+                    responseFormat: [
+                        { name: 'applicationId', type: 'String', required: true, description: '대출 신청 ID' },
+                        { name: 'status', type: 'String', required: true, description: '신청 상태 (예: 승인, 거절, 검토 중)' },
+                        { name: 'message', type: 'String', required: false, description: '상태에 대한 추가 설명' },
+                        { name: 'approvedAmount', type: 'Number', required: false, description: '승인된 대출 금액' },
+                        { name: 'interestRate', type: 'Number', required: false, description: '이자율 (%)' },
+                        { name: 'applicationDate', type: 'String', required: true, description: '신청 일시 (yyyymmddhh24miss 형식)' }
+                    ],
                 },
                 checkLoanLimit: {
                     name: '한도 조회',
                     endpoint: '/api/loan/limit',
-                    method: 'GET',
+                    method: 'POST',
                     description: '대출 가능 한도를 조회합니다.',
                     parameters: [
                         { name: 'customerId', type: 'String', required: true, description: '고객 ID' }
                     ],
-                    curlExample: 'curl -X GET "https://api.example.com/api/loan/limit?customerId=123456" \\\n     -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\\n     -H "Content-Type: application/json"',
+                    curlExample: 'curl -X POST "https://api.example.com/api/loan/limit" \\\n     -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"customerId": "123456"}\'',
                     responseExample: '{\n  "customerId": "string",\n  "loanLimit": "number",\n  "creditScore": "number"\n}',
                     responseSample: {
                         customerId: '123456',
                         loanLimit: 50000000,
                         creditScore: 850
-                    }
+                    },
+                    responseFormat: [
+                        { name: 'customerId', type: 'String', required: true, description: '고객 ID' },
+                        { name: 'loanLimit', type: 'Number', required: true, description: '대출 가능 한도' },
+                        { name: 'creditScore', type: 'Number', required: true, description: '신용 점수' },
+                        { name: 'lastUpdateDate', type: 'String', required: true, description: '마지막 업데이트 일시 (yyyymmddhh24miss 형식)' },
+                        { name: 'factors', type: 'Array', required: false, description: '한도 결정 요인 목록' },
+                        { name: 'factors[].name', type: 'String', required: true, description: '요인 이름' },
+                        { name: 'factors[].impact', type: 'String', required: true, description: '영향도 (예: 높음, 중간, 낮음)' }
+                    ],
                 }
             }
         };
