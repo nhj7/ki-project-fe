@@ -138,8 +138,8 @@ const comp = module.exports = {
             realChartData: {
                 svg: null,
                 width: '100%',
-                height: 75,
-                barHeight: 50,
+                height: 40,
+                barHeight: 35,
                 barWidth: 800,
                 ellipseRx: 13, // 가로 반지름
                 ellipseRy: 7, // 세로 반지름
@@ -428,9 +428,6 @@ const comp = module.exports = {
         await this.fetchNewData(); // 초기 데이터 로드
         this.startUpdating();
 
-
-
-
         // SVG 생성
         this.realChartData.svg = d3.select("#realtime-transaction-chart")
             .append("svg")
@@ -489,7 +486,7 @@ const comp = module.exports = {
 }
 
 svg {
-    border: 1px solid #ccc;
+    /* border: 1px solid #ccc; */
 }
 
 .transaction {
@@ -499,5 +496,9 @@ svg {
 
 .bar {
     fill: whitesmoke;
+}
+
+.theme--dark .bar {
+    fill: #333333;
 }
 </style>
