@@ -33,6 +33,8 @@
     <script src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -229,6 +231,13 @@
                         title: "토스 비교금리 대출",
                     }
                 }
+                , {
+                    path:'/login', name:'login', component: loadVue('./page/p0-login'), meta: {
+                        showInMenu: false,
+                        title: "로그인",
+                        icon: "mdi-login",
+                    }
+                }
                 
                 , {
                     path: '#1', name: 'test', meta: {
@@ -256,6 +265,10 @@
                         title: "샘플 페이지",  
                         isGroupOpen: true,
                     }, subRoutes: [
+                        {
+                            path: '/login'
+                        }
+                        ,
                         {
                             path: '/sample-apexcharts'
                         }

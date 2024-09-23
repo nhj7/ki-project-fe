@@ -9,11 +9,11 @@
                             <v-col cols="6" md="6" class="text-right">
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on, attrs }">
-                                        <v-list-item v-bind="attrs" v-on="on" @click.stop="drawer = !drawer">{{
-            "KI-SQMS"
-        }}</v-list-item>
+                                        <v-list-item v-bind="attrs" v-on="on" @click.stop="drawer = !drawer">
+                                            KI-SQM
+                                        </v-list-item>
                                     </template>
-                                    <span>Korea Investment Service Quality Management System</span>
+                                    <span>Korea Investment Service Quality Management</span>
                                 </v-tooltip>
 
                                 <!--v-img src="/assets/ci.png" :width="30" cover /-->
@@ -94,7 +94,15 @@
             <!--v-btn icon @click.stop="rightDrawer = !rightDrawer">
                         <v-icon>mdi-cog</v-icon>
                     </v-btn-->
-
+            
+            <v-btn v-if="username" text>
+                <v-icon>mdi-account-circle</v-icon>
+                {{ username }}님
+            </v-btn>
+            <v-btn v-if="username" text @click="logout">
+                <v-icon>mdi-logout</v-icon>
+                로그아웃
+            </v-btn>
             <v-btn icon @click="showAlarmPopup">
                 <v-badge :content="alarmCount" :value="alarmCount > 0" color="error" overlap>
                     <v-icon>mdi-bell</v-icon>
@@ -204,7 +212,8 @@ const data = {
     groupStates: [true, true],
     alarmCount: 3,
     alarmPopupVisible: false,
-    alarms: []
+    alarms: [],
+    username: "나형주"
 }
 
 
@@ -220,6 +229,10 @@ const comp = module.exports = {
         }
     },
     methods: {
+
+        logout() {
+            this.$router.push('/login');
+        },
         toggleDarkTheme() {
             data.isDark = !data.isDark;
             this.$vuetify.theme.dark = data.isDark;

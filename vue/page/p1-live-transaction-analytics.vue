@@ -23,7 +23,7 @@
                         </v-row-->
 
                         <v-row>
-                            <v-col cols="12">
+                            <v-col cols="12" align="center">
                                 <div id="realtime-transaction-chart"></div>
                             </v-col>
                         </v-row>
@@ -137,7 +137,7 @@ const comp = module.exports = {
             itemsPerPageOptions: [3, 5, 10, 15, 20],
             realChartData: {
                 svg: null,
-                width: '100%',
+                width: '90%',
                 height: 40,
                 barHeight: 35,
                 barWidth: 800,
@@ -146,7 +146,8 @@ const comp = module.exports = {
                 colors: ["red", "orange", "yellow", "green", "blue", "indigo", "violet"],  // 무지개 색상
                 colorIndex: 0,
                 updateInterval: null,
-            }
+            },
+            resizeObserver: null
         };
     },
     computed: {
@@ -217,14 +218,24 @@ const comp = module.exports = {
         animateTransaction(transaction) {
             const ellipse = this.realChartData.svg.append("ellipse")
                 .attr("class", "transaction")
-                .attr("cx", 100 - this.realChartData.ellipseRx)  // 시작 지점 (원통의 왼쪽 밖)
+                .attr("cx", 0)  // 시작 지점 (원통의 왼쪽 밖)
                 .attr("cy", transaction.y)       // Y 좌표는 원통의 중간
                 .attr("rx", this.realChartData.ellipseRx)           // 가로 반지름
                 .attr("ry", this.realChartData.ellipseRy)           // 세로 반지름
                 .attr("fill", transaction.color);  // 색상 지정
 
+            /*
+            const ellipse = this.realChartData.svg.append("rect")
+                .attr("class", "transaction")
+                .attr("x", this.realChartData.ellipseRx)  // 시작 x 좌표
+                .attr("y", transaction.y)  // 막대가 중간에 위치하도록 y 좌표를 설정
+                .attr("width", this.realChartData.ellipseRx)  // 너비 설정 (막대는 얇게)
+                .attr("height", this.realChartData.ellipseRy)  // 높이 설정
+                .attr("fill", transaction.color);  // 색상 설정
+            */
+
             const endX = this.realChartData.barWidth; // 원통의 우측 끝
-            const fadeStartX = this.realChartData.barWidth * 0.80;  // 80% 지점에서 서서히 사라지기 시작
+            const fadeStartX = this.realChartData.barWidth;  // 80% 지점에서 서서히 사라지기 시작
 
             // 애니메이션: 좌측에서 우측으로 이동하며 타원의 모양 변형
 
@@ -233,14 +244,14 @@ const comp = module.exports = {
                 .transition()
                 .duration(transaction.speed)
                 .ease(d3.easeLinear)
-                .attrTween("transform", function(){
+                .attrTween("transform", function () {
                     //const interpolateX = d3.interpolate(100 , fadeStartX); // 시작과 끝 좌표 사이의 보간
-                    const interpolateX = d3.interpolate(100 , fadeStartX); // 시작과 끝 좌표 사이의 보간
+                    const interpolateX = d3.interpolate(100, fadeStartX); // 시작과 끝 좌표 사이의 보간
                     //console.log('interpolateX', interpolateX);
                     return function (t) {
                         const x = parseInt(interpolateX(t));
                         //console.log('t', t, x);
-                        return `translate(${ x },0)`;  // translate로 x 좌표 변경
+                        return `translate(${x},0)`;  // translate로 x 좌표 변경
                     };
                 })
                 .on("end", function () {
@@ -433,27 +444,12 @@ const comp = module.exports = {
             .append("svg")
             .attr("width", this.realChartData.width)
             .attr("height", this.realChartData.height);
-            
-
-        const resizeObserver = new ResizeObserver(entries => {
-            for (let entry of entries) {
-                const newWidth = entry.contentRect.width;  // 변경된 너비
-                const newHeight = entry.contentRect.height; // 변경된 높이 (필요시 사용)
-
-                // SVG 크기 업데이트
-                this.realChartData.svg
-                    .attr("width", newWidth)
-                    .attr("height", newHeight);
-            }
-        });
-
-        //resizeObserver.observe(document.getElementById("realtime-transaction-chart"));
 
         const currentWidth = this.realChartData.svg.node().getBoundingClientRect().width;
 
         this.realChartData.svg
             .attr("viewBox", `0 0 ${currentWidth} ${this.realChartData.height}`)  // viewBox 설정
-            .attr("preserveAspectRatio", "xMinYMin meet");
+            .attr("preserveAspectRatio", "xMidYMid meet");
 
         //console.log('realChartData', currentWidth);
         this.realChartData.barWidth = currentWidth * 0.9;
@@ -472,10 +468,19 @@ const comp = module.exports = {
             const transaction = this.generateTransaction();
             this.animateTransaction(transaction);
         }, 300);  // 1초마다 1개 트랜잭션 생성 (10배 감소)
+
+        this.resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                //console.log('Element resized:', entry.contentRect.width, entry.contentRect.height);
+            }
+        });
+
+        this.resizeObserver.observe(this.$el.querySelector('#realtime-transaction-chart'));
     },
     beforeDestroy: function () {
         //console.log(`${this.$route.meta.title} beforeDestroy`);
         this.stopUpdating();
+        this.resizeObserver.disconnect();
     }
 };
 </script>
@@ -483,10 +488,6 @@ const comp = module.exports = {
 <style scoped>
 .chart {
     height: 400px;
-}
-
-svg {
-    /* border: 1px solid #ccc; */
 }
 
 .transaction {
