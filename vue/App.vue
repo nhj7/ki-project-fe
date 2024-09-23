@@ -94,10 +94,18 @@
             <!--v-btn icon @click.stop="rightDrawer = !rightDrawer">
                         <v-icon>mdi-cog</v-icon>
                     </v-btn-->
+
+            <v-btn icon @click="showAlarmPopup">
+                <v-badge :content="alarmCount" :value="alarmCount > 0" color="error" overlap>
+                    <v-icon>mdi-bell</v-icon>
+                </v-badge>
+            </v-btn>
             <v-btn icon @click="toggleDarkTheme">
                 <v-icon>{{ themeIcon }}</v-icon>
             </v-btn>
         </v-app-bar>
+
+        <alarm-popup v-model="alarmPopupVisible" :alarms="alarms"></alarm-popup>
 
         <v-main>
             <v-container lass="fill-height pa-0" fluid>
@@ -135,6 +143,8 @@
                 </v-list-item>
 
                 <v-divider></v-divider>
+
+
 
                 <v-list-item @click="toggleDarkTheme">
                     <v-list-item-action>
@@ -191,7 +201,10 @@ const data = {
     right: true,
     rightDrawer: false,
     title: "KI-RS",
-    groupStates: [true, true]
+    groupStates: [true, true],
+    alarmCount: 3,
+    alarmPopupVisible: false,
+    alarms: []
 }
 
 
@@ -220,14 +233,30 @@ const comp = module.exports = {
             console.log("updateGroupState", this.groupStates, group, value);
             this.groupStates[0] = value;
         },
+        showAlarmPopup() {
+            this.fetchAlarms();
+            this.alarmPopupVisible = true;
+        },
+        fetchAlarms() {
+            // 여기서 실제 알람 데이터를 가져오는 API 호출을 수행해야 합니다.
+            // 예시 데이터:
+            this.alarms = [
+                { timestamp: '2023-05-10 14:30:00', system: '소비자금융시스템', severity: '심각', description: '대출 한도조회 오류' },
+                { timestamp: '2023-05-10 15:15:00', system: '일반여신시스템', severity: '심각', description: '스크래핑 오류' },
+                { timestamp: '2023-05-10 16:00:00', system: '모바일앱', severity: '심각', description: '1원 인증 오류' },
+            ];
+            this.alarmCount = this.alarms.length;
+        },
+
     }
     , mounted() {
         //console.log("App.vue mounted");
-
+        this.$router.push('/live-transaction-analytics');
     }
     , components: {
-
-    }, created() {
+        'alarm-popup': loadVue('/component/AlarmPopup')
+    }
+    , created() {
         //console.log("app.vue created", this, this.$options.components);
         //this.$router.addRoutes(router);
         const savedTheme = localStorage.getItem('darkTheme');
@@ -273,7 +302,6 @@ const globalMethods = {
 
 Vue.prototype.$util = globalMethods;
 </script>
-
 <style scoped>
 .router-view-container {
     position: relative;
@@ -442,7 +470,7 @@ Vue.prototype.$util = globalMethods;
 }
 
 .lnb-subItem .v-list-item__title {
-    font-size: 0.5rem !important;
+    font-size: 0.8rem !important;
 }
 
 /* v-list 자체의 패딩 조정 */

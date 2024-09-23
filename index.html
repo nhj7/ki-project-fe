@@ -31,6 +31,8 @@
     <script src="https://cdn.jsdelivr.net/npm/echarts"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-echarts"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 
 <body>
@@ -219,7 +221,14 @@
 
                 }
                 
-                
+                , {
+                    path: '/toss-loan', name: 'toss-loan', component: loadVue('./page/p13-toss-loan'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-infinity",
+                        iconColor: "info",
+                        title: "토스 비교금리 대출",
+                    }
+                }
                 
                 , {
                     path: '#1', name: 'test', meta: {
@@ -233,6 +242,9 @@
                         }
                         , {
                             path: '/mobile-banking-loan'
+                        }
+                        , {
+                            path: '/toss-loan'
                         }
                     ]
                 }
@@ -304,7 +316,7 @@
                 , {
                     path: '/mobile-banking-transfer', name: 'mobile-banking-transfer', component: loadVue('./page/p11-mobile-banking-transfer'), meta: {
                         showInMenu: false,
-                        icon: "mdi-clipboard-check-outline",
+                        icon: "mdi-bank-transfer",
                         iconColor: "green",
                         title: "모바일뱅킹 간편이체",
                     }
@@ -312,7 +324,7 @@
                 , {
                     path: '/mobile-banking-loan', name: 'mobile-banking-loan', component: loadVue('./page/p12-mobile-banking-loan'), meta: {
                         showInMenu: false,
-                        icon: "mdi-clipboard-check-outline",
+                        icon: "mdi-checkbook",
                         iconColor: "green",
                         title: "모바일뱅킹 대출신청",
                     }
