@@ -115,15 +115,18 @@
 const comp = module.exports = {
     data() {
         return {
-            selectedApi: 'getIncidents',
+            selectedApi: 'loginSignin',
             selectedApiDetails: null,
             apiResponse: null,
             apiList: [
+                { text: '로그인', value: 'loginSignin' },
+                { text: '로그인 체크', value: 'loginCheck' },
                 { text: '인시던트 목록 조회', value: 'getIncidents' },
                 { text: '실시간 거래 분석', value: 'getLiveTransactions' },
                 { text: '룰셋 조회', value: 'getRules' },
                 { text: '대출 신청', value: 'applyLoan' },
-                { text: '한도 조회', value: 'checkLoanLimit' }
+                { text: '한도 조회', value: 'checkLoanLimit' },
+                
             ],
             apiDetails: {
                 getIncidents: {
@@ -171,34 +174,41 @@ const comp = module.exports = {
                         { name: 'duration', type: 'Number', required: false, description: '조회 기간 (분 단위, 기본값: 5)' }
                     ],
                     curlExample: 'curl -X POST "https://api.example.com/api/live-transactions" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"duration": 10}\'',
-                    responseExample: '{\n  "normalTransactions": [\n    { "timestamp": "string", "value": "number" }\n  ],\n  "anomalyTransactions": [\n    { "timestamp": "string", "value": "number" }\n  ],\n  "kpi": {\n    "totalTransactions": "number",\n    "transactionsPerMinute": "number",\n    "errorRate": "number",\n    "averageResponseTime": "number"\n  }\n}',
+                    responseExample: '{\n  "timestamp": "string",\n  "transactionData": {\n    "normal": "number",\n    "anomaly": "number"\n  },\n  "anomalyTransactions": [\n    {\n      "timestamp": "string",\n      "transactionId": "string",\n      "type": "string",\n      "amount": "number",\n      "status": "string"\n    }\n  ]\n}',
                     responseSample: {
-                        normalTransactions: [
-                            { timestamp: '2023-05-01T10:30:00Z', value: 100 },
-                            { timestamp: '2023-05-01T10:31:00Z', value: 105 }
-                        ],
+                        timestamp: "20230515143000",
+                        transactionData: {
+                            normal: 187,
+                            anomaly: 13
+                        },
                         anomalyTransactions: [
-                            { timestamp: '2023-05-01T10:32:00Z', value: 5 }
-                        ],
-                        kpi: {
-                            totalTransactions: 210,
-                            transactionsPerMinute: 70,
-                            errorRate: 2.38,
-                            averageResponseTime: 0.5
-                        }
+                            {
+                                timestamp: "20230515142945",
+                                transactionId: "TX123456",
+                                type: "이체",
+                                amount: 1000000,
+                                status: "오류"
+                            },
+                            {
+                                timestamp: "20230515142930",
+                                transactionId: "TX123457",
+                                type: "이체",
+                                amount: 1000000,
+                                status: "의심"
+                            }
+                        ]
                     },
                     responseFormat: [
-                        { name: 'normalTransactions', type: 'Array', required: true, description: '정상 거래 목록' },
-                        { name: 'normalTransactions[].timestamp', type: 'String', required: true, description: '거래 시간 (yyyymmddhh24miss 형식)' },
-                        { name: 'normalTransactions[].value', type: 'Number', required: true, description: '거래 금액' },
+                        { name: 'timestamp', type: 'String', required: true, description: '데이터 생성 시간 (yyyymmddhh24miss 형식)' },
+                        { name: 'transactionData', type: 'Object', required: true, description: '거래 데이터 요약' },
+                        { name: 'transactionData.normal', type: 'Number', required: true, description: '정상 거래 수' },
+                        { name: 'transactionData.anomaly', type: 'Number', required: true, description: '이상 거래 수' },
                         { name: 'anomalyTransactions', type: 'Array', required: true, description: '이상 거래 목록' },
                         { name: 'anomalyTransactions[].timestamp', type: 'String', required: true, description: '거래 시간 (yyyymmddhh24miss 형식)' },
-                        { name: 'anomalyTransactions[].value', type: 'Number', required: true, description: '거래 금액' },
-                        { name: 'kpi', type: 'Object', required: true, description: '주요 성과 지표' },
-                        { name: 'kpi.totalTransactions', type: 'Number', required: true, description: '전체 거래 수' },
-                        { name: 'kpi.transactionsPerMinute', type: 'Number', required: true, description: '분당 거래 수' },
-                        { name: 'kpi.errorRate', type: 'Number', required: true, description: '오류율 (%)' },
-                        { name: 'kpi.averageResponseTime', type: 'Number', required: true, description: '평균 응답 시간 (초)' }
+                        { name: 'anomalyTransactions[].transactionId', type: 'String', required: true, description: '거래 ID' },
+                        { name: 'anomalyTransactions[].type', type: 'String', required: true, description: '거래 유형' },
+                        { name: 'anomalyTransactions[].amount', type: 'Number', required: true, description: '거래 금액' },
+                        { name: 'anomalyTransactions[].status', type: 'String', required: true, description: '거래 상태' }
                     ],
                 },
                 getRules: {
@@ -286,13 +296,104 @@ const comp = module.exports = {
                         { name: 'factors[].name', type: 'String', required: true, description: '요인 이름' },
                         { name: 'factors[].impact', type: 'String', required: true, description: '영향도 (예: 높음, 중간, 낮음)' }
                     ],
-                }
+                },
+                loginCheck: {
+                    name: '로그인 체크',
+                    endpoint: '/api/login-check',
+                    method: 'POST',
+                    description: '사용자의 로그인 상태를 확인합니다.',
+                    parameters: [
+                        { name: 'token', type: 'String', required: true, description: '사용자 인증 토큰' }
+                    ],
+                    curlExample: 'curl -X POST "https://api.example.com/api/login-check" \\\n     -H "Content-Type: application/json"',
+                    responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  },\n  "body": {\n    "userId": "string",\n    "userName": "string",\n    "userType": "string",\n    "userStatus": "string",\n    "loginStatus": "string",\n    "lastLoginDate": "string",\n    "expiredDate": "string"\n  }\n}',
+                    responseSample: {
+                        header: {
+                            resultCode: "0000",
+                            resultMessage: "로그인 상태입니다."
+                        },
+                        body: {
+                            userId: "admin",
+                            userName: "나형주1",
+                            userType: "admin",
+                            userStatus: "정상",
+                            loginStatus: "로그인",
+                            lastLoginDate: "2024-05-01 12:00:00",
+                            expiredDate: "2024-05-01 13:00:00"
+                        }
+                    },
+                    responseFormat: [
+                        { name: 'header', type: 'Object', required: true, description: '응답 헤더' },
+                        { name: 'header.resultCode', type: 'String', required: true, description: '결과 코드' },
+                        { name: 'header.resultMessage', type: 'String', required: true, description: '결과 메시지' },
+                        { name: 'body', type: 'Object', required: true, description: '응답 본문' },
+                        { name: 'body.userId', type: 'String', required: true, description: '사용자 ID' },
+                        { name: 'body.userName', type: 'String', required: true, description: '사용자 이름' },
+                        { name: 'body.userType', type: 'String', required: true, description: '사용자 유형' },
+                        { name: 'body.userStatus', type: 'String', required: true, description: '사용자 상태' },
+                        { name: 'body.loginStatus', type: 'String', required: true, description: '로그인 상태' },
+                        { name: 'body.lastLoginDate', type: 'String', required: true, description: '마지막 로그인 일시' },
+                        { name: 'body.expiredDate', type: 'String', required: true, description: '만료 일시' }
+                    ],
+                },
+                loginSignin: {
+                    name: '로그인',
+                    endpoint: '/api/login-signin',
+                    method: 'POST',
+                    description: '사용자 로그인을 처리합니다.',
+                    parameters: [
+                        { name: 'userId', type: 'String', required: true, description: '사용자 아이디' },
+                        { name: 'password', type: 'String', required: true, description: '사용자 비밀번호' }
+                    ],
+                    curlExample: 'curl -X POST "https://api.example.com/api/login-signin" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"userId": "admin", "password": "your_password_here"}\'',
+                    responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  },\n  "body": {\n    "userId": "string",\n    "userName": "string",\n    "userType": "string",\n    "userStatus": "string",\n    "loginStatus": "string",\n    "lastLoginDate": "string",\n    "expiredDate": "string"\n  }\n}',
+                    responseSample: {
+                        header: {
+                            resultCode: "0000",
+                            resultMessage: "로그인 성공"
+                        },
+                        body: {
+                            userId: "admin",
+                            userName: "나형주",
+                            userType: "admin",
+                            userStatus: "정상",
+                            loginStatus: "로그인",
+                            lastLoginDate: "2024-05-01 12:00:00",
+                            expiredDate: "2024-05-01 13:00:00"
+                        }
+                    },
+                    responseFormat: [
+                        { name: 'header', type: 'Object', required: true, description: '응답 헤더' },
+                        { name: 'header.resultCode', type: 'String', required: true, description: '결과 코드' },
+                        { name: 'header.resultMessage', type: 'String', required: true, description: '결과 메시지' },
+                        { name: 'body', type: 'Object', required: true, description: '응답 본문' },
+                        { name: 'body.userId', type: 'String', required: true, description: '사용자 ID' },
+                        { name: 'body.userName', type: 'String', required: true, description: '사용자 이름' },
+                        { name: 'body.userType', type: 'String', required: true, description: '사용자 유형' },
+                        { name: 'body.userStatus', type: 'String', required: true, description: '사용자 상태' },
+                        { name: 'body.loginStatus', type: 'String', required: true, description: '로그인 상태' },
+                        { name: 'body.lastLoginDate', type: 'String', required: true, description: '마지막 로그인 일시' },
+                        { name: 'body.expiredDate', type: 'String', required: true, description: '세션 만료 일시' }
+                    ],
+                },
             }
         };
     },
     methods: {
-        showApiDetails() {
+        async showApiDetails() {
             this.selectedApiDetails = this.apiDetails[this.selectedApi];
+            try {
+                const response = await fetch(`/mock/${this.selectedApiDetails.endpoint.replace('/api/', '')}.json`);
+                console.log('response', response);
+                if (!response.ok) {
+                    throw new Error('데이터를 불러오는 중 오류가 발생했습니다.');
+                }
+                const liveTransactionsData = await response.json();
+                console.log('liveTransactionsData', liveTransactionsData);
+                this.apiDetails[this.selectedApi].responseSample = liveTransactionsData;
+            } catch (error) {
+                console.error('json 로드 중 오류 발생:', error);
+            }
         },
         async callApi() {
             try {
@@ -319,8 +420,19 @@ const comp = module.exports = {
             }
         },
     },
-    mounted() {
+    async mounted() {
         this.showApiDetails(); // 컴포넌트 마운트 시 API 상세 정보 표시
+        
+        // live_transactions.json 파일 로드
+        /*
+        try {
+            const response = await fetch('/mock/live_transactions.json');
+            const liveTransactionsData = await response.json();
+            this.apiDetails.getLiveTransactions.responseSample = liveTransactionsData;
+        } catch (error) {
+            console.error('live_transactions.json 로드 중 오류 발생:', error);
+        }
+        */
     },
 };
 </script>

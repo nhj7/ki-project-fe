@@ -1,0 +1,23 @@
+{
+  "timestamp": "20230515143000",
+  "transactionData": {
+    "normal": 187,
+    "anomaly": 13
+  },  
+  "anomalyTransactions": [
+    {
+      "timestamp": "20230515142945",
+      "transactionId": "TX123456",
+      "type": "이체",
+      "amount": 1000000,
+      "status": "오류"
+    },
+    {
+        "timestamp": "20230515142930",
+        "transactionId": "TX123457",
+        "type": "이체",
+        "amount": 1000000,
+        "status": "의심"
+    }
+  ]
+}

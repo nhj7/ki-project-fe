@@ -285,7 +285,7 @@ const comp = (module.exports = {
   async mounted() {
     console.log("App.vue mounted");
 
-
+    this.drawer = window.innerWidth >= 1264; // Vuetify의 lg 브레이크포인트
   },
   components: {
     "alarm-popup": loadVue("/component/AlarmPopup"),
@@ -300,11 +300,13 @@ const comp = (module.exports = {
       this.$vuetify.theme.dark = this.isDark;
     }
 
-    await axios.get("/mock/login_check.json").then((response) => {
+    await axios.get("/mock/login-check.json").then((response) => {
       if (response.data.header.resultCode === "0000") {
         Object.assign(this.$session, response.data.body);
         console.log("login_check", this.$session, response.data.body);
-        this.$router.push("/live-transaction-analytics");
+        if( this.$router.currentRoute.path == "/"){
+          this.$router.push("/live-transaction-analytics");
+        }
       } else {
         this.$router.push("/login");
       }
