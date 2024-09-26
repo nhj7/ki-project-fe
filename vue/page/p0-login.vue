@@ -43,7 +43,7 @@ const comp = (module.exports = {
     async login() {
       if (this.$refs.form.validate()) {
         try {
-          const response = await axios.get("/mock/login_success.json", {
+          const response = await axios.get("/mock/login-signin.json", {
             userId: this.userId,
             password: this.password,
           });

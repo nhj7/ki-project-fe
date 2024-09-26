@@ -13,7 +13,10 @@
                                 <tbody>
                                     <tr>
                                         <td>엔드포인트</td>
-                                        <td><code>{{ selectedApiDetails.endpoint }}</code></td>
+                                        <td>
+                                            <!--code>{{ selectedApiDetails.endpoint }}</code-->
+                                            <v-text-field v-model="selectedApiDetails.endpoint"></v-text-field>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td>메소드</td>
@@ -112,6 +115,9 @@
 </template>
 
 <script>
+
+const endpoint_url = 'http://3.35.141.7:18080';
+
 const comp = module.exports = {
     data() {
         return {
@@ -139,7 +145,7 @@ const comp = module.exports = {
                         { name: 'endDate', type: 'String', required: true, description: '조회 종료 날짜 (YYYY-MM-DD 형식)' },
                         { name: 'status', type: 'String', required: false, description: '인시던트 상태 (예: "open", "closed")' }
                     ],
-                    curlExample: 'curl -X POST "https://api.example.com/api/incidents" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"startDate": "2023-01-01", "endDate": "2023-12-31", "status": "open"}\'',
+                    curlExample: `curl -X POST "${endpoint_url}/api/incidents" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"startDate": "2023-01-01", "endDate": "2023-12-31", "status": "open"}\'`,
                     responseExample: '{\n  "incidents": [\n    {\n      "id": "string",\n      "title": "string",\n      "description": "string",\n      "status": "string",\n      "createdAt": "string",\n      "updatedAt": "string"\n    }\n  ],\n  "totalCount": "number"\n}',
                     responseSample: {
                         incidents: [
@@ -173,7 +179,7 @@ const comp = module.exports = {
                     parameters: [
                         { name: 'duration', type: 'Number', required: false, description: '조회 기간 (분 단위, 기본값: 5)' }
                     ],
-                    curlExample: 'curl -X POST "https://api.example.com/api/live-transactions" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"duration": 10}\'',
+                    curlExample: `curl -X POST "${endpoint_url}/api/live-transactions" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"duration": 10}\'`,
                     responseExample: '{\n  "timestamp": "string",\n  "transactionData": {\n    "normal": "number",\n    "anomaly": "number"\n  },\n  "anomalyTransactions": [\n    {\n      "timestamp": "string",\n      "transactionId": "string",\n      "type": "string",\n      "amount": "number",\n      "status": "string"\n    }\n  ]\n}',
                     responseSample: {
                         timestamp: "20230515143000",
@@ -217,7 +223,7 @@ const comp = module.exports = {
                     method: 'POST',
                     description: '설정된 룰셋 목록을 조회합니다.',
                     parameters: [],
-                    curlExample: 'curl -X POST "https://api.example.com/api/rules" \\\n     -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\\n     -H "Content-Type: application/json" \\\n     -d \'{}\'',
+                    curlExample: `curl -X POST "${endpoint_url}/api/rules" \\\n     -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\\n     -H "Content-Type: application/json" \\\n     -d \'{}\'`,
                     responseExample: '{\n  "rules": [\n    {\n      "id": "string",\n      "name": "string",\n      "type": "string",\n      "condition": "string",\n      "action": "string"\n    }\n  ]\n}',
                     responseSample: {
                         rules: [
@@ -251,7 +257,7 @@ const comp = module.exports = {
                         { name: 'amount', type: 'Number', required: true, description: '대출 금액' },
                         { name: 'period', type: 'Number', required: true, description: '대출 기간 (개월)' }
                     ],
-                    curlExample: 'curl -X POST "https://api.example.com/api/loan/apply" \\\n     -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"name": "홍길동", "amount": 1000000, "period": 12}\'',
+                    curlExample: `curl -X POST "${endpoint_url}/api/loan/apply" \\\n     -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"name": "홍길동", "amount": 1000000, "period": 12}\'`,
                     sampleRequestBody: {
                         name: "홍길동",
                         amount: 1000000,
@@ -280,7 +286,7 @@ const comp = module.exports = {
                     parameters: [
                         { name: 'customerId', type: 'String', required: true, description: '고객 ID' }
                     ],
-                    curlExample: 'curl -X POST "https://api.example.com/api/loan/limit" \\\n     -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"customerId": "123456"}\'',
+                    curlExample: `curl -X POST "${endpoint_url}/api/loan/limit" \\\n     -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"customerId": "123456"}\'`,
                     responseExample: '{\n  "customerId": "string",\n  "loanLimit": "number",\n  "creditScore": "number"\n}',
                     responseSample: {
                         customerId: '123456',
@@ -305,7 +311,7 @@ const comp = module.exports = {
                     parameters: [
                         { name: 'token', type: 'String', required: true, description: '사용자 인증 토큰' }
                     ],
-                    curlExample: 'curl -X POST "https://api.example.com/api/login-check" \\\n     -H "Content-Type: application/json"',
+                    curlExample: `curl -X POST "${endpoint_url}/api/login-check" \\\n     -H "Content-Type: application/json"`,
                     responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  },\n  "body": {\n    "userId": "string",\n    "userName": "string",\n    "userType": "string",\n    "userStatus": "string",\n    "loginStatus": "string",\n    "lastLoginDate": "string",\n    "expiredDate": "string"\n  }\n}',
                     responseSample: {
                         header: {
@@ -345,7 +351,7 @@ const comp = module.exports = {
                         { name: 'userId', type: 'String', required: true, description: '사용자 아이디' },
                         { name: 'password', type: 'String', required: true, description: '사용자 비밀번호' }
                     ],
-                    curlExample: 'curl -X POST "https://api.example.com/api/login-signin" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"userId": "admin", "password": "your_password_here"}\'',
+                    curlExample: `curl -X POST "${endpoint_url}/api/login-signin" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"userId": "admin", "password": "your_password_here"}\'`,
                     responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  },\n  "body": {\n    "userId": "string",\n    "userName": "string",\n    "userType": "string",\n    "userStatus": "string",\n    "loginStatus": "string",\n    "lastLoginDate": "string",\n    "expiredDate": "string"\n  }\n}',
                     responseSample: {
                         header: {
@@ -399,7 +405,7 @@ const comp = module.exports = {
             try {
                 this.$loading.show('API를 호출하는 중입니다...');
                 const apiDetails = this.apiDetails[this.selectedApi];
-                const response = await fetch(apiDetails.endpoint, {
+                const response = await fetch(endpoint_url + apiDetails.endpoint, {
                     method: apiDetails.method,
                     headers: {
                         'Content-Type': 'application/json',
