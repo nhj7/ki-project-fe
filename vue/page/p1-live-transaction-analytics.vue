@@ -101,17 +101,7 @@ const comp = module.exports = {
                         data: []
                     }
                 ],
-                dataZoom: [
-                    {
-                        type: 'inside',
-                        start: 0,
-                        end: 100
-                    },
-                    {
-                        start: 0,
-                        end: 100
-                    }
-                ]
+                
             },
             kpiData: [
                 { label: '총 거래량', value: '0', trend: 'up' },
@@ -353,7 +343,7 @@ const comp = module.exports = {
 
                 const now = new Date();
                 const normalValue = Math.round(Math.random() * 100 + 100);
-                const anomalyValue = Math.round(Math.random() * 10 + 10);
+                const anomalyValue = Math.round(Math.random() * 2 + 2);
 
                 this.transactionFlowOption.series[0].data.push([now, normalValue]);
                 this.transactionFlowOption.series[1].data.push([now, anomalyValue]);
@@ -372,7 +362,7 @@ const comp = module.exports = {
                 this.summaryItems[3].value = (Math.random() * 0.5 + 0.5).toFixed(2);
 
                 // 이상 거래 추가
-                if (Math.random() < 0.3) {  // 30% 확률로 이상 거래 발생
+                if (Math.random() < 0.1) {  // 30% 확률로 이상 거래 발생
                     this.anomalyTransactions.unshift({
                         timestamp: now.toLocaleString(),
                         transactionId: 'TX' + Math.random().toString(36).substr(2, 6),
