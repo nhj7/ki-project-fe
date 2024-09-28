@@ -1,20 +1,20 @@
 <template>
   <v-container fluid>
     <v-card>
-      <v-card-title>
-        사용자 관리
+      <v-card-title>        
+        
         <v-spacer></v-spacer>
         <v-btn color="primary" @click="openUserDialog()">
           사용자 등록
         </v-btn>
       </v-card-title>
       <v-card-text>
-        <v-data-table :headers="headers" :items="users" :items-per-page="10" class="elevation-1">
+        <v-data-table :headers="headers" :items="users" :items-per-page="10" class="elevation-1" @click:row="editUser">
           <template v-slot:[`item.actions`]="{ item }">
             <v-icon small class="mr-2" @click="editUser(item)">
               mdi-pencil
             </v-icon>
-            <v-icon small @click="deleteUser(item)">
+            <v-icon small @click.stop="deleteUser(item)">
               mdi-delete
             </v-icon>
           </template>
@@ -23,10 +23,11 @@
     </v-card>
 
     <!-- 사용자 등록/수정 다이얼로그 -->
-    <v-dialog v-model="dialog" max-width="500px">
+    <v-dialog v-model="dialog" max-width="500px" @after-leave="onDialogClosed">
       <v-card>
         <v-card-title>
-          <span class="headline">{{ formTitle }}</span>
+          <v-icon>mdi-account</v-icon> &nbsp;
+          {{ formTitle }}
         </v-card-title>
         <v-card-text>
           <v-container>
@@ -72,7 +73,6 @@ const comp = module.exports = {
         { text: '사용자 상태', value: 'userStatus' },
         { text: '로그인 상태', value: 'loginStatus' },
         { text: '마지막 로그인', value: 'lastLoginDate' },
-        { text: '만료 일시', value: 'expiredDate' },
         { text: '작업', value: 'actions', sortable: false },
       ],
       users: [],
@@ -84,7 +84,7 @@ const comp = module.exports = {
         userStatus: '',
         loginStatus: '',
         lastLoginDate: '',
-        expiredDate: '',
+
         password: '',
       },
       defaultItem: {
@@ -94,28 +94,24 @@ const comp = module.exports = {
         userStatus: '',
         loginStatus: '',
         lastLoginDate: '',
-        expiredDate: '',
+
         password: '',
       },
     }
   },
-
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? '사용자 등록' : '사용자 수정'
     },
   },
-
   watch: {
     dialog(val) {
       val || this.close()
     },
   },
-
   created() {
     this.initialize()
   },
-
   methods: {
     initialize() {
       // 여기서 실제 API를 호출하여 사용자 목록을 가져와야 합니다.
@@ -147,10 +143,17 @@ const comp = module.exports = {
     },
     close() {
       this.dialog = false
+      /*
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem)
         this.editedIndex = -1
       })
+      */
+    },
+    onDialogClosed() {
+      console.log('onDialogClosed')
+      this.editedItem = Object.assign({}, this.defaultItem)
+      this.editedIndex = -1
     },
     save() {
       if (this.editedIndex > -1) {
@@ -168,6 +171,8 @@ const comp = module.exports = {
       this.close()
     },
     openUserDialog() {
+      this.editedItem = Object.assign({}, this.defaultItem)
+      this.editedIndex = -1
       this.dialog = true
     },
   },

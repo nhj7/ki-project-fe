@@ -1,0 +1,17 @@
+{
+    "header": {
+        "resultCode": "0000",
+        "resultMessage": "룰셋 목록 조회 성공"
+    },
+    "body": {
+        "rules": [
+            {
+                "id": "RULE-001",
+                "name": "10분 무거래 탐지",
+                "type": "거래 부재",
+                "condition": "10분 동안 거래 없음",
+                "action": "시스템 관리자에게 알림 발송"
+            }
+        ]
+    }
+}

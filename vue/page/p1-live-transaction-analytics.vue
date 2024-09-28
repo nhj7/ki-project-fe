@@ -287,10 +287,12 @@ const comp = module.exports = {
 
 
         generateTransaction() {
+            const randomValue = Math.random();
             const transaction = {
-                id: Math.random(),
-                speed: (Math.random() * 1500 + 1000) * 2,  // 속도는 기존의 절반으로 더 빠르게
+                id: randomValue,
+                speed: (randomValue * 1500 + 1000) * 2,  // 속도는 기존의 절반으로 더 빠르게
                 //color: this.realChartData.colors[this.realChartData.colorIndex % this.realChartData.colors.length],  // 무지개 색 순서대로 지정
+                //color: randomValue < 0.05 ? 'red' : 'dodgerblue',
                 color: 'dodgerblue',
                 y: (this.realChartData.height - this.realChartData.barHeight) / 2 + this.realChartData.barHeight / 2  // 트랜잭션은 원통의 중간을 지나가도록
             };

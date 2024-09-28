@@ -204,6 +204,15 @@
                 }
 
                 , {
+                    path: '/rule-condition-builder', name: 'rule-condition-builder', component: loadVue('./page/p4-rule-condition-builder'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-clipboard-check-outline",
+                        iconColor: "green",
+                        title: "규칙 조건 빌더",
+                    }
+                }
+
+                , {
                     path: '/user-management', name: 'user-management', component: loadVue('./page/p6-user-management'), meta: {
                         showInMenu: true,
                         icon: "mdi-account-multiple",
@@ -253,7 +262,7 @@
                         showInMenu: true,
                         icon: "mdi-view-dashboard",
                         title: "서비스 품질 테스트 센터",  
-                        isGroupOpen: true,
+                        isGroupOpen: false,
                     }, subRoutes: [
                         {
                             path: '/mobile-banking-transfer'
@@ -272,7 +281,7 @@
                         showInMenu: true,
                         icon: "mdi-view-dashboard-outline",
                         title: "샘플 페이지",  
-                        isGroupOpen: true,
+                        isGroupOpen: false,
                     }, subRoutes: [
                         {
                             path: '/login'

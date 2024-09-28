@@ -29,7 +29,7 @@
         </v-list-item-content>
       </v-list-item>
       <v-divider></v-divider>
-      <v-list>
+      <v-list expand dense>
         <v-list-item>
           <v-btn icon @click.stop="miniVariant = !miniVariant">
             <v-icon>mdi-{{ `chevron-${miniVariant ? "right" : "left"}` }}</v-icon>
@@ -47,8 +47,8 @@
         <template v-for="(route, i) in this.$router.options.routes.filter(
             (route) => route.meta && route.meta.showInMenu
           )">
-          <v-list-group v-model="groupStates[i]" v-if="route.subRoutes" :key="i" :prepend-icon="route.meta.icon"
-            no-action @input="updateGroupState(route.name, $event)">
+          <v-list-group v-model="route.meta.isGroupOpen" v-if="route.subRoutes" :key="i" :prepend-icon="route.meta.icon"
+            no-action dense @click="updateGroupState(route, $event)">
             <template v-slot:activator>
               <v-list-item-content class="lnb-item rounded-lg">
                 <v-list-item-title>{{ route.meta.title }}</v-list-item-title>
@@ -57,10 +57,10 @@
 
             <v-list-item v-for="subItem in route.subRoutes" :key="subItem.path" :to="subItem.path" link
               class="lnb-subItem rounded-lg pl-4">
-              <v-list-item-action>
+              <v-list-item-action dense>
                 <v-icon>{{ findRouteByPath(subItem.path).meta.icon }}</v-icon>
               </v-list-item-action>
-              <v-list-item-content>
+              <v-list-item-content dense>
                 <v-list-item-title>{{
                   findRouteByPath(subItem.path).meta.title
                   }}</v-list-item-title>
@@ -212,11 +212,12 @@ const data = {
   title: "KI-SQM",
   groupStates: [true, true],
   alarmCount: 3,
-  
+
   alarms: [],
   userName: "나형주",
   alarmPopupVisible: false,
   accountSettingsVisible: false,
+  groupOpened: true,
 };
 
 const comp = (module.exports = {
@@ -229,9 +230,12 @@ const comp = (module.exports = {
       return this.isDark ? "mdi-weather-night" : "mdi-weather-sunny";
     },
   },
+  watch: {
+    
+  },
   methods: {
     goToAccountSettings() {
-      
+
       this.accountSettingsVisible = true;
       console.log("goToAccountSettings", this.accountSettingsVisible);
     },
@@ -248,9 +252,10 @@ const comp = (module.exports = {
     findRouteByPath(path) {
       return this.$router.options.routes.find((route) => route.path === path);
     },
-    updateGroupState(group, value) {
-      console.log("updateGroupState", this.groupStates, group, value);
-      this.groupStates[0] = value;
+    updateGroupState(route, value) {
+      //console.log("updateGroupState", route, value);
+      route.meta.isGroupOpen = !route.meta.isGroupOpen;
+      //this.groupStates[0] = value;
     },
     showAlarmPopup() {
       this.fetchAlarms();
@@ -291,6 +296,18 @@ const comp = (module.exports = {
     "alarm-popup": loadVue("/component/AlarmPopup"),
     "account-settings": loadVue("/component/AccountSettings"),
   },
+  beforeCreate() {
+    console.log("App.vue beforeCreate");
+    this.$router.options.routes.forEach(route => {
+      if (route.subRoutes && route.subRoutes.some(subRoute => subRoute.path === this.$router.currentRoute.path)) {
+        if (route.meta) {
+          route.meta.isGroupOpen = true;
+        } else {
+          route.meta = { isGroupOpen: true };
+        }
+      }
+    });
+  },
   async created() {
     //console.log("app.vue created", this, this.$options.components);
     //this.$router.addRoutes(router);
@@ -304,7 +321,7 @@ const comp = (module.exports = {
       if (response.data.header.resultCode === "0000") {
         Object.assign(this.$session, response.data.body);
         console.log("login_check", this.$session, response.data.body);
-        if( this.$router.currentRoute.path == "/"){
+        if (this.$router.currentRoute.path == "/") {
           this.$router.push("/live-transaction-analytics");
         }
       } else {
@@ -609,5 +626,13 @@ Vue.prototype.$session = {
 /* 다크 테마 대응 */
 .theme--dark .v-data-table__wrapper table tbody tr:hover {
   background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+.v-list-item__action {
+  margin: 0px 0;
+}
+
+.v-list-group .v-list--dense .v-list-item {
+  min-height: 33px !important;
 }
 </style>

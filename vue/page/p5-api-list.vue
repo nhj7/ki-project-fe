@@ -116,7 +116,7 @@
 
 <script>
 
-const endpoint_url = 'http://3.35.141.7:18080';
+const endpoint_url = 'https://ki.iinfo.kr:18080';
 
 const comp = module.exports = {
     data() {
@@ -126,9 +126,11 @@ const comp = module.exports = {
             apiResponse: null,
             apiList: [
                 { text: '로그인', value: 'loginSignin' },
-                { text: '로그인 체크', value: 'loginCheck' },
-                { text: '인시던트 목록 조회', value: 'getIncidents' },
-                { text: '실시간 거래 분석', value: 'getLiveTransactions' },
+                { text: '사용자 등록', value: 'loginSignup' },
+                { text: '로그인 상태 체크', value: 'loginCheck' },
+                { text: '로그아웃', value: 'logout' },
+                { text: '서비스 거래 목록 조회', value: 'getIncidents' },
+                { text: '실시간 서비스 분석', value: 'getLiveTransactions' },
                 { text: '룰셋 조회', value: 'getRules' },
                 { text: '대출 신청', value: 'applyLoan' },
                 { text: '한도 조회', value: 'checkLoanLimit' },
@@ -218,23 +220,29 @@ const comp = module.exports = {
                     ],
                 },
                 getRules: {
-                    name: '룰셋 조회',
-                    endpoint: '/api/rules',
+                    name: '서비스 모니터링 정책 설정',
+                    endpoint: '/api/rule-list',
                     method: 'POST',
                     description: '설정된 룰셋 목록을 조회합니다.',
                     parameters: [],
                     curlExample: `curl -X POST "${endpoint_url}/api/rules" \\\n     -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\\n     -H "Content-Type: application/json" \\\n     -d \'{}\'`,
                     responseExample: '{\n  "rules": [\n    {\n      "id": "string",\n      "name": "string",\n      "type": "string",\n      "condition": "string",\n      "action": "string"\n    }\n  ]\n}',
                     responseSample: {
-                        rules: [
-                            {
-                                id: 'RULE-001',
+                        header: {
+                            resultCode: "0000",
+                            resultMessage: "룰셋 목록 조회 성공"
+                        },
+                        body: {
+                            rules: [
+                                {
+                                    id: 'RULE-001',
                                 name: '10분 무거래 탐지',
                                 type: '거래 부재',
-                                condition: '10분 동안 거래 없음',
-                                action: '시스템 관리자에게 알림 발송'
-                            }
-                        ]
+                                    condition: '10분 동안 거래 없음',
+                                    action: '시스템 관리자에게 알림 발송'
+                                }
+                            ]
+                        }
                     },
                     responseFormat: [
                         { name: 'rules', type: 'Array', required: true, description: '룰셋 목록' },
@@ -249,7 +257,7 @@ const comp = module.exports = {
                 },
                 applyLoan: {
                     name: '대출 신청',
-                    endpoint: '/api/loan/apply',
+                    endpoint: '/api/loan-apply',
                     method: 'POST',
                     description: '대출을 신청합니다.',
                     parameters: [
@@ -280,7 +288,7 @@ const comp = module.exports = {
                 },
                 checkLoanLimit: {
                     name: '한도 조회',
-                    endpoint: '/api/loan/limit',
+                    endpoint: '/api/loan-limit',
                     method: 'POST',
                     description: '대출 가능 한도를 조회합니다.',
                     parameters: [
@@ -382,7 +390,56 @@ const comp = module.exports = {
                         { name: 'body.expiredDate', type: 'String', required: true, description: '세션 만료 일시' }
                     ],
                 },
+                loginSignup: {
+                    name: '사용자 등록',
+                    endpoint: '/api/login-signup',
+                    method: 'POST',
+                    description: '사용자를 등록합니다.',
+                    parameters: [
+                        { name: 'userId', type: 'String', required: true, description: '사용자 ID' },
+                        { name: 'userName', type: 'String', required: true, description: '사용자 이름' },
+                        { name: 'password', type: 'String', required: true, description: '사용자 비밀번호' },
+                    ],
+                    curlExample: `curl -X POST "${endpoint_url}/api/login-signup" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"userId": "newuser", "userName": "새로운 사용자", "password": "newpassword"}\'`,
+                    responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  },\n  "body": {\n    "userId": "string",\n    "userName": "string",\n    "userType": "string",\n    "userStatus": "string",\n    "loginStatus": "string",\n    "lastLoginDate": "string",\n    "expiredDate": "string"\n  }\n}',
+                    responseSample: {
+                        header: {
+                            resultCode: "0000",
+                            resultMessage: "사용자 등록 성공"
+                        },
+                        body: {
+                            userId: "newuser",
+                            userName: "새로운 사용자",
+                            userType: "user",
+                            userStatus: "정상",
+                            loginStatus: "로그인",
+                            lastLoginDate: "2024-05-01 12:00:00",
+                            expiredDate: "2024-05-01 13:00:00"
+                        }
+                    },                    
+                },
+                logout: {
+                    name: '로그아웃',
+                    endpoint: '/api/logout',
+                    method: 'POST',
+                    description: '사용자 로그아웃을 처리합니다.',
+                    parameters: [],
+                    curlExample: `curl -X POST "${endpoint_url}/api/logout"`,
+                    responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  }\n}',
+                    responseSample: {
+                        header: {
+                            resultCode: "0000",
+                            resultMessage: "로그아웃 성공"
+                        }
+                    },
+                    responseFormat: [
+                        { name: 'header', type: 'Object', required: true, description: '응답 헤더' },
+                        { name: 'header.resultCode', type: 'String', required: true, description: '결과 코드' },
+                        { name: 'header.resultMessage', type: 'String', required: true, description: '결과 메시지' }
+                    ],
+                },
             }
+            
         };
     },
     methods: {
