@@ -7,15 +7,15 @@
           <v-card-text>
             <v-form ref="form" v-model="valid" lazy-validation>
               <v-text-field ref="userId" v-model="userId" :rules="userIdRules" label="아이디"
-                :validate-on-blur="false"></v-text-field>
+                :validate-on-blur="false" data-test="userId-input"></v-text-field>
               <v-text-field v-model="password" :rules="passwordRules" label="패스워드" type="password"
-                @keypress.enter="login" :validate-on-blur="false" autocomplete="current-password"></v-text-field>
-              <v-btn color="success" @click="login">로그인</v-btn>
+                @keypress.enter="login" :validate-on-blur="false" autocomplete="current-password" data-test="password-input"></v-text-field>
+              <v-btn color="success" @click="login" data-test="login-button">로그인</v-btn>
             </v-form>
 
             <v-divider class="mt-2 mb-2"></v-divider>
 
-            <v-alert v-if="loginError" type="error" dismissible>{{
+            <v-alert v-if="loginError" type="error" dismissible data-test="login-error-message">{{
               loginErrorMessage
               }}</v-alert>
           </v-card-text>
@@ -69,7 +69,7 @@ const comp = (module.exports = {
           } else {
             // 로그인 실패 시 에러 메시지 표시
             this.$session.clear();
-            this.loginErrorMessage = response.data.message || "로그인 실패";
+            this.loginErrorMessage = "로그인 실패";
             this.loginError = true;
           }
         } catch (error) {

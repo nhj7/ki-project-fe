@@ -36,7 +36,7 @@
                 </v-col>
               </v-row>
 
-              <v-btn color="primary" block @click="submitLoanApplication">신청하기</v-btn>
+              <v-btn color="primary" block @click="submitLoanApplication" class="mb-2">신청하기</v-btn>
               <v-divider></v-divider>
               <v-btn color="primary" block @click="checkLoanLimit">한도조회</v-btn>
             </v-form>

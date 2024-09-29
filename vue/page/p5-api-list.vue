@@ -318,7 +318,8 @@ const comp = module.exports = {
                     method: 'POST',
                     description: '사용자의 로그인 상태를 확인합니다.',
                     parameters: [
-                        { name: 'token', type: 'String', required: true, default: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c', description: '사용자 인증 토큰' }
+                        { name: 'accessToken', type: 'String', required: true, default: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c', description: '사용자 인증 토큰' },
+                        { name: 'refreshToken', type: 'String', required: true, default: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c', description: '사용자 재발급 토큰' },
                     ],
 
                     responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  },\n  "body": {\n    "userId": "string",\n    "userName": "string",\n    "userType": "string",\n    "userStatus": "string",\n    "loginStatus": "string",\n    "lastLoginDate": "string",\n    "expiredDate": "string"\n  }\n}',

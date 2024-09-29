@@ -800,4 +800,8 @@ Vue.prototype.$session = {
   line-height: 1.2 !important;
   /* 줄 간격 조정 */
 }
+
+.v-select .v-select__selections {
+  color: var(--v-primary-base) !important;
+}
 </style>
