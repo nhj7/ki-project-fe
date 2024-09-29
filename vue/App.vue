@@ -136,17 +136,69 @@
         <!--component :is="currentView"></component-->
         <div class="router-view-container flex-grow-1">
           <router-view></router-view>
-          <v-overlay :value="$loading.isLoading" :opacity="0.05" absolute class="loading-overlay">
-            <div class="loading-content">
+          <v-overlay :value="$loading.isLoading" :opacity="0.05" absolute class="d-flex align-center justify-center">
+            <v-card class="loading-card pa-4 d-flex flex-column align-center" elevation="0" color="transparent">
               <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
                 <v-icon size="40" color="primary">mdi-magnify</v-icon>
               </v-progress-circular>
-              <div class="loading-text mt-4 primary--text">
-                {{ $loading.loadingText }}
-              </div>
-            </div>
+              <v-card-text class="text-center pt-4">
+                <span class="text-body-1 primary--text">{{ $loading.displayText }}</span>
+              </v-card-text>
+            </v-card>
           </v-overlay>
         </div>
+
+        <!-- 메시지 팝업 -->
+        <v-dialog v-if="$msg" v-model="$msg.showMessagePopup" max-width="600px" @keydown.enter="$msg.hide"
+          @keydown.space="$msg.hide">
+          <v-card>
+            <v-card-title class="headline d-flex justify-space-between align-center">
+              <div>
+                <v-icon left>{{ $msg.messageIcon }}</v-icon>
+                {{ $msg.messageTitle }} 결과
+              </div>
+              <v-btn icon large @click="$msg.hide">
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+            </v-card-title>
+            <v-card-text>
+              <v-simple-table>
+                <template v-slot:default>
+                  <tbody>
+                    <tr>
+                      <td style="width: 20%;"><strong>거래 종류:</strong></td>
+                      <td>{{ $msg.messageTitle }}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>메시지 코드:</strong></td>
+                      <td>{{ $msg.messageCode }}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>메시지 내용:</strong></td>
+                      <td>{{ $msg.messageContent }}</td>
+                    </tr>
+                    <v-expand-transition>
+                      <tr v-if="$msg.showErrorDetails">
+                        <td><strong>오류 상세:</strong></td>
+                        <td><v-textarea v-model="$msg.errorDetails" outlined readonly auto-grow rows="3" row-height="20"
+                            hide-details class="error-details"></v-textarea></td>
+                      </tr>
+                    </v-expand-transition>
+                  </tbody>
+                </template>
+              </v-simple-table>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn v-if="$msg.isError" color="primary" text @click="$msg.toggleErrorDetails">
+                {{ $msg.showErrorDetails ? '접기' : '자세히' }}
+              </v-btn>
+              <v-btn color="primary" x-large rounded text @click="$msg.hide">닫기</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
+
       </v-container>
     </v-main>
 
@@ -199,6 +251,91 @@
   </v-app>
 </template>
 <script>
+
+const LoadingPlugin = {
+  install(Vue) {
+    const loading = new Vue({
+      data: {
+        isLoading: false,
+        loadingText: '로딩 중...',
+        elapsedTime: 0,
+        timerInterval: null
+      },
+      methods: {
+        show(text = '로딩 중...') {
+          this.isLoading = true;
+          this.loadingText = text;
+          this.elapsedTime = 0;
+          this.startTimer();
+        },
+        hide() {
+          this.isLoading = false;
+          this.stopTimer();
+        },
+        startTimer() {
+          this.stopTimer(); // 기존 타이머가 있다면 중지
+          this.timerInterval = setInterval(() => {
+            this.elapsedTime++;
+          }, 1000);
+        },
+        stopTimer() {
+          if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+          }
+        },
+        getFormattedTime() {
+          const minutes = Math.floor(this.elapsedTime / 60);
+          const seconds = this.elapsedTime % 60;
+          return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+      },
+      computed: {
+        displayText() {
+          return `${this.loadingText} (${this.getFormattedTime()})`;
+        }
+      }
+    });
+
+    Vue.prototype.$loading = loading;
+  }
+};
+
+Vue.use(LoadingPlugin);
+
+const MessagePlugin = {
+  install(Vue) {
+    const message = new Vue({
+      data: {
+        showMessagePopup: false,
+        messageIcon: "mdi-information",
+        messageCode: "0000",
+        messageTitle: "메시지 제목",
+        messageContent: "메시지 내용",
+        errorDetails: "오류 상세",
+        isError: false,
+        showErrorDetails: false,
+      },
+      methods: {
+        show(options = {}) {
+          Object.assign(this.$data, options);
+          this.showMessagePopup = true;
+        },
+        hide() {
+          this.showMessagePopup = false;
+          this.showErrorDetails = false;
+        },
+        toggleErrorDetails() {
+          this.showErrorDetails = !this.showErrorDetails;
+        }
+      }
+    });
+
+    Vue.prototype.$msg = message;
+  }
+};
+Vue.use(MessagePlugin);
+
 const data = {
   currentView: "",
   isDark: false,
@@ -231,7 +368,7 @@ const comp = (module.exports = {
     },
   },
   watch: {
-    
+
   },
   methods: {
     goToAccountSettings() {
@@ -288,7 +425,7 @@ const comp = (module.exports = {
     },
   },
   async mounted() {
-    console.log("App.vue mounted");
+    console.log("App.vue mounted", Object.keys(this.$options.components));
 
     this.drawer = window.innerWidth >= 1264; // Vuetify의 lg 브레이크포인트
   },
@@ -362,6 +499,9 @@ const globalMethods = {
   numberWithComma(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   },
+  async sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 };
 
 Vue.prototype.$util = globalMethods;
@@ -373,6 +513,8 @@ Vue.prototype.$session = {
   loginStatus: null,
   lastLoginDate: null,
   expiredDate: null,
+  accessToken: null,
+  refreshToken: null,
   clear() {
     this.userId = null;
     this.userName = null;
@@ -381,8 +523,14 @@ Vue.prototype.$session = {
     this.loginStatus = null;
     this.lastLoginDate = null;
     this.expiredDate = null;
+    this.accessToken = null;
+    this.refreshToken = null;
   },
 };
+
+
+
+
 </script>
 <style scoped>
 .router-view-container {
@@ -634,5 +782,12 @@ Vue.prototype.$session = {
 
 .v-list-group .v-list--dense .v-list-item {
   min-height: 33px !important;
+}
+
+.error-details textarea {
+  font-size: 12px !important;
+  /* 원하는 크기로 조정 */
+  line-height: 1.2 !important;
+  /* 줄 간격 조정 */
 }
 </style>

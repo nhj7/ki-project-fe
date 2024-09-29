@@ -4,8 +4,8 @@
         "resultMessage": "로그인 상태입니다."
     },
     "body": {
-        "userId": "admin",
-        "userName" : "나형주1",
+        "userId": "nhj7",
+        "userName" : "나형주",
         "userType" : "admin",
         "userStatus" : "정상",
         "loginStatus" : "로그인",

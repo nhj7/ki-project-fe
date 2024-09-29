@@ -9,7 +9,7 @@
               <v-text-field ref="userId" v-model="userId" :rules="userIdRules" label="아이디"
                 :validate-on-blur="false"></v-text-field>
               <v-text-field v-model="password" :rules="passwordRules" label="패스워드" type="password"
-                @keypress.enter="login" :validate-on-blur="false"></v-text-field>
+                @keypress.enter="login" :validate-on-blur="false" autocomplete="current-password"></v-text-field>
               <v-btn color="success" @click="login">로그인</v-btn>
             </v-form>
 
@@ -43,15 +43,26 @@ const comp = (module.exports = {
     async login() {
       if (this.$refs.form.validate()) {
         try {
+          /*
           const response = await axios.get("/mock/login-signin.json", {
             userId: this.userId,
             password: this.password,
           });
+          */
+          const response = await request("/api/login-signin", "POST", {
+            username: this.userId,
+            password: this.password,
+          });
 
           console.log("response", response);
-          if (response.data?.header?.resultCode === "0000") {
+          //if (response.data?.header?.resultCode === "0000") {
+          if (response.data?.success) {
+
+            response.data.result.data.userId = this.userId;
+            response.data.result.data.userName = this.userId;           
+            
             // 로그인 성공 시 페이지 이동
-            Object.assign(this.$session, response.data.body);
+            Object.assign(this.$session, response.data.result.data);
             this.$router.push("/live-transaction-analytics");
           } else {
             // 로그인 실패 시 에러 메시지 표시

@@ -1,8 +1,8 @@
 <template>
   <v-container fluid>
     <v-card>
-      <v-card-title>        
-        
+      <v-card-title>
+
         <v-spacer></v-spacer>
         <v-btn color="primary" @click="openUserDialog()">
           사용자 등록
@@ -124,7 +124,6 @@ const comp = module.exports = {
           userStatus: '정상',
           loginStatus: '로그인',
           lastLoginDate: '2024-05-01 12:00:00',
-          expiredDate: '2024-05-01 13:00:00',
         },
         // 더 많은 사용자 데이터...
       ]
@@ -155,7 +154,7 @@ const comp = module.exports = {
       this.editedItem = Object.assign({}, this.defaultItem)
       this.editedIndex = -1
     },
-    save() {
+   async save() {
       if (this.editedIndex > -1) {
         // 사용자 수정
         const updatedUser = Object.assign({}, this.users[this.editedIndex], this.editedItem)
@@ -166,6 +165,15 @@ const comp = module.exports = {
         Object.assign(this.users[this.editedIndex], updatedUser)
       } else {
         // 새 사용자 등록
+
+        const res = await request("/api/login-signup", "POST", {
+          name: this.editedItem.userName,
+          username: this.editedItem.userId,          
+          password: this.editedItem.password,
+        });
+
+        console.log("res", res);
+
         this.users.push(this.editedItem)
       }
       this.close()

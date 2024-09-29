@@ -54,17 +54,14 @@
 
                         <v-subheader class="mt-4">요청 형식</v-subheader>
                         <v-card outlined>
-                            <v-card-text>
-                                <pre><code>{{ selectedApiDetails.curlExample }}</code></pre>
-                            </v-card-text>
+                            <v-card-text class="font-weight-bold"
+                                v-html="selectedApiDetails.curlExample"></v-card-text><!--eslint-disable-line-->
                         </v-card>
                         <v-btn color="primary" @click="callApi" class="mt-2">API 호출</v-btn>
 
                         <v-subheader class="mt-4">응답 결과</v-subheader>
-                        <v-card outlined v-if="apiResponse">
-                            <v-card-text>
-                                <pre><code>{{ apiResponse }}</code></pre>
-                            </v-card-text>
+                        <v-card outlined v-if="apiResponse" >
+                            <v-card-text class="font-weight-bold" v-html="apiResponse"></v-card-text><!--eslint-disable-line-->                                
                         </v-card>
 
                         <v-row>
@@ -100,9 +97,8 @@
                             <v-col cols="12" md="6">
                                 <v-subheader class="mt-4">응답 샘플</v-subheader>
                                 <v-card outlined>
-                                    <v-card-text>
-                                        <pre><code>{{ JSON.stringify(selectedApiDetails.responseSample, null, 2) }}</code></pre>
-                                    </v-card-text>
+                                    <v-card-text class="font-weight-bold"
+                                        v-html="selectedApiDetails.responseSample"></v-card-text><!--eslint-disable-line-->
                                 </v-card>
                             </v-col>
                         </v-row>
@@ -116,7 +112,7 @@
 
 <script>
 
-const endpoint_url = 'https://ki.iinfo.kr:18080';
+
 
 const comp = module.exports = {
     data() {
@@ -134,7 +130,7 @@ const comp = module.exports = {
                 { text: '룰셋 조회', value: 'getRules' },
                 { text: '대출 신청', value: 'applyLoan' },
                 { text: '한도 조회', value: 'checkLoanLimit' },
-                
+
             ],
             apiDetails: {
                 getIncidents: {
@@ -147,7 +143,11 @@ const comp = module.exports = {
                         { name: 'endDate', type: 'String', required: true, description: '조회 종료 날짜 (YYYY-MM-DD 형식)' },
                         { name: 'status', type: 'String', required: false, description: '인시던트 상태 (예: "open", "closed")' }
                     ],
-                    curlExample: `curl -X POST "${endpoint_url}/api/incidents" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"startDate": "2023-01-01", "endDate": "2023-12-31", "status": "open"}\'`,
+
+                    requestSample: {
+                        username: "nhj7",
+                        password: "djdl77&&",
+                    },
                     responseExample: '{\n  "incidents": [\n    {\n      "id": "string",\n      "title": "string",\n      "description": "string",\n      "status": "string",\n      "createdAt": "string",\n      "updatedAt": "string"\n    }\n  ],\n  "totalCount": "number"\n}',
                     responseSample: {
                         incidents: [
@@ -181,7 +181,7 @@ const comp = module.exports = {
                     parameters: [
                         { name: 'duration', type: 'Number', required: false, description: '조회 기간 (분 단위, 기본값: 5)' }
                     ],
-                    curlExample: `curl -X POST "${endpoint_url}/api/live-transactions" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"duration": 10}\'`,
+
                     responseExample: '{\n  "timestamp": "string",\n  "transactionData": {\n    "normal": "number",\n    "anomaly": "number"\n  },\n  "anomalyTransactions": [\n    {\n      "timestamp": "string",\n      "transactionId": "string",\n      "type": "string",\n      "amount": "number",\n      "status": "string"\n    }\n  ]\n}',
                     responseSample: {
                         timestamp: "20230515143000",
@@ -225,7 +225,7 @@ const comp = module.exports = {
                     method: 'POST',
                     description: '설정된 룰셋 목록을 조회합니다.',
                     parameters: [],
-                    curlExample: `curl -X POST "${endpoint_url}/api/rules" \\\n     -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\\n     -H "Content-Type: application/json" \\\n     -d \'{}\'`,
+
                     responseExample: '{\n  "rules": [\n    {\n      "id": "string",\n      "name": "string",\n      "type": "string",\n      "condition": "string",\n      "action": "string"\n    }\n  ]\n}',
                     responseSample: {
                         header: {
@@ -236,8 +236,8 @@ const comp = module.exports = {
                             rules: [
                                 {
                                     id: 'RULE-001',
-                                name: '10분 무거래 탐지',
-                                type: '거래 부재',
+                                    name: '10분 무거래 탐지',
+                                    type: '거래 부재',
                                     condition: '10분 동안 거래 없음',
                                     action: '시스템 관리자에게 알림 발송'
                                 }
@@ -265,8 +265,8 @@ const comp = module.exports = {
                         { name: 'amount', type: 'Number', required: true, description: '대출 금액' },
                         { name: 'period', type: 'Number', required: true, description: '대출 기간 (개월)' }
                     ],
-                    curlExample: `curl -X POST "${endpoint_url}/api/loan/apply" \\\n     -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"name": "홍길동", "amount": 1000000, "period": 12}\'`,
-                    sampleRequestBody: {
+
+                    requestBody: {
                         name: "홍길동",
                         amount: 1000000,
                         period: 12
@@ -294,7 +294,7 @@ const comp = module.exports = {
                     parameters: [
                         { name: 'customerId', type: 'String', required: true, description: '고객 ID' }
                     ],
-                    curlExample: `curl -X POST "${endpoint_url}/api/loan/limit" \\\n     -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"customerId": "123456"}\'`,
+
                     responseExample: '{\n  "customerId": "string",\n  "loanLimit": "number",\n  "creditScore": "number"\n}',
                     responseSample: {
                         customerId: '123456',
@@ -319,7 +319,7 @@ const comp = module.exports = {
                     parameters: [
                         { name: 'token', type: 'String', required: true, description: '사용자 인증 토큰' }
                     ],
-                    curlExample: `curl -X POST "${endpoint_url}/api/login-check" \\\n     -H "Content-Type: application/json"`,
+
                     responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  },\n  "body": {\n    "userId": "string",\n    "userName": "string",\n    "userType": "string",\n    "userStatus": "string",\n    "loginStatus": "string",\n    "lastLoginDate": "string",\n    "expiredDate": "string"\n  }\n}',
                     responseSample: {
                         header: {
@@ -359,7 +359,11 @@ const comp = module.exports = {
                         { name: 'userId', type: 'String', required: true, description: '사용자 아이디' },
                         { name: 'password', type: 'String', required: true, description: '사용자 비밀번호' }
                     ],
-                    curlExample: `curl -X POST "${endpoint_url}/api/login-signin" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"userId": "admin", "password": "your_password_here"}\'`,
+
+                    requestSample: {
+                        username: "nhj7",
+                        password: "djdl77&&",
+                    },
                     responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  },\n  "body": {\n    "userId": "string",\n    "userName": "string",\n    "userType": "string",\n    "userStatus": "string",\n    "loginStatus": "string",\n    "lastLoginDate": "string",\n    "expiredDate": "string"\n  }\n}',
                     responseSample: {
                         header: {
@@ -396,11 +400,16 @@ const comp = module.exports = {
                     method: 'POST',
                     description: '사용자를 등록합니다.',
                     parameters: [
-                        { name: 'userId', type: 'String', required: true, description: '사용자 ID' },
-                        { name: 'userName', type: 'String', required: true, description: '사용자 이름' },
+                        { name: 'username', type: 'String', required: true, description: '사용자 ID' },
                         { name: 'password', type: 'String', required: true, description: '사용자 비밀번호' },
+                        { name: 'name', type: 'String', required: true, description: '사용자 이름' },
                     ],
-                    curlExample: `curl -X POST "${endpoint_url}/api/login-signup" \\\n     -H "Content-Type: application/json" \\\n     -d \'{"userId": "newuser", "userName": "새로운 사용자", "password": "newpassword"}\'`,
+
+                    requestSample: {
+                        username: "nhj77",
+                        password: "nhj77",
+                        name: "행주햄",
+                    },
                     responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  },\n  "body": {\n    "userId": "string",\n    "userName": "string",\n    "userType": "string",\n    "userStatus": "string",\n    "loginStatus": "string",\n    "lastLoginDate": "string",\n    "expiredDate": "string"\n  }\n}',
                     responseSample: {
                         header: {
@@ -416,7 +425,7 @@ const comp = module.exports = {
                             lastLoginDate: "2024-05-01 12:00:00",
                             expiredDate: "2024-05-01 13:00:00"
                         }
-                    },                    
+                    },
                 },
                 logout: {
                     name: '로그아웃',
@@ -424,7 +433,6 @@ const comp = module.exports = {
                     method: 'POST',
                     description: '사용자 로그아웃을 처리합니다.',
                     parameters: [],
-                    curlExample: `curl -X POST "${endpoint_url}/api/logout"`,
                     responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  }\n}',
                     responseSample: {
                         header: {
@@ -439,11 +447,21 @@ const comp = module.exports = {
                     ],
                 },
             }
-            
+
         };
     },
     methods: {
         async showApiDetails() {
+            this.apiResponse = '';
+            //this.apiDetails[this.selectedApi].curlExample = hljs.highlight(`curl -X POST "${this.$config.endpoint_url}${this.apiDetails[this.selectedApi].endpoint}" \\\n     -H "Content-Type: application/json" \\\n ${this.apiDetails[this.selectedApi].requestSample ? '-d \'' + this.customStringify(this.apiDetails[this.selectedApi].requestSample) : ''}\'`
+            //    , { language: 'curl' }).value;
+
+            //this.apiDetails[this.selectedApi].curlExample = this.beautifyCURL(`curl -X POST "${this.$config.endpoint_url}${this.apiDetails[this.selectedApi].endpoint}" \\\n     -H "Content-Type: application/json" \\\n ${this.apiDetails[this.selectedApi].requestSample ? '-d \'' + this.customStringify(this.apiDetails[this.selectedApi].requestSample) : ''}\'`);
+            this.apiDetails[this.selectedApi].curlExample = this.highlightCurl(`curl -X POST "${this.$config.endpoint_url}${this.apiDetails[this.selectedApi].endpoint}" \\\n     -H "Content-Type: application/json" \\\n ${this.apiDetails[this.selectedApi].requestSample ? '-d \'' + this.customStringify(this.apiDetails[this.selectedApi].requestSample)+'\'' : ''}`);
+
+            //this.apiDetails[this.selectedApi].responseSample = hljs.highlight(this.customStringify(this.apiDetails[this.selectedApi].responseSample)
+            //    , { language: 'json' }).value;
+
             this.selectedApiDetails = this.apiDetails[this.selectedApi];
             try {
                 const response = await fetch(`/mock/${this.selectedApiDetails.endpoint.replace('/api/', '')}.json`);
@@ -451,9 +469,11 @@ const comp = module.exports = {
                 if (!response.ok) {
                     throw new Error('데이터를 불러오는 중 오류가 발생했습니다.');
                 }
-                const liveTransactionsData = await response.json();
-                console.log('liveTransactionsData', liveTransactionsData);
-                this.apiDetails[this.selectedApi].responseSample = liveTransactionsData;
+                const resJson = await response.json();
+                console.log('showApiDetails', resJson);
+
+                //this.apiDetails[this.selectedApi].responseSample = hljs.highlight(JSON.stringify(resJson, null, 2), { language: 'json' }).value;
+                this.apiDetails[this.selectedApi].responseSample = this.beautifyJSON(resJson);
             } catch (error) {
                 console.error('json 로드 중 오류 발생:', error);
             }
@@ -462,30 +482,117 @@ const comp = module.exports = {
             try {
                 this.$loading.show('API를 호출하는 중입니다...');
                 const apiDetails = this.apiDetails[this.selectedApi];
-                const response = await fetch(endpoint_url + apiDetails.endpoint, {
-                    method: apiDetails.method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // 필요한 경우 인증 헤더 추가
-                    },
-                    // POST 요청의 경우 body 추가
-                    ...(apiDetails.method === 'POST' && {
-                        body: JSON.stringify(apiDetails.sampleRequestBody)
-                    }),
-                });
-                const data = await response.json();
-                this.apiResponse = JSON.stringify(data, null, 2);
+                const response = await axios.post(this.$config.endpoint_url + apiDetails.endpoint, apiDetails.requestSample);
+                //console.log('response', response);
+                try {
+                    //this.apiResponse = ' ' + JSON.stringify(response.data, null, 2);
+                    this.apiResponse = ' ' + this.beautifyJSON(response.data);
+                } catch (error) {
+                    console.error('API 호출 중 오류가 발생했습니다:', error, response.data);
+                    const data = await response.json();
+                    this.apiResponse = JSON.stringify(data, null, 2);
+                }
             } catch (error) {
                 console.error('API 호출 중 오류가 발생했습니다:', error);
-                this.apiResponse = '오류: ' + error.message;
+                this.apiResponse = '오류: ' + error.message + ' ' + this.beautifyJSON(error.response.data);
             } finally {
                 this.$loading.hide();
             }
         },
+        customStringify(obj) {
+            return JSON.stringify(obj, null, 2)
+                .replace(/\n/g, ' ')
+                .replace(/:\s+/g, ' : ')
+                .replace(/,\s+/g, ', ');
+        },
+        beautifyJSON(obj) {
+            const json = JSON.stringify(obj, null, 2);
+            let depth = 0;
+
+            const colorize = (match) => {
+                let cls = 'json_number';
+                if (/^"/.test(match)) {
+                    cls = /:$/.test(match) ? 'json_key' : 'json_string';
+                } else if (/true|false/.test(match)) {
+                    cls = 'json_boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json_null';
+                }
+                return `<span class="${cls}">${match}</span>`;
+            };
+
+            const processLine = (line) => {
+                const trimmedLine = line.trim();
+                if (trimmedLine.includes('}') || trimmedLine.includes(']')) {
+                    depth--;
+                }
+
+                const indentation = '&nbsp;&nbsp;&nbsp;&nbsp;'.repeat(depth);
+                const processedLine = trimmedLine
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, colorize);
+
+                if (trimmedLine.includes('{') || trimmedLine.includes('[')) {
+                    depth++;
+                }
+
+                return `<span class="json_line">${indentation}${processedLine}</span>`;
+            };
+
+            return json.split('\n').map(processLine).join('\n');
+        },
+        beautifyCURL(curlCommand) {
+            const CLASSES = {
+                COMMAND: 'curl_command',
+                URL: 'curl_url',
+                OPTION: 'curl_option',
+                HEADER: 'curl_header',
+                DATA: 'curl_data'
+            };
+
+            const escapeHtml = (str) => {
+                return str
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            };
+
+            const wrap = (content, className) => `<span class="${className}">${content}</span>`;
+
+            const highlightParts = (line) => {
+                return line
+                    .replace(/^(curl\s)/i, (match) => wrap(match, CLASSES.COMMAND))
+                    .replace(/(-X\s+\w+)/g, (match) => wrap(match, CLASSES.OPTION))
+                    .replace(/"(https?:\/\/[^"]+)"/g, (match, url) => `"${wrap(url, CLASSES.URL)}"`)
+                    .replace(/(-H\s+("[^"]+"|\S+))/g, (match) => wrap(match, CLASSES.HEADER))
+                    .replace(/(-d\s+('[^']+'|"[^"]+"))/g, (match) => wrap(match, CLASSES.DATA))
+                    .replace(/(\\\s*)$/g, (match) => wrap(match, CLASSES.OPTION));
+            };
+
+            return curlCommand
+                .split('\n')
+                .map(line => escapeHtml(line.trim()))
+                .map(highlightParts)
+                .map(line => `<span class="curl_line">${line}</span>`)
+                .join('\n');
+        },
+        highlightCurl(curlCommand) {
+            return curlCommand
+                .replace(/(curl)/g, '<span class="curl_command">$1</span>')
+                .replace(/(-X POST)/g, '<span class="curl_method">$1</span>')
+                //.replace(/(https:\/\/[\w./]+)(?=\s)/g, '<span class="curl_url">$1</span>')
+                .replace(/(["']https?:\/\/[^\s"']+)/g, '<span class="curl_url">$1</span>')
+                .replace(/(-H ".*?")/g, '<br />&nbsp;&nbsp;&nbsp;&nbsp;<span class="curl_header">$1</span>')
+                .replace(/(-d '.*?')/g, '<br />&nbsp;&nbsp;&nbsp;&nbsp;<span class="curl_data">$1</span>');
+        }
     },
     async mounted() {
         this.showApiDetails(); // 컴포넌트 마운트 시 API 상세 정보 표시
-        
+
         // live_transactions.json 파일 로드
         /*
         try {
@@ -516,5 +623,42 @@ pre {
     border-radius: 4px;
     white-space: pre-wrap;
     word-wrap: break-word;
+}
+
+.json_string { color: var(--v-success-base); }
+.json_key { color: var(--v-primary-base); }
+.json_number { color: var(--v-warning-base); }
+.json_boolean { color: purple; }
+.json_null { color: var(--v-grey-base); }
+.json_line { display: block; }
+
+.curl_line {
+    display: block;
+}
+
+.curl_command {
+    color: var(--v-primary-base);
+    font-weight: bold;
+}
+
+.curl_method {
+    color: var(--v-success-base);
+}
+
+.curl_url {    
+    color: var(--v-success-base);
+}
+
+.curl_option {
+    color: var(--v-warning-base);
+    font-weight: bold;
+}
+
+.curl_header {    
+    color: var(--v-accent-base);
+}
+
+.curl_data {
+    color: var(--v-warning-base);
 }
 </style>

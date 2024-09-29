@@ -167,7 +167,7 @@
 
         const Home = { template: '<div>Home</div>' }
 
-        
+
         const router = new VueRouter({
             mode: 'hash',
             routes: [
@@ -178,7 +178,7 @@
                         icon: "mdi-home",
                     }
                 }
-                
+
                 , {
                     path: '/live-transaction-analytics', name: 'live-transaction-analytics', component: loadVue('./page/p1-live-transaction-analytics'), meta: {
                         showInMenu: true,
@@ -230,7 +230,7 @@
                     }
                 }
 
-                
+
                 , {
                     path: '/logo-generator', name: 'logo-generator', component: loadVue('./page/page4-logo-generator'), meta: {
                         showInMenu: false,
@@ -240,7 +240,7 @@
                     }
 
                 }
-                
+
                 , {
                     path: '/toss-loan', name: 'toss-loan', component: loadVue('./page/p13-toss-loan'), meta: {
                         showInMenu: false,
@@ -250,18 +250,18 @@
                     }
                 }
                 , {
-                    path:'/login', name:'login', component: loadVue('./page/p0-login'), meta: {
+                    path: '/login', name: 'login', component: loadVue('./page/p0-login'), meta: {
                         showInMenu: false,
                         title: "로그인",
                         icon: "mdi-login",
                     }
                 }
-                
+
                 , {
                     path: '#1', name: 'test', meta: {
                         showInMenu: true,
                         icon: "mdi-view-dashboard",
-                        title: "서비스 품질 테스트 센터",  
+                        title: "서비스 품질 테스트 센터",
                         isGroupOpen: false,
                     }, subRoutes: [
                         {
@@ -280,7 +280,7 @@
                     path: '#', name: 'sample', meta: {
                         showInMenu: true,
                         icon: "mdi-view-dashboard-outline",
-                        title: "샘플 페이지",  
+                        title: "샘플 페이지",
                         isGroupOpen: false,
                     }, subRoutes: [
                         {
@@ -307,7 +307,7 @@
                         }
                     ]
                 }
-                
+
                 , {
                     path: '/sample-apexcharts', name: 'sample-apexcharts', component: loadVue('./page/page5-sample-apexcharts'), meta: {
                         showInMenu: false,
@@ -380,7 +380,7 @@
                 }
             }
             , components: {
-                'App': loadVue('App')                
+                'App': loadVue('App')
                 //, 'page-title': PageTitle
             }
             , methods: {
@@ -414,69 +414,33 @@
 
         });
 
-        const LoadingPlugin = {
-            install(Vue) {
-                const loading = new Vue({
-                    data: {
-                        isLoading: false,
-                        loadingText: '로딩 중...'
-                    },
-                    methods: {
-                        show(text = '로딩 중...') {
-                            this.isLoading = true;
-                            this.loadingText = text;
-                        },
-                        hide() {
-                            this.isLoading = false;
-                        }
-                    }
+        
+        Vue.prototype.$config = {
+            endpoint_url: 'https://ki.iinfo.kr:18080'
+        }
+
+
+             
+        async function request(url, method, data) {            
+            try{
+                return await axios.request( {
+                    method : method, 
+                    url : Vue.prototype.$config.endpoint_url + url, 
+                    data : data
                 });
-
-                Vue.prototype.$loading = loading;
+            } catch(error) {
+                console.log('error', error);
+                return error;
             }
-        };
-
-        Vue.use(LoadingPlugin);
-
-
-
-        /*
-        const { createApp, ref, defineAsyncComponent } = Vue;
-
-        const app = createApp({
-            setup() {
-                const message = ref('Hello vue!')
-                return {
-                    message
-                }
-            }
-            , data() {
-                return {
-                    "currentView":""
-                    , "data1" : "data22"
-                }
-            }
-            , mounted() {
-                console.log("mounted");
-                this.currentView = "Dashboard";
-            }
-        });
-        app.component('Dashboard', httpVueLoader('./page/Dashboard.vue'));
-        //const AsyncComp = defineAsyncComponent(() => import('./page/Dashboard.vue'))
-        //app.component('Dashboard', defineAsyncComponent(() => import('./page/Dashboard.vue')))
+        }
+        //hljs.registerLanguage("curl", window.hljsDefineCurl);
+        //hljs.highlightAll();
         
-
-        console.log("pre mount");
-        app.mount('#app');
-
-        console.log(app);
+        //hljs.registerLanguage("vue", window.hljsDefineVue);
+        //hljs.initHighlightingOnLoad();
         
-
-        //app.mounted()
-
-        //app.
-
-        */
+        
+        
     </script>
 
 </body>
