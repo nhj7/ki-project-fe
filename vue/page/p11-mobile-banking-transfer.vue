@@ -97,7 +97,7 @@ const comp = module.exports = {
         this.$loading.hide();
         //alert('이체가 완료되었습니다.');
         this.$msg.show({
-          messageTitle: '간편 이체',
+          messageTitle: '모바일뱅킹 간편 이체',
           messageCode: this.transferData.txStatus === '처리완료' ? '0000' : '9999',
           messageContent: this.transferData.txStatus === '처리완료' ? '이체가 완료되었습니다.' : '이체가 실패하였습니다.',
           isError: this.transferData.txStatus === '처리오류',

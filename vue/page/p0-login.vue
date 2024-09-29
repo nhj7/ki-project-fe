@@ -55,14 +55,16 @@ const comp = (module.exports = {
           });
 
           console.log("response", response);
-          //if (response.data?.header?.resultCode === "0000") {
-          if (response.data?.success) {
+          if (response.data?.header?.resultCode === "0000") {
+          //if (response.data?.success) {
 
-            response.data.result.data.userId = this.userId;
-            response.data.result.data.userName = this.userId;           
+            //response.data.result.data.userId = this.userId;
+            //response.data.result.data.userName = this.userId;           
             
             // 로그인 성공 시 페이지 이동
-            Object.assign(this.$session, response.data.result.data);
+            Object.assign(this.$session, response.data.body);
+            localStorage.setItem("accessToken", response.data.body.accessToken);
+            localStorage.setItem("refreshToken", response.data.body.refreshToken);
             this.$router.push("/live-transaction-analytics");
           } else {
             // 로그인 실패 시 에러 메시지 표시

@@ -31,37 +31,46 @@
                         </v-simple-table>
 
                         <v-subheader class="mt-4">요청 파라미터</v-subheader>
-                        <v-simple-table v-if="selectedApiDetails.parameters.length">
-                            <template v-slot:default>
-                                <thead>
-                                    <tr>
-                                        <th class="text-left">파라미터</th>
-                                        <th class="text-left">타입</th>
-                                        <th class="text-left">필수</th>
-                                        <th class="text-left">설명</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="param in selectedApiDetails.parameters" :key="param.name">
-                                        <td><code>{{ param.name }}</code></td>
-                                        <td>{{ param.type }}</td>
-                                        <td>{{ param.required ? '예' : '아니오' }}</td>
-                                        <td>{{ param.description }}</td>
-                                    </tr>
-                                </tbody>
-                            </template>
-                        </v-simple-table>
+                        <v-form v-if="selectedApiDetails.parameters.length" ref="form" v-model="isFormValid">
+                            <v-simple-table>
+                                <template v-slot:default>
+                                    <thead>
+                                        <tr>
+                                            <th class="text-left">파라미터</th>
+                                            <th class="text-left">타입</th>
+                                            <th class="text-left">필수</th>
+                                            <th class="text-left">설명</th>
+                                            <th class="text-left">입력</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="param in selectedApiDetails.parameters" :key="param.name">
+                                            <td><code>{{ param.name }}</code></td>
+                                            <td>{{ param.type }}</td>
+                                            <td>{{ param.required ? '예' : '아니오' }}</td>
+                                            <td>{{ param.description }}</td>
+                                            <td>
+                                                <v-text-field :value="paramValues[param.name]" @input="updateParamValue(param.name, $event)" :label="param.name"
+                                                    :rules="[(v) => !param.required || !!v || '이 필드는 필수입니다.']" dense
+                                                    hide-details="auto" ></v-text-field>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </template>
+                            </v-simple-table>
+                        </v-form>
 
                         <v-subheader class="mt-4">요청 형식</v-subheader>
                         <v-card outlined>
                             <v-card-text class="font-weight-bold"
-                                v-html="selectedApiDetails.curlExample"></v-card-text><!--eslint-disable-line-->
+                                v-html="curlExample"></v-card-text><!--eslint-disable-line-->
                         </v-card>
                         <v-btn color="primary" @click="callApi" class="mt-2">API 호출</v-btn>
 
                         <v-subheader class="mt-4">응답 결과</v-subheader>
-                        <v-card outlined v-if="apiResponse" >
-                            <v-card-text class="font-weight-bold" v-html="apiResponse"></v-card-text><!--eslint-disable-line-->                                
+                        <v-card outlined v-if="apiResponse">
+                            <v-card-text class="font-weight-bold"
+                                v-html="apiResponse"></v-card-text><!--eslint-disable-line-->
                         </v-card>
 
                         <v-row>
@@ -120,6 +129,9 @@ const comp = module.exports = {
             selectedApi: 'loginSignin',
             selectedApiDetails: null,
             apiResponse: null,
+            curlExample: '',
+            paramValues: {},
+            isFormValid: true,
             apiList: [
                 { text: '로그인', value: 'loginSignin' },
                 { text: '사용자 등록', value: 'loginSignup' },
@@ -139,15 +151,10 @@ const comp = module.exports = {
                     method: 'POST',
                     description: '인시던트 목록을 조회합니다.',
                     parameters: [
-                        { name: 'startDate', type: 'String', required: true, description: '조회 시작 날짜 (YYYY-MM-DD 형식)' },
-                        { name: 'endDate', type: 'String', required: true, description: '조회 종료 날짜 (YYYY-MM-DD 형식)' },
-                        { name: 'status', type: 'String', required: false, description: '인시던트 상태 (예: "open", "closed")' }
+                        { name: 'startDate', type: 'String', required: true, default: this.$util.getDate(), description: '조회 시작 날짜 (YYYY-MM-DD 형식)' },
+                        { name: 'endDate', type: 'String', required: true, default: this.$util.getDate(), description: '조회 종료 날짜 (YYYY-MM-DD 형식)' },
+                        { name: 'status', type: 'String', required: false, default: 'open', description: '인시던트 상태 (예: "open", "closed")' }
                     ],
-
-                    requestSample: {
-                        username: "nhj7",
-                        password: "djdl77&&",
-                    },
                     responseExample: '{\n  "incidents": [\n    {\n      "id": "string",\n      "title": "string",\n      "description": "string",\n      "status": "string",\n      "createdAt": "string",\n      "updatedAt": "string"\n    }\n  ],\n  "totalCount": "number"\n}',
                     responseSample: {
                         incidents: [
@@ -179,7 +186,7 @@ const comp = module.exports = {
                     method: 'POST',
                     description: '실시간 거래 데이터를 분석하여 제공합니다.',
                     parameters: [
-                        { name: 'duration', type: 'Number', required: false, description: '조회 기간 (분 단위, 기본값: 5)' }
+                        { name: 'duration', type: 'Number', required: false, default: 5, description: '조회 기간 (분 단위, 기본값: 5)' }
                     ],
 
                     responseExample: '{\n  "timestamp": "string",\n  "transactionData": {\n    "normal": "number",\n    "anomaly": "number"\n  },\n  "anomalyTransactions": [\n    {\n      "timestamp": "string",\n      "transactionId": "string",\n      "type": "string",\n      "amount": "number",\n      "status": "string"\n    }\n  ]\n}',
@@ -261,16 +268,10 @@ const comp = module.exports = {
                     method: 'POST',
                     description: '대출을 신청합니다.',
                     parameters: [
-                        { name: 'name', type: 'String', required: true, description: '신청자 이름' },
-                        { name: 'amount', type: 'Number', required: true, description: '대출 금액' },
-                        { name: 'period', type: 'Number', required: true, description: '대출 기간 (개월)' }
+                        { name: 'name', type: 'String', required: true, default: '홍길동', description: '신청자 이름' },
+                        { name: 'amount', type: 'Number', required: true, default: 1000000, description: '대출 금액' },
+                        { name: 'period', type: 'Number', required: true, default: 12, description: '대출 기간 (개월)' }
                     ],
-
-                    requestBody: {
-                        name: "홍길동",
-                        amount: 1000000,
-                        period: 12
-                    },
                     responseExample: '{\n  "applicationId": "string",\n  "status": "string",\n  "message": "string"\n}',
                     responseSample: {
                         applicationId: 'LOAN-001',
@@ -292,7 +293,7 @@ const comp = module.exports = {
                     method: 'POST',
                     description: '대출 가능 한도를 조회합니다.',
                     parameters: [
-                        { name: 'customerId', type: 'String', required: true, description: '고객 ID' }
+                        { name: 'customerId', type: 'String', required: true, default: '123456', description: '고객 ID' }
                     ],
 
                     responseExample: '{\n  "customerId": "string",\n  "loanLimit": "number",\n  "creditScore": "number"\n}',
@@ -317,7 +318,7 @@ const comp = module.exports = {
                     method: 'POST',
                     description: '사용자의 로그인 상태를 확인합니다.',
                     parameters: [
-                        { name: 'token', type: 'String', required: true, description: '사용자 인증 토큰' }
+                        { name: 'token', type: 'String', required: true, default: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c', description: '사용자 인증 토큰' }
                     ],
 
                     responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  },\n  "body": {\n    "userId": "string",\n    "userName": "string",\n    "userType": "string",\n    "userStatus": "string",\n    "loginStatus": "string",\n    "lastLoginDate": "string",\n    "expiredDate": "string"\n  }\n}',
@@ -356,30 +357,11 @@ const comp = module.exports = {
                     method: 'POST',
                     description: '사용자 로그인을 처리합니다.',
                     parameters: [
-                        { name: 'userId', type: 'String', required: true, description: '사용자 아이디' },
-                        { name: 'password', type: 'String', required: true, description: '사용자 비밀번호' }
-                    ],
-
-                    requestSample: {
-                        username: "nhj7",
-                        password: "djdl77&&",
-                    },
+                        { name: 'username', type: 'String', required: true, description: '사용자 아이디', default: 'admin' },
+                        { name: 'password', type: 'String', required: true, description: '사용자 비밀번호', default: 'admin' }
+                    ],                    
                     responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  },\n  "body": {\n    "userId": "string",\n    "userName": "string",\n    "userType": "string",\n    "userStatus": "string",\n    "loginStatus": "string",\n    "lastLoginDate": "string",\n    "expiredDate": "string"\n  }\n}',
-                    responseSample: {
-                        header: {
-                            resultCode: "0000",
-                            resultMessage: "로그인 성공"
-                        },
-                        body: {
-                            userId: "admin",
-                            userName: "나형주",
-                            userType: "admin",
-                            userStatus: "정상",
-                            loginStatus: "로그인",
-                            lastLoginDate: "2024-05-01 12:00:00",
-                            expiredDate: "2024-05-01 13:00:00"
-                        }
-                    },
+                    responseSample: '',
                     responseFormat: [
                         { name: 'header', type: 'Object', required: true, description: '응답 헤더' },
                         { name: 'header.resultCode', type: 'String', required: true, description: '결과 코드' },
@@ -391,7 +373,9 @@ const comp = module.exports = {
                         { name: 'body.userStatus', type: 'String', required: true, description: '사용자 상태' },
                         { name: 'body.loginStatus', type: 'String', required: true, description: '로그인 상태' },
                         { name: 'body.lastLoginDate', type: 'String', required: true, description: '마지막 로그인 일시' },
-                        { name: 'body.expiredDate', type: 'String', required: true, description: '세션 만료 일시' }
+                        { name: 'body.expiredDate', type: 'String', required: true, description: '세션 만료 일시' },
+                        { name: 'body.accessToken', type: 'String', required: true, description: '액세스 토큰' },
+                        { name: 'body.refreshToken', type: 'String', required: true, description: '리프레시 토큰' }
                     ],
                 },
                 loginSignup: {
@@ -400,16 +384,10 @@ const comp = module.exports = {
                     method: 'POST',
                     description: '사용자를 등록합니다.',
                     parameters: [
-                        { name: 'username', type: 'String', required: true, description: '사용자 ID' },
-                        { name: 'password', type: 'String', required: true, description: '사용자 비밀번호' },
-                        { name: 'name', type: 'String', required: true, description: '사용자 이름' },
+                        { name: 'username', type: 'String', required: true, default: 'admin', description: '사용자 ID' },
+                        { name: 'password', type: 'String', required: true, default: 'admin', description: '사용자 비밀번호' },
+                        { name: 'name', type: 'String', required: true, default: '나형주', description: '사용자 이름' },
                     ],
-
-                    requestSample: {
-                        username: "nhj77",
-                        password: "nhj77",
-                        name: "행주햄",
-                    },
                     responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  },\n  "body": {\n    "userId": "string",\n    "userName": "string",\n    "userType": "string",\n    "userStatus": "string",\n    "loginStatus": "string",\n    "lastLoginDate": "string",\n    "expiredDate": "string"\n  }\n}',
                     responseSample: {
                         header: {
@@ -450,19 +428,70 @@ const comp = module.exports = {
 
         };
     },
+    computed: {
+        computedCurlExample() {
+            console.log('computedCurlExample', this.paramValues);
+            if (!this.selectedApiDetails) return '';
+
+            const endpoint = this.$config.endpoint_url + this.selectedApiDetails.endpoint;
+            const headers = '-H "Content-Type: application/json"';
+            let data = '';
+
+            if (Object.keys(this.paramValues).length > 0) {
+                const nonEmptyParams = Object.entries(this.paramValues)
+                    .filter(([_, value]) => value !== '')
+                    .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+                
+                if (Object.keys(nonEmptyParams).length > 0) {
+                    data = `-d '${JSON.stringify(nonEmptyParams)}'`;
+                }
+            }
+
+            const curlCommand = `curl -X ${this.selectedApiDetails.method} "${endpoint}" \\\n     ${headers} \\\n     ${data}`;
+            return this.highlightCurl(curlCommand);
+        },
+    },
+    watch: {
+        
+    },
     methods: {
+        updateParamValue(paramName, value) {
+            //console.log('updateParamValue', paramName, value);
+            this.$set(this.paramValues, paramName, value);
+            this.curlExample = this.dynamicCurlExample();
+        },
+        dynamicCurlExample() {
+            //console.log('dynamicCurlExample', this.selectedApiDetails, this.paramValues);
+            if (!this.selectedApiDetails) return '';
+
+            const endpoint = this.$config.endpoint_url + this.selectedApiDetails.endpoint;
+            const headers = '-H "Content-Type: application/json"';
+            let data = '';
+
+            if (Object.keys(this.paramValues).length > 0) {
+                const nonEmptyParams = Object.entries(this.paramValues)
+                    .filter(([_, value]) => value !== '')
+                    .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+                
+                if (Object.keys(nonEmptyParams).length > 0) {
+                    data = `-d '${JSON.stringify(nonEmptyParams)}'`;
+                }
+            }
+
+            const curlCommand = `curl -X ${this.selectedApiDetails.method} "${endpoint}" \\\n     ${headers} \\\n     ${data}`;
+            return this.highlightCurl(curlCommand);
+        },
         async showApiDetails() {
             this.apiResponse = '';
-            //this.apiDetails[this.selectedApi].curlExample = hljs.highlight(`curl -X POST "${this.$config.endpoint_url}${this.apiDetails[this.selectedApi].endpoint}" \\\n     -H "Content-Type: application/json" \\\n ${this.apiDetails[this.selectedApi].requestSample ? '-d \'' + this.customStringify(this.apiDetails[this.selectedApi].requestSample) : ''}\'`
-            //    , { language: 'curl' }).value;
-
-            //this.apiDetails[this.selectedApi].curlExample = this.beautifyCURL(`curl -X POST "${this.$config.endpoint_url}${this.apiDetails[this.selectedApi].endpoint}" \\\n     -H "Content-Type: application/json" \\\n ${this.apiDetails[this.selectedApi].requestSample ? '-d \'' + this.customStringify(this.apiDetails[this.selectedApi].requestSample) : ''}\'`);
-            this.apiDetails[this.selectedApi].curlExample = this.highlightCurl(`curl -X POST "${this.$config.endpoint_url}${this.apiDetails[this.selectedApi].endpoint}" \\\n     -H "Content-Type: application/json" \\\n ${this.apiDetails[this.selectedApi].requestSample ? '-d \'' + this.customStringify(this.apiDetails[this.selectedApi].requestSample)+'\'' : ''}`);
-
-            //this.apiDetails[this.selectedApi].responseSample = hljs.highlight(this.customStringify(this.apiDetails[this.selectedApi].responseSample)
-            //    , { language: 'json' }).value;
-
+            this.paramValues = {};
+            
             this.selectedApiDetails = this.apiDetails[this.selectedApi];
+            this.selectedApiDetails.parameters.forEach(param => {
+                this.paramValues[param.name] = param.default || '';
+            });
+
+            this.curlExample = this.dynamicCurlExample();
+
             try {
                 const response = await fetch(`/mock/${this.selectedApiDetails.endpoint.replace('/api/', '')}.json`);
                 console.log('response', response);
@@ -482,7 +511,10 @@ const comp = module.exports = {
             try {
                 this.$loading.show('API를 호출하는 중입니다...');
                 const apiDetails = this.apiDetails[this.selectedApi];
-                const response = await axios.post(this.$config.endpoint_url + apiDetails.endpoint, apiDetails.requestSample);
+
+                const requestData = { ...this.paramValues };
+                console.log('requestData', requestData);
+                const response = await axios.post(this.$config.endpoint_url + apiDetails.endpoint, requestData);
                 //console.log('response', response);
                 try {
                     //this.apiResponse = ' ' + JSON.stringify(response.data, null, 2);
@@ -625,12 +657,29 @@ pre {
     word-wrap: break-word;
 }
 
-.json_string { color: var(--v-success-base); }
-.json_key { color: var(--v-primary-base); }
-.json_number { color: var(--v-warning-base); }
-.json_boolean { color: purple; }
-.json_null { color: var(--v-grey-base); }
-.json_line { display: block; }
+.json_string {
+    color: var(--v-success-base);
+}
+
+.json_key {
+    color: var(--v-primary-base);
+}
+
+.json_number {
+    color: var(--v-warning-base);
+}
+
+.json_boolean {
+    color: purple;
+}
+
+.json_null {
+    color: var(--v-grey-base);
+}
+
+.json_line {
+    display: block;
+}
 
 .curl_line {
     display: block;
@@ -645,7 +694,7 @@ pre {
     color: var(--v-success-base);
 }
 
-.curl_url {    
+.curl_url {
     color: var(--v-success-base);
 }
 
@@ -654,7 +703,7 @@ pre {
     font-weight: bold;
 }
 
-.curl_header {    
+.curl_header {
     color: var(--v-accent-base);
 }
 

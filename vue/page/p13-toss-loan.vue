@@ -7,7 +7,7 @@
                 <v-card class="mb-4 pb-0">
                     <v-card-text class="text-center">
                         <v-row align="center" justify="center">
-                            <v-col cols="4">                                
+                            <v-col cols="4">
                                 <v-img src="/assets/toss-ci.jpg" height="100" width="100" class="mx-auto"></v-img>
                                 <div class="text-h6 font-weight-bold primary--text">TOSS</div>
                             </v-col>
@@ -33,8 +33,22 @@
 
                 <v-tabs-items v-model="tab">
                     <v-tab-item>
+                        <v-card outlined class="mb-4">
+                            <v-card-text>
+                                <v-row dense>
+                                    <v-col cols="12" sm="6">
+                                        <v-text-field v-model="loanData.txSecond" label="처리 시간(초)" outlined dense
+                                            :rules="[rules.required, rules.number]"></v-text-field>
+                                    </v-col>
+                                    <v-col cols="12" sm="6">
+                                        <v-select v-model="loanData.txStatus" :items="['처리완료', '처리오류']" label="처리 상태"
+                                            outlined dense :rules="[rules.required]"></v-select>
+                                    </v-col>
+                                </v-row>
+                            </v-card-text>
+                        </v-card>
                         <!-- 신용대출 한도 확인 버튼 -->
-                        <v-btn color="primary" x-large block class="my-4">
+                        <v-btn color="primary" x-large block class="my-4" @click="checkLoanLimit">
                             신용대출 한도 확인하기
                         </v-btn>
 
@@ -116,6 +130,15 @@ const comp = module.exports = {
                 { title: '대출 이자 계산기', icon: 'mdi-calculator', route: '/interest-calculator' },
                 { title: '아파트 대출한도 계산기', icon: 'mdi-home-city', route: '/apartment-loan-calculator' },
             ],
+            loanData: {
+                txSecond: 1,
+                txStatus: '처리완료',
+            },
+            rules: {
+                required: value => !!value || '필수 입력 항목입니다.',
+                phone: value => /^\d{3}-\d{3,4}-\d{4}$/.test(value) || '유효한 전화번호를 입력하세요.',
+                number: value => !isNaN(value) || '숫자만 입력 가능합니다.'
+            }
         };
     },
     methods: {
@@ -123,6 +146,23 @@ const comp = module.exports = {
             // 실제 라우팅 로직 구현
             console.log('Navigating to:', route);
         },
+        async checkLoanLimit() {
+            //if (this.$refs.form.validate()) {
+                // 한도 조회 로직을 여기에 추가합니다.
+                console.log('한도 조회 데이터:', this.loanData);
+                this.$loading.show();
+                await this.$util.sleep(this.loanData.txSecond * 1000);
+                this.$loading.hide();
+                this.$msg.show({
+                    messageTitle: '토스 비교금리 조회',
+                    messageCode: '0000',
+                    messageContent: '토스 비교금리 조회가 완료되었습니다.',
+                    isError: false,
+                    showErrorDetails: false,
+                    errorDetails: ''
+                });
+            //}
+        }
     },
 };
 </script>

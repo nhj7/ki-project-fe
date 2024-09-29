@@ -154,7 +154,7 @@
           <v-card>
             <v-card-title class="headline d-flex justify-space-between align-center">
               <div>
-                <v-icon left>{{ $msg.messageIcon }}</v-icon>
+                <v-icon left color="primary">{{ $msg.messageIcon }}</v-icon>
                 {{ $msg.messageTitle }} 결과
               </div>
               <v-btn icon large @click="$msg.hide">
@@ -454,7 +454,13 @@ const comp = (module.exports = {
       this.$vuetify.theme.dark = this.isDark;
     }
 
-    await axios.get("/mock/login-check.json").then((response) => {
+    const accessToken = localStorage.getItem("accessToken");
+    const refreshToken = localStorage.getItem("refreshToken");
+    if (accessToken && refreshToken) {
+      // mock 데이터로 로그인 상태 체크.
+      const response = await axios.get("/mock/login-check.json");
+
+      // 정상이면 로그인 없이 대시보드로 이동.
       if (response.data.header.resultCode === "0000") {
         Object.assign(this.$session, response.data.body);
         console.log("login_check", this.$session, response.data.body);
@@ -462,9 +468,10 @@ const comp = (module.exports = {
           this.$router.push("/live-transaction-analytics");
         }
       } else {
+        // 로그인 페이지로 이동.
         this.$router.push("/login");
       }
-    });
+    }
   },
 });
 
@@ -482,6 +489,9 @@ const globalMethods = {
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
+  },
+  getDate() {
+    return this.formatDate(new Date());
   },
   toggleAll(array, selectedArray) {
     if (selectedArray.length === array.length) {
