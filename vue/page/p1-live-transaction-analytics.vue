@@ -79,7 +79,7 @@ const comp = module.exports = {
                 },
                 yAxis: {
                     type: 'value',
-                    name: '거래량'
+                    name: '거래시간'
                 },
                 grid: {
                     left: '3%',
@@ -90,18 +90,28 @@ const comp = module.exports = {
                 series: [
                     {
                         name: '정상 거래',
-                        type: 'line',
+                        type: 'scatter',
                         smooth: true,
-                        data: []
+                        data: [],
+                        symbolSize: 5,
+                        symbol: 'circle',
+                        itemStyle: {
+                            color: 'dodgerblue'
+                        }
                     },
                     {
                         name: '이상 거래',
-                        type: 'line',
+                        type: 'scatter',
                         smooth: true,
-                        data: []
+                        data: [],
+                        symbolSize: 5,
+                        symbol: 'circle',
+                        itemStyle: {
+                            color: 'red'
+                        }
                     }
                 ],
-                
+
             },
             kpiData: [
                 { label: '총 거래량', value: '0', trend: 'up' },
@@ -191,6 +201,28 @@ const comp = module.exports = {
                     splitLine: {
                         lineStyle: {
                             color: this.isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
+                        }
+                    }
+                },
+                brush: {
+                    xAxisIndex: 'all',
+                    brushLink: 'all',
+                    outOfBrush: {
+                        colorAlpha: 0.1
+                    },
+                    brushStyle: {
+                        borderWidth: 1,
+                        color: 'rgba(120,140,180,0.3)',
+                        borderColor: 'rgba(120,140,180,0.8)'
+                    },
+                    toolbox: ['rect', 'polygon', 'keep', 'clear'],
+                    throttleType: 'debounce',
+                    throttleDelay: 300
+                },
+                toolbox: {
+                    feature: {
+                        brush: {
+                            type: ['rect', 'polygon', 'keep', 'clear']
                         }
                     }
                 },
@@ -306,15 +338,12 @@ const comp = module.exports = {
 
             for (let time = fiveMinutesAgo; time <= now; time.setSeconds(time.getSeconds() + 10)) {
                 const normalValue = Math.round(Math.random() * 100 + 100);
-                const anomalyValue = Math.round(Math.random() * 10);
-                data.push({
+                const tx_data = {
                     time: time.getTime(),
                     normal: normalValue,
-                    anomaly: anomalyValue
-                });
-
+                }
                 // 이상 거래 추가
-                if (Math.random() < 0.1) {  // 10% 확률로 이상 거래 발생
+                if (Math.random() < 0.03) {  // 3% 확률로 이상 거래 발생
                     this.anomalyTransactions.unshift({
                         timestamp: time.toLocaleString(),
                         transactionId: 'TX' + Math.random().toString(36).substr(2, 6),
@@ -324,10 +353,14 @@ const comp = module.exports = {
                     });
 
                     // 최근 100개 이상 거래만 유지
+                    const anomalyValue = Math.round(Math.random() * 100 + 100);
+                    tx_data.anomaly = anomalyValue;
                     if (this.anomalyTransactions.length > 100) {
                         this.anomalyTransactions.pop();
                     }
                 }
+
+                data.push(tx_data);
 
             }
 
@@ -335,7 +368,9 @@ const comp = module.exports = {
         },
         updateChartData(data) {
             this.transactionFlowOption.series[0].data = data.map(item => [item.time, item.normal]);
-            this.transactionFlowOption.series[1].data = data.map(item => [item.time, item.anomaly]);
+            this.transactionFlowOption.series[1].data = data
+                .filter(item => item.anomaly !== undefined)
+                .map(item => [item.time, item.anomaly]);
         },
         async fetchNewData() {
             try {
@@ -344,27 +379,17 @@ const comp = module.exports = {
                 await new Promise(resolve => setTimeout(resolve, 500));
 
                 const now = new Date();
-                const normalValue = Math.round(Math.random() * 100 + 100);
-                const anomalyValue = Math.round(Math.random() * 2 + 2);
+                const normalValue = Math.round(Math.random() * 60 + 60);
 
                 this.transactionFlowOption.series[0].data.push([now, normalValue]);
-                this.transactionFlowOption.series[1].data.push([now, anomalyValue]);
+
 
                 // 최근 100개 데이터만 유지
                 if (this.transactionFlowOption.series[0].data.length > 100) {
                     this.transactionFlowOption.series[0].data.shift();
-                    this.transactionFlowOption.series[1].data.shift();
                 }
-
-                // KPI 업데이트
-                const totalTransactions = parseInt(this.summaryItems[0].value) + (normalValue + anomalyValue);
-                this.summaryItems[0].value = totalTransactions.toString();
-                this.summaryItems[1].value = normalValue + anomalyValue;
-                this.summaryItems[2].value = ((anomalyValue / totalTransactions) * 100).toFixed(2);
-                this.summaryItems[3].value = (Math.random() * 0.5 + 0.5).toFixed(2);
-
                 // 이상 거래 추가
-                if (Math.random() < 0.1) {  // 30% 확률로 이상 거래 발생
+                if (Math.random() < 0.03) {  // 3% 확률로 이상 거래 발생
                     this.anomalyTransactions.unshift({
                         timestamp: now.toLocaleString(),
                         transactionId: 'TX' + Math.random().toString(36).substr(2, 6),
@@ -372,6 +397,9 @@ const comp = module.exports = {
                         amount: this.$util.numberWithComma(Math.floor(Math.random() * 1000000)) + '원',
                         status: Math.random() < 0.5 ? '의심' : '오류'
                     });
+
+                    const anomalyValue = Math.round(Math.random() * 60 + 60);
+                    this.transactionFlowOption.series[1].data.push([now, anomalyValue]);
 
                     // 최근 100개 이상 거래만 유지
                     if (this.anomalyTransactions.length > 100) {

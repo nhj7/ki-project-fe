@@ -7,10 +7,10 @@
           <v-card-text>
             <v-form ref="form" v-model="valid" lazy-validation>
               <v-text-field ref="userId" v-model="userId" :rules="userIdRules" label="아이디"
-                :validate-on-blur="false" data-test="userId-input"></v-text-field>
+                validate-on-blur data-test="userId-input" hint="제공받은 아이디를 입력해주세요." clearable @input="userIdRules = []"></v-text-field>
               <v-text-field v-model="password" :rules="passwordRules" label="패스워드" type="password"
-                @keypress.enter="login" :validate-on-blur="false" autocomplete="current-password" data-test="password-input"></v-text-field>
-              <v-btn color="success" @click="login" data-test="login-button">로그인</v-btn>
+                @keypress.enter="login" :validate-on-blur="false" autocomplete="current-password" data-test="password-input" hint="제공받은 패스워드를 입력해주세요." clearable @input="passwordRules = []"></v-text-field>
+              <v-btn color="success" @click="login" data-test="login-button" class="mt-4">로그인</v-btn>
             </v-form>
 
             <v-divider class="mt-2 mb-2"></v-divider>
@@ -34,13 +34,17 @@ const comp = (module.exports = {
       userId: "",
       password: "",
       loginError: false,
-      loginErrorMessage: "로그인 제한 중입니다.",
-      userIdRules: [(v) => !!v || "아이디를 입력해주세요"],
-      passwordRules: [(v) => !!v || "패스워드를 입력해주세요"],
+      loginErrorMessage: "로그인 제한 중입니다.",      
+      userIdRules: [],
+      passwordRules: [],
     };
   },
   methods: {
     async login() {
+
+      this.userIdRules = [(v) => !!v || "아이디를 입력해주세요"];
+      this.passwordRules = [(v) => !!v || "패스워드를 입력해주세요"];
+
       if (this.$refs.form.validate()) {
         try {
           /*
@@ -49,6 +53,9 @@ const comp = (module.exports = {
             password: this.password,
           });
           */
+
+
+          this.$loading.show('로그인 중...');
           const response = await request("/api/login-signin", "POST", {
             username: this.userId,
             password: this.password,
@@ -77,6 +84,8 @@ const comp = (module.exports = {
           // API 호출 실패 시 에러 메시지 표시
           this.loginErrorMessage = error.response.data.message || "서버 오류";
           this.loginError = true;
+        } finally {
+          this.$loading.hide();
         }
       }
     },

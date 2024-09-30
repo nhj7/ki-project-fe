@@ -61,5 +61,42 @@ describe('로그인 페이지', () => {
     cy.wait('@loginRequest')
     cy.get('[data-test="login-error-message"]').should('contain', '로그인 실패')
   })
+
+  it('로컬 스토리지에 accessToken이 있을 때 자동 로그인 수행', () => {
+    // 로컬 스토리지에 토큰 설정
+    cy.window().then((win) => {
+      win.localStorage.setItem('accessToken', 'fakeAccessToken');
+      win.localStorage.setItem('refreshToken', 'fakeRefreshToken');
+    });
+
+    // /api/login-check API 요청 인터셉트
+    cy.intercept('POST', '/api/login-check', {
+      statusCode: 200,
+      body: {
+        header: { resultCode: '0000' },
+        body: {
+          userId: 'testUser',
+          userName: '테스트 사용자',
+          userType: 'admin'
+        }
+      }
+    }).as('loginCheck');
+
+    // 루트 페이지 방문
+    cy.visit('/');
+
+    // 로그인 체크 API 호출 확인
+    cy.wait('@loginCheck');
+
+    // 대시보드로 리다이렉션 확인
+    cy.url().should('include', '/live-transaction-analytics');
+
+    // 세션 정보 확인
+    cy.window().its('app.$session').should('deep.include', {
+      userId: 'testUser',
+      userName: '테스트 사용자',
+      userType: 'admin'
+    });
+  });
   
 })

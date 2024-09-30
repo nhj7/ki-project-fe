@@ -50,9 +50,10 @@
                                             <td>{{ param.required ? '예' : '아니오' }}</td>
                                             <td>{{ param.description }}</td>
                                             <td>
-                                                <v-text-field :value="paramValues[param.name]" @input="updateParamValue(param.name, $event)" :label="param.name"
+                                                <v-text-field :value="paramValues[param.name]"
+                                                    @input="updateParamValue(param.name, $event)" :label="param.name"
                                                     :rules="[(v) => !param.required || !!v || '이 필드는 필수입니다.']" dense
-                                                    hide-details="auto" ></v-text-field>
+                                                    hide-details="auto"></v-text-field>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -135,6 +136,7 @@ const comp = module.exports = {
             apiList: [
                 { text: '로그인', value: 'loginSignin' },
                 { text: '사용자 등록', value: 'loginSignup' },
+                { text: '사용자 목록 조회', value: 'getUserList' },
                 { text: '로그인 상태 체크', value: 'loginCheck' },
                 { text: '로그아웃', value: 'logout' },
                 { text: '서비스 거래 목록 조회', value: 'getIncidents' },
@@ -360,7 +362,7 @@ const comp = module.exports = {
                     parameters: [
                         { name: 'username', type: 'String', required: true, description: '사용자 아이디', default: 'admin' },
                         { name: 'password', type: 'String', required: true, description: '사용자 비밀번호', default: 'admin' }
-                    ],                    
+                    ],
                     responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  },\n  "body": {\n    "userId": "string",\n    "userName": "string",\n    "userType": "string",\n    "userStatus": "string",\n    "loginStatus": "string",\n    "lastLoginDate": "string",\n    "expiredDate": "string"\n  }\n}',
                     responseSample: '',
                     responseFormat: [
@@ -425,6 +427,46 @@ const comp = module.exports = {
                         { name: 'header.resultMessage', type: 'String', required: true, description: '결과 메시지' }
                     ],
                 },
+
+                getUserList: {
+                    name: '사용자 목록 조회',
+                    endpoint: '/api/user-list',
+                    method: 'GET',
+                    description: '등록된 사용자 목록을 조회합니다.',
+                    parameters: [],
+                    responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  },\n  "body": {\n    "users": [\n      {\n        "userId": "string",\n        "userName": "string",\n        "userType": "string",\n        "userStatus": "string",\n        "loginStatus": "string",\n        "lastLoginDate": "string"\n      }\n    ]\n  }\n}',
+                    responseSample: {
+                        header: {
+                            resultCode: "0000",
+                            resultMessage: "사용자 목록 조회 성공"
+                        },
+                        body: {
+                            users: [
+                                {
+                                    userId: "admin",
+                                    userName: "나형주1",
+                                    userType: "admin",
+                                    userStatus: "정상",
+                                    loginStatus: "로그인",
+                                    lastLoginDate: "2024-05-01 12:00:00"
+                                }
+                            ]
+                        }
+                    },
+                    responseFormat: [
+                        { name: 'header', type: 'Object', required: true, description: '응답 헤더' },
+                        { name: 'header.resultCode', type: 'String', required: true, description: '결과 코드' },
+                        { name: 'header.resultMessage', type: 'String', required: true, description: '결과 메시지' },
+                        { name: 'body', type: 'Object', required: true, description: '응답 본문' },
+                        { name: 'body.users', type: 'Array', required: true, description: '사용자 목록' },
+                        { name: 'body.users[].userId', type: 'String', required: true, description: '사용자 ID' },
+                        { name: 'body.users[].userName', type: 'String', required: true, description: '사용자 이름' },
+                        { name: 'body.users[].userType', type: 'String', required: true, description: '사용자 유형 (admin, user)' },
+                        { name: 'body.users[].userStatus', type: 'String', required: true, description: '사용자 상태 (정상, 휴면, 잠금)' },
+                        { name: 'body.users[].loginStatus', type: 'String', required: true, description: '로그인 상태' },
+                        { name: 'body.users[].lastLoginDate', type: 'String', required: true, description: '마지막 로그인 일시' }
+                    ],
+                },
             }
 
         };
@@ -442,7 +484,7 @@ const comp = module.exports = {
                 const nonEmptyParams = Object.entries(this.paramValues)
                     .filter(([_, value]) => value !== '')
                     .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
-                
+
                 if (Object.keys(nonEmptyParams).length > 0) {
                     data = `-d '${JSON.stringify(nonEmptyParams)}'`;
                 }
@@ -453,7 +495,7 @@ const comp = module.exports = {
         },
     },
     watch: {
-        
+
     },
     methods: {
         updateParamValue(paramName, value) {
@@ -473,7 +515,7 @@ const comp = module.exports = {
                 const nonEmptyParams = Object.entries(this.paramValues)
                     .filter(([_, value]) => value !== '')
                     .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
-                
+
                 if (Object.keys(nonEmptyParams).length > 0) {
                     data = `-d '${JSON.stringify(nonEmptyParams)}'`;
                 }
@@ -485,7 +527,7 @@ const comp = module.exports = {
         async showApiDetails() {
             this.apiResponse = '';
             this.paramValues = {};
-            
+
             this.selectedApiDetails = this.apiDetails[this.selectedApi];
             this.selectedApiDetails.parameters.forEach(param => {
                 this.paramValues[param.name] = param.default || '';

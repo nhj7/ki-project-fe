@@ -456,14 +456,24 @@ const comp = (module.exports = {
 
     const accessToken = localStorage.getItem("accessToken");
     const refreshToken = localStorage.getItem("refreshToken");
+
+    console.log("accessToken", accessToken, "refreshToken", refreshToken);
     if (accessToken && refreshToken) {
       // mock 데이터로 로그인 상태 체크.
-      const response = await axios.get("/mock/login-check.json");
+      //const response = await axios.get("/mock/login-check.json");
+      const response = await request("/api/login-check", "POST", {
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      });
+
+      console.log("response", response);
 
       // 정상이면 로그인 없이 대시보드로 이동.
-      if (response.data.header.resultCode === "0000") {
+      if (response?.data?.header?.resultCode === "0000") {
         Object.assign(this.$session, response.data.body);
-        console.log("login_check", this.$session, response.data.body);
+        //console.log("login_check", this.$session, response.data.body, this.$router.currentRoute.path);
+        localStorage.setItem("accessToken", response.data.body.accessToken);
+        localStorage.setItem("refreshToken", response.data.body.refreshToken);
         if (this.$router.currentRoute.path == "/") {
           this.$router.push("/live-transaction-analytics");
         }
