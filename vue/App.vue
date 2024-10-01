@@ -448,40 +448,47 @@ const comp = (module.exports = {
   async created() {
     //console.log("app.vue created", this, this.$options.components);
     //this.$router.addRoutes(router);
-    const savedTheme = localStorage.getItem("darkTheme");
-    if (savedTheme !== null) {
-      this.isDark = JSON.parse(savedTheme);
-      this.$vuetify.theme.dark = this.isDark;
-    }
 
-    const accessToken = localStorage.getItem("accessToken");
-    const refreshToken = localStorage.getItem("refreshToken");
-
-    console.log("accessToken", accessToken, "refreshToken", refreshToken);
-    if (accessToken && refreshToken) {
-      // mock 데이터로 로그인 상태 체크.
-      //const response = await axios.get("/mock/login-check.json");
-      const response = await request("/api/login-check", "POST", {
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-      });
-
-      console.log("response", response);
-
-      // 정상이면 로그인 없이 대시보드로 이동.
-      if (response?.data?.header?.resultCode === "0000") {
-        Object.assign(this.$session, response.data.body);
-        //console.log("login_check", this.$session, response.data.body, this.$router.currentRoute.path);
-        localStorage.setItem("accessToken", response.data.body.accessToken);
-        localStorage.setItem("refreshToken", response.data.body.refreshToken);
-        if (this.$router.currentRoute.path == "/") {
-          this.$router.push("/live-transaction-analytics");
-        }
-      } else {
-        // 로그인 페이지로 이동.
-        this.$router.push("/login");
+    { // ===== 테마 설정 =====
+      const savedTheme = localStorage.getItem("darkTheme");
+      if (savedTheme !== null) {
+        this.isDark = JSON.parse(savedTheme);
+        this.$vuetify.theme.dark = this.isDark;
       }
-    }
+    } // end 테마 설정
+
+
+    { // ===== 로그인 상태 확인 =====
+      let nextRoute = "/login";
+
+      // 로그인 상태 체크
+      const accessToken = localStorage.getItem("accessToken");
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (accessToken && refreshToken) {
+        try {
+          const response = await request("/api/login-check", "POST", { accessToken, refreshToken });
+          console.log("response", response);
+
+          if (response?.data?.header?.resultCode === "0000") {
+            // 로그인 성공 처리
+            Object.assign(this.$session, response.data.body);
+            localStorage.setItem("accessToken", response.data.body.accessToken);
+            localStorage.setItem("refreshToken", response.data.body.refreshToken);
+            // 현재 경로가 루트("/") 또는 "/login"인 경우 대시보드로 리다이렉트
+            nextRoute = ["/", "/login"].includes(this.$route.path) ? "/live-transaction-analytics" : this.$route.path;
+
+          }
+        } catch (error) {
+          console.error("Login check failed:", error);
+        }
+      }
+
+      // 현재 경로가 nextRoute와 다른 경우에만 리다이렉션
+      if (this.$route.path !== nextRoute) {
+        this.$router.push(nextRoute);
+      }
+    } // end 로그인 상태 체크
+
   },
 });
 
@@ -502,6 +509,30 @@ const globalMethods = {
   },
   getDate() {
     return this.formatDate(new Date());
+  },
+  getCurrentDateTime() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  },
+  generateUUID() {
+    const HEX = '0123456789ABCDEF';  // 대문자로 변경
+    let uuid = '';
+    for (let i = 0; i < 32; i++) {  // 32로 변경 (하이픈 제거)
+      if (i === 12) {
+        uuid += '4';
+      } else if (i === 16) {
+        uuid += HEX[(Math.random() * 4 | 8)];
+      } else {
+        uuid += HEX[(Math.random() * 16 | 0)];
+      }
+    }
+    return uuid;
   },
   toggleAll(array, selectedArray) {
     if (selectedArray.length === array.length) {
@@ -545,6 +576,8 @@ Vue.prototype.$session = {
     this.expiredDate = null;
     this.accessToken = null;
     this.refreshToken = null;
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
   },
 };
 

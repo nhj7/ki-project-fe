@@ -500,7 +500,11 @@ const comp = module.exports = {
     beforeDestroy: function () {
         //console.log(`${this.$route.meta.title} beforeDestroy`);
         this.stopUpdating();
-        this.resizeObserver.disconnect();
+        try{
+            this.resizeObserver.disconnect();
+        }catch(e){
+            console.error('resizeObserver 종료 중 오류가 발생했습니다:', e);
+        }
     }
 };
 </script>

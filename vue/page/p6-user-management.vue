@@ -4,12 +4,12 @@
       <v-card-title>
 
         <v-spacer></v-spacer>
-        <v-btn color="primary" @click="openUserDialog()">
+        <v-btn color="primary" @click="openUserDialog">
           사용자 등록
         </v-btn>
       </v-card-title>
       <v-card-text>
-        <v-data-table :headers="headers" :items="users" :items-per-page="10" class="elevation-1" @click:row="editUser">
+        <v-data-table :headers="headers" :items="users" :items-per-page="10" class="elevation-1" @click:row="editUser" data-cy="user-management-table">
           <template v-slot:[`item.actions`]="{ item }">
             <v-icon small class="mr-2" @click="editUser(item)">
               mdi-pencil
@@ -113,9 +113,15 @@ const comp = module.exports = {
     this.initialize()
   },
   methods: {
-    initialize() {
+    async initialize() {
       // 여기서 실제 API를 호출하여 사용자 목록을 가져와야 합니다.
       // 지금은 예시 데이터를 사용합니다.
+
+      const response = await request('/api/user-list', 'get');
+      console.log("response", response);
+
+      this.users = response.data.body;
+      /*
       this.users = [
         {
           userId: 'admin',
@@ -126,7 +132,7 @@ const comp = module.exports = {
           lastLoginDate: '2024-05-01 12:00:00',
         },
         // 더 많은 사용자 데이터...
-      ]
+      ]*/
     },
 
     editUser(item) {

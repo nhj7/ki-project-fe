@@ -108,7 +108,7 @@
                                 <v-subheader class="mt-4">응답 샘플</v-subheader>
                                 <v-card outlined>
                                     <v-card-text class="font-weight-bold"
-                                        v-html="selectedApiDetails.responseSample"></v-card-text><!--eslint-disable-line-->
+                                        v-html="selectedApiDetails.responseSampleHtml"></v-card-text><!--eslint-disable-line-->
                                 </v-card>
                             </v-col>
                         </v-row>
@@ -127,13 +127,16 @@
 const comp = module.exports = {
     data() {
         return {
-            selectedApi: 'loginSignin',
+            selectedApi: 'transfer',
             selectedApiDetails: null,
             apiResponse: null,
             curlExample: '',
             paramValues: {},
             isFormValid: true,
             apiList: [
+                { text: '간편 이체(1)', value: 'transfer' },
+                { text: '대출 신청(2)', value: 'applyLoan' },
+                { text: '한도 조회(3)', value: 'checkLoanLimit' },
                 { text: '로그인', value: 'loginSignin' },
                 { text: '사용자 등록', value: 'loginSignup' },
                 { text: '사용자 목록 조회', value: 'getUserList' },
@@ -142,8 +145,7 @@ const comp = module.exports = {
                 { text: '서비스 거래 목록 조회', value: 'getIncidents' },
                 { text: '실시간 서비스 분석', value: 'getLiveTransactions' },
                 { text: '룰셋 조회', value: 'getRules' },
-                { text: '대출 신청', value: 'applyLoan' },
-                { text: '한도 조회', value: 'checkLoanLimit' },
+
 
             ],
             apiDetails: {
@@ -155,9 +157,9 @@ const comp = module.exports = {
                     parameters: [
                         { name: 'startDate', type: 'String', required: true, default: this.$util.getDate(), description: '조회 시작 날짜 (YYYY-MM-DD 형식)' },
                         { name: 'endDate', type: 'String', required: true, default: this.$util.getDate(), description: '조회 종료 날짜 (YYYY-MM-DD 형식)' },
-                        { name: 'status', type: 'String', required: false, default: 'open', description: '인시던트 상태 (예: "open", "closed")' }
+                        { name: 'status', type: 'String', required: false, default: '', description: '인시던트 상태 (예: "open", "closed")' }
                     ],
-                    responseExample: '{\n  "incidents": [\n    {\n      "id": "string",\n      "title": "string",\n      "description": "string",\n      "status": "string",\n      "createdAt": "string",\n      "updatedAt": "string"\n    }\n  ],\n  "totalCount": "number"\n}',
+                    responseSampleHtml: '',
                     responseSample: {
                         incidents: [
                             {
@@ -191,7 +193,7 @@ const comp = module.exports = {
                         { name: 'duration', type: 'Number', required: false, default: 5, description: '조회 기간 (분 단위, 기본값: 5)' }
                     ],
 
-                    responseExample: '{\n  "timestamp": "string",\n  "transactionData": {\n    "normal": "number",\n    "anomaly": "number"\n  },\n  "anomalyTransactions": [\n    {\n      "timestamp": "string",\n      "transactionId": "string",\n      "type": "string",\n      "amount": "number",\n      "status": "string"\n    }\n  ]\n}',
+                    responseSampleHtml: '',
                     responseSample: {
                         timestamp: "20230515143000",
                         transactionData: {
@@ -234,8 +236,7 @@ const comp = module.exports = {
                     method: 'POST',
                     description: '설정된 룰셋 목록을 조회합니다.',
                     parameters: [],
-
-                    responseExample: '{\n  "rules": [\n    {\n      "id": "string",\n      "name": "string",\n      "type": "string",\n      "condition": "string",\n      "action": "string"\n    }\n  ]\n}',
+                    responseSampleHtml: '',
                     responseSample: {
                         header: {
                             resultCode: "0000",
@@ -274,7 +275,7 @@ const comp = module.exports = {
                         { name: 'amount', type: 'Number', required: true, default: 1000000, description: '대출 금액' },
                         { name: 'period', type: 'Number', required: true, default: 12, description: '대출 기간 (개월)' }
                     ],
-                    responseExample: '{\n  "applicationId": "string",\n  "status": "string",\n  "message": "string"\n}',
+                    responseSampleHtml: '',
                     responseSample: {
                         applicationId: 'LOAN-001',
                         status: '승인',
@@ -298,7 +299,7 @@ const comp = module.exports = {
                         { name: 'customerId', type: 'String', required: true, default: '123456', description: '고객 ID' }
                     ],
 
-                    responseExample: '{\n  "customerId": "string",\n  "loanLimit": "number",\n  "creditScore": "number"\n}',
+                    responseSampleHtml: '',
                     responseSample: {
                         customerId: '123456',
                         loanLimit: 50000000,
@@ -324,7 +325,7 @@ const comp = module.exports = {
                         { name: 'refreshToken', type: 'String', required: true, default: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c', description: '사용자 재발급 토큰' },
                     ],
 
-                    responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  },\n  "body": {\n    "userId": "string",\n    "userName": "string",\n    "userType": "string",\n    "userStatus": "string",\n    "loginStatus": "string",\n    "lastLoginDate": "string",\n    "expiredDate": "string"\n  }\n}',
+                    responseSampleHtml: '',
                     responseSample: {
                         header: {
                             resultCode: "0000",
@@ -363,7 +364,7 @@ const comp = module.exports = {
                         { name: 'username', type: 'String', required: true, description: '사용자 아이디', default: 'admin' },
                         { name: 'password', type: 'String', required: true, description: '사용자 비밀번호', default: 'admin' }
                     ],
-                    responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  },\n  "body": {\n    "userId": "string",\n    "userName": "string",\n    "userType": "string",\n    "userStatus": "string",\n    "loginStatus": "string",\n    "lastLoginDate": "string",\n    "expiredDate": "string"\n  }\n}',
+                    responseSampleHtml: '',
                     responseSample: '',
                     responseFormat: [
                         { name: 'header', type: 'Object', required: true, description: '응답 헤더' },
@@ -391,7 +392,7 @@ const comp = module.exports = {
                         { name: 'password', type: 'String', required: true, default: 'admin', description: '사용자 비밀번호' },
                         { name: 'name', type: 'String', required: true, default: '나형주', description: '사용자 이름' },
                     ],
-                    responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  },\n  "body": {\n    "userId": "string",\n    "userName": "string",\n    "userType": "string",\n    "userStatus": "string",\n    "loginStatus": "string",\n    "lastLoginDate": "string",\n    "expiredDate": "string"\n  }\n}',
+                    responseSampleHtml: '',
                     responseSample: {
                         header: {
                             resultCode: "0000",
@@ -414,7 +415,7 @@ const comp = module.exports = {
                     method: 'POST',
                     description: '사용자 로그아웃을 처리합니다.',
                     parameters: [],
-                    responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  }\n}',
+                    responseSampleHtml: '',
                     responseSample: {
                         header: {
                             resultCode: "0000",
@@ -434,7 +435,7 @@ const comp = module.exports = {
                     method: 'GET',
                     description: '등록된 사용자 목록을 조회합니다.',
                     parameters: [],
-                    responseExample: '{\n  "header": {\n    "resultCode": "string",\n    "resultMessage": "string"\n  },\n  "body": {\n    "users": [\n      {\n        "userId": "string",\n        "userName": "string",\n        "userType": "string",\n        "userStatus": "string",\n        "loginStatus": "string",\n        "lastLoginDate": "string"\n      }\n    ]\n  }\n}',
+                    responseSampleHtml: '',
                     responseSample: {
                         header: {
                             resultCode: "0000",
@@ -465,6 +466,33 @@ const comp = module.exports = {
                         { name: 'body.users[].userStatus', type: 'String', required: true, description: '사용자 상태 (정상, 휴면, 잠금)' },
                         { name: 'body.users[].loginStatus', type: 'String', required: true, description: '로그인 상태' },
                         { name: 'body.users[].lastLoginDate', type: 'String', required: true, description: '마지막 로그인 일시' }
+                    ],
+                },
+                transfer: {
+                    name: '간편 이체',
+                    endpoint: '/api/transfer',
+                    method: 'POST',
+                    description: '간편 이체를 처리합니다.',
+                    requestHeader: true,
+                    parameters: [
+                        { name: 'sender', type: 'String', required: true, default: '김남구', description: '보내는 사람' },
+                        { name: 'receiver', type: 'String', required: true, default: '이민호', description: '받는 사람' },
+                        { name: 'amount', type: 'String', required: true, default: '100000000', description: '이체 금액' },
+                        { name: 'date', type: 'String', required: true, default: this.$util.formatDate(new Date()), description: '이체 날짜 (YYYY-MM-DD 형식)' },
+                        { name: 'txSecond', type: 'String', required: true, default: '2', description: '처리 시간(초)' },
+                        { name: 'txStatus', type: 'String', required: true, default: '처리완료', description: '처리 상태 (처리완료 또는 처리오류)' }
+                    ],
+                    responseSampleHtml: '',
+                    responseSample: {
+                        header: {
+                            resultCode: "0000",
+                            resultMessage: "간편 이체 성공"
+                        }
+                    },
+                    responseFormat: [
+                        { name: 'header', type: 'Object', required: true, description: '응답 헤더' },
+                        { name: 'header.resultCode', type: 'String', required: true, description: '결과 코드' },
+                        { name: 'header.resultMessage', type: 'String', required: true, description: '결과 메시지' }
                     ],
                 },
             }
@@ -498,6 +526,25 @@ const comp = module.exports = {
 
     },
     methods: {
+        getRequestData() {
+            if (this.selectedApiDetails.requestHeader) {
+                return {
+                    header: {
+                        prgId: this.selectedApiDetails.endpoint,
+                        prgNm: this.selectedApiDetails.name,
+                        txId: this.$util.generateUUID(),
+                        txDtm: this.$util.getCurrentDateTime(),
+                        userId: this.$session.userId,
+                        userNm: this.$session.userName,
+                    },
+                    body: Object.fromEntries(Object.entries(this.paramValues).filter(([_, value]) => value !== '')),
+                }
+            } else {
+                return {
+                    ...Object.fromEntries(Object.entries(this.paramValues).filter(([_, value]) => value !== '')),
+                }
+            }
+        },
         updateParamValue(paramName, value) {
             //console.log('updateParamValue', paramName, value);
             this.$set(this.paramValues, paramName, value);
@@ -511,13 +558,16 @@ const comp = module.exports = {
             const headers = '-H "Content-Type: application/json"';
             let data = '';
 
+            const requestData = this.getRequestData();
+            //console.log('requestData', requestData);
             if (Object.keys(this.paramValues).length > 0) {
                 const nonEmptyParams = Object.entries(this.paramValues)
                     .filter(([_, value]) => value !== '')
                     .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
 
                 if (Object.keys(nonEmptyParams).length > 0) {
-                    data = `-d '${JSON.stringify(nonEmptyParams)}'`;
+                    //requestData.body = nonEmptyParams;
+                    data = `-d '${JSON.stringify(requestData)}'`;
                 }
             }
 
@@ -545,9 +595,10 @@ const comp = module.exports = {
                 console.log('showApiDetails', resJson);
 
                 //this.apiDetails[this.selectedApi].responseSample = hljs.highlight(JSON.stringify(resJson, null, 2), { language: 'json' }).value;
-                this.apiDetails[this.selectedApi].responseSample = this.beautifyJSON(resJson);
+                this.selectedApiDetails.responseSampleHtml = this.beautifyJSON(resJson);
             } catch (error) {
-                console.error('json 로드 중 오류 발생:', error);
+                this.selectedApiDetails.responseSampleHtml = this.beautifyJSON(this.apiDetails[this.selectedApi].responseSample);
+                //console.error('json 로드 중 오류 발생:', error);
             }
         },
         async callApi() {
@@ -555,7 +606,8 @@ const comp = module.exports = {
                 this.$loading.show('API를 호출하는 중입니다...');
                 const apiDetails = this.apiDetails[this.selectedApi];
 
-                const requestData = { ...this.paramValues };
+
+                const requestData = this.getRequestData();
                 console.log('requestData', requestData);
                 const response = await axios.post(this.$config.endpoint_url + apiDetails.endpoint, requestData);
                 //console.log('response', response);
@@ -597,6 +649,7 @@ const comp = module.exports = {
             };
 
             const processLine = (line) => {
+                
                 const trimmedLine = line.trim();
                 if (trimmedLine.includes('}') || trimmedLine.includes(']')) {
                     depth--;
@@ -612,8 +665,8 @@ const comp = module.exports = {
                 if (trimmedLine.includes('{') || trimmedLine.includes('[')) {
                     depth++;
                 }
-
                 return `<span class="json_line">${indentation}${processedLine}</span>`;
+                
             };
 
             return json.split('\n').map(processLine).join('\n');
