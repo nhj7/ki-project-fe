@@ -127,25 +127,29 @@
 const comp = module.exports = {
     data() {
         return {
-            selectedApi: 'getTxData',
+            selectedApi: 'transfer',
             selectedApiDetails: null,
             apiResponse: null,
             curlExample: '',
             paramValues: {},
             isFormValid: true,
             apiList: [
-                { text: '거래 데이터 조회', value: 'getTxData' },
-                { text: '간편 이체(1)', value: 'transfer' },
-                { text: '대출 신청(2)', value: 'applyLoan' },
-                { text: '한도 조회(3)', value: 'checkLoanLimit' },
-                { text: '로그인', value: 'loginSignin' },
-                { text: '사용자 등록', value: 'loginSignup' },
-                { text: '사용자 목록 조회', value: 'getUserList' },
-                { text: '로그인 상태 체크', value: 'loginCheck' },
-                { text: '로그아웃', value: 'logout' },
-                { text: '서비스 거래 목록 조회', value: 'getIncidents' },
-                { text: '실시간 서비스 분석', value: 'getLiveTransactions' },
-                { text: '룰셋 조회', value: 'getRules' },
+                
+                { text: '간편 이체(미완-1)', value: 'transfer' },
+                { text: '대출 신청(미완-2)', value: 'applyLoan' },
+                { text: '한도 조회(미완-3)', value: 'checkLoanLimit' },
+                { text: '서비스 거래 목록 조회(미완-4)', value: 'getIncidents' },
+                { text: '룰셋 조회(미완)', value: 'getRules' },
+                { text: '실시간 서비스 분석(미완)', value: 'getLiveTransactions' },
+
+                { text: '거래 데이터 조회(완료)', value: 'getTxData' },
+                { text: '로그인(완료)', value: 'loginSignin' },
+                { text: '로그인 상태 체크(완료)', value: 'loginCheck' },
+                { text: '로그아웃(완료)', value: 'logout' },
+                { text: '사용자 등록(완료)', value: 'loginSignup' },
+                { text: '사용자 목록 조회(완료)', value: 'getUserList' },
+                
+                
 
 
             ],
