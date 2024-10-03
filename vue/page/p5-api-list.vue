@@ -134,6 +134,7 @@ const comp = module.exports = {
             paramValues: {},
             isFormValid: true,
             apiList: [
+                { text: '거래 데이터 조회', value: 'getTxData' },
                 { text: '간편 이체(1)', value: 'transfer' },
                 { text: '대출 신청(2)', value: 'applyLoan' },
                 { text: '한도 조회(3)', value: 'checkLoanLimit' },
@@ -495,6 +496,57 @@ const comp = module.exports = {
                         { name: 'header.resultMessage', type: 'String', required: true, description: '결과 메시지' }
                     ],
                 },
+                getTxData: {
+                    name: '거래 데이터 조회',
+                    endpoint: '/api/gettxdata',
+                    method: 'GET',
+                    description: '지정된 시간 범위 내의 거래 데이터 목록을 조회합니다.',
+                    parameters: [
+                        { name: 'startDttm', type: 'String', required: true, default: '20241003214304', description: '조회 시작 일시 (YYYYMMDDHHmmss 형식)' },
+                        { name: 'endDttm', type: 'String', required: true, default: '20241003214310', description: '조회 종료 일시 (YYYYMMDDHHmmss 형식)' }
+                    ],
+                    responseSampleHtml: '',
+                    responseSample: [
+                        {
+                            id: 228380,
+                            guid: "df296924-b9c7-48ab-92e9-12a748f991d2",
+                            tx_id: "uE4I9nfVJlkB",
+                            if_id: "IF_00016",
+                            prg_nm: "나형주5",
+                            system_cd: "pmw",
+                            tx_status: "타임아웃",
+                            req_dt: "20241003",
+                            req_tm: "221514",
+                            req_dttm: "20241003221514",
+                            res_dttm: "20241003221520",
+                            res_cd: "T00",
+                            res_msg: "T00",
+                            tx_biz_id: "BIZ_00016",
+                            req_json: "{\"req_dttm\":\"20241003221514\",\"IF_ID\":\"IF_00016\",\"res_dttm\":\"20241003221520\",\"prg_nm\":\"나형주5\"}",
+                            res_json: "{\"tx_status\":\"타임아웃\",\"res_cd\":\"T00\"}",
+                            elapsed: 0
+                        }
+                    ],
+                    responseFormat: [
+                        { name: 'id', type: 'Number', required: true, description: '거래 ID' },
+                        { name: 'guid', type: 'String', required: true, description: '고유 식별자' },
+                        { name: 'tx_id', type: 'String', required: true, description: '트랜잭션 ID' },
+                        { name: 'if_id', type: 'String', required: true, description: '인터페이스 ID' },
+                        { name: 'prg_nm', type: 'String', required: true, description: '프로그램 이름' },
+                        { name: 'system_cd', type: 'String', required: true, description: '시스템 코드' },
+                        { name: 'tx_status', type: 'String', required: true, description: '트랜잭션 상태' },
+                        { name: 'req_dt', type: 'String', required: true, description: '요청 날짜' },
+                        { name: 'req_tm', type: 'String', required: true, description: '요청 시간' },
+                        { name: 'req_dttm', type: 'String', required: true, description: '요청 일시' },
+                        { name: 'res_dttm', type: 'String', required: true, description: '응답 일시' },
+                        { name: 'res_cd', type: 'String', required: true, description: '응답 코드' },
+                        { name: 'res_msg', type: 'String', required: true, description: '응답 메시지' },
+                        { name: 'tx_biz_id', type: 'String', required: true, description: '비즈니스 트랜잭션 ID' },
+                        { name: 'req_json', type: 'String', required: true, description: '요청 JSON' },
+                        { name: 'res_json', type: 'String', required: true, description: '응답 JSON' },
+                        { name: 'elapsed', type: 'Number', required: true, description: '경과 시간 (밀리초)' }
+                    ],
+                },
             }
 
         };
@@ -649,7 +701,7 @@ const comp = module.exports = {
             };
 
             const processLine = (line) => {
-                
+
                 const trimmedLine = line.trim();
                 if (trimmedLine.includes('}') || trimmedLine.includes(']')) {
                     depth--;
@@ -666,7 +718,7 @@ const comp = module.exports = {
                     depth++;
                 }
                 return `<span class="json_line">${indentation}${processedLine}</span>`;
-                
+
             };
 
             return json.split('\n').map(processLine).join('\n');
