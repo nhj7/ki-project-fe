@@ -161,11 +161,10 @@ const comp = module.exports = {
             const textColor = this.themeColors.text;
             const primaryColor = this.themeColors.primary;
             const errorColor = this.themeColors.error;
-            //const backgroundColor = this.isDarkMode ? '#1E1E1E' : '#FFFFFF';
-            //console.log('chartOption', textColor, primaryColor, errorColor);
+
             return {
                 ...this.transactionFlowOption,
-                //backgroundColor: backgroundColor,
+                animation: false,  // 애니메이션 비활성화
                 textStyle: {
                     color: primaryColor
                 },
@@ -178,19 +177,19 @@ const comp = module.exports = {
                 },
                 tooltip: {
                     trigger: 'axis',
-                    axisPointer: {
-                        type: 'cross',
-                        label: {
-                            backgroundColor: this.themeColors.secondary
-                        }
-                    }
                 },
                 xAxis: {
                     ...this.transactionFlowOption.xAxis,
                     axisLabel: {
                         ...this.transactionFlowOption.xAxis.axisLabel,
-                        color: primaryColor
+                        color: primaryColor,
+                        formatter: (value) => {
+                            const date = new Date(value);
+                            return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+                        }
                     },
+                    min: this.transactionFlowOption.xAxis.min,
+                    max: this.transactionFlowOption.xAxis.max
                 },
                 yAxis: {
                     ...this.transactionFlowOption.yAxis,
@@ -201,28 +200,6 @@ const comp = module.exports = {
                     splitLine: {
                         lineStyle: {
                             color: this.isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
-                        }
-                    }
-                },
-                brush: {
-                    xAxisIndex: 'all',
-                    brushLink: 'all',
-                    outOfBrush: {
-                        colorAlpha: 0.1
-                    },
-                    brushStyle: {
-                        borderWidth: 1,
-                        color: 'rgba(120,140,180,0.3)',
-                        borderColor: 'rgba(120,140,180,0.8)'
-                    },
-                    toolbox: ['rect', 'polygon', 'keep', 'clear'],
-                    throttleType: 'debounce',
-                    throttleDelay: 300
-                },
-                toolbox: {
-                    feature: {
-                        brush: {
-                            type: ['rect', 'polygon', 'keep', 'clear']
                         }
                     }
                 },
@@ -277,7 +254,7 @@ const comp = module.exports = {
                     };
                 })
                 .on("end", function () {
-                    d3.select(this).remove();  // 애니메이션이 끝나면 타원 제거
+                    d3.select(this).remove();  // 애니메이션이 끝면 타원 제거
                 });
 
             /*
@@ -331,81 +308,99 @@ const comp = module.exports = {
             this.realChartData.colorIndex++;  // 다음 트랜잭션에 대해 색상 순서 업데이트
             return transaction;
         },
-        generateInitialData() {
+        async generateInitialData() {
             const now = new Date();
-            const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
+            const minutesAgo = new Date(now.getTime() - 3 * 60 * 1000);
             const data = [];
+            // 초기 데이터 로드를 위한 API 호출
+            const endDttm = this.$util.getDateTime(now);
+            const startDttm = this.$util.getDateTime(minutesAgo);
+            try {
+                const response = await request(
+                    '/api/gettxdata',
+                    'POST',
+                    {
+                        startDttm: startDttm,
+                        endDttm: endDttm
+                    }
+                );
+                return response.data.txDataList;
+            } catch (error) {
+                console.error('초기 데이터를 가져오는 중 오류가 발생했습니다:', error);
+                return [];
+            }
+        },
+        updateChartData(transactions) {
+            const now = Date.now();
+            const threeMinutesAgo = now - 180000; // 3분 전
 
-            for (let time = fiveMinutesAgo; time <= now; time.setSeconds(time.getSeconds() + 10)) {
-                const normalValue = Math.round(Math.random() * 100 + 100);
-                const tx_data = {
-                    time: time.getTime(),
-                    normal: normalValue,
-                }
-                // 이상 거래 추가
-                if (Math.random() < 0.03) {  // 3% 확률로 이상 거래 발생
-                    this.anomalyTransactions.unshift({
-                        timestamp: time.toLocaleString(),
-                        transactionId: 'TX' + Math.random().toString(36).substr(2, 6),
-                        type: ['이체', '결제', '출금'][Math.floor(Math.random() * 3)],
-                        amount: this.$util.numberWithComma(Math.floor(Math.random() * 1000000)) + '원',
-                        status: Math.random() < 0.5 ? '의심' : '오류'
-                    });
-
-                    // 최근 100개 이상 거래만 유지
-                    const anomalyValue = Math.round(Math.random() * 100 + 100);
-                    tx_data.anomaly = anomalyValue;
-                    if (this.anomalyTransactions.length > 100) {
-                        this.anomalyTransactions.pop();
+            transactions.forEach(tx => {
+                const time = new Date(tx.req_dttm.slice(0, 4) + '-' + tx.req_dttm.slice(4, 6) + '-' + tx.req_dttm.slice(6, 8) + 'T' + tx.req_dttm.slice(8, 10) + ':' + tx.req_dttm.slice(10, 12) + ':' + tx.req_dttm.slice(12, 14)).getTime();
+                if (time >= threeMinutesAgo) {
+                    if (tx.tx_status === '정상') {
+                        this.transactionFlowOption.series[0].data.push([time, tx.elapsed]);
+                    } else {
+                        this.transactionFlowOption.series[1].data.push([time, tx.elapsed]);
                     }
                 }
+            });
 
-                data.push(tx_data);
-
+            // 데이터 정렬 및 오래된 데이터 제거
+            for (let i = 0; i < 2; i++) {
+                this.transactionFlowOption.series[i].data.sort((a, b) => a[0] - b[0]);
+                this.transactionFlowOption.series[i].data = this.transactionFlowOption.series[i].data.filter(item => item[0] >= threeMinutesAgo);
             }
 
-            return data;
-        },
-        updateChartData(data) {
-            this.transactionFlowOption.series[0].data = data.map(item => [item.time, item.normal]);
-            this.transactionFlowOption.series[1].data = data
-                .filter(item => item.anomaly !== undefined)
-                .map(item => [item.time, item.anomaly]);
+            // X축 범위 조정
+            this.transactionFlowOption.xAxis.min = threeMinutesAgo;
+            this.transactionFlowOption.xAxis.max = now;
         },
         async fetchNewData() {
             try {
-                // 실제로는 서버에서 데이터를 가져와야 합니다.
-                // 여기서는 가상의 트랜잭션을 사용합니다.
-                await new Promise(resolve => setTimeout(resolve, 500));
+                // 실제로는 서버에서 데이터를 가져와야 합니다.                
+                // gettxdata API를 사용하여 최근 5분간의 거래 데이터를 가져옵니다.
+                const endDttm = this.$util.getDateTime(new Date());
+                const startDttm = this.$util.getDateTime(new Date(Date.now() - 5 * 1000));
+
+
+                const response = await request(
+                    '/api/gettxdata',
+                    'POST',
+                    {
+                        startDttm: startDttm,
+                        endDttm: endDttm
+                    }
+                );
+
+
+
+                const transactions = response.data.txDataList;
+
+                console.log('fetchNewData response', response, transactions.length);
+
+                this.updateChartData(transactions);
+
+                
+
+                // 차트 데이터 업데이트
+                //this.updateChartData(chartData);
+
+                // 이상 거래 목록 업데이트
+                this.anomalyTransactions = transactions
+                    .filter(tx => tx.tx_status !== '정상')
+                    .map(tx => ({
+                        timestamp: tx.req_dttm,
+                        transactionId: tx.tx_id,
+                        type: tx.tx_biz_id,
+                        amount: this.$util.numberWithComma(JSON.parse(tx.req_json).amount || 0) + '원',
+                        status: tx.tx_status === '타임아웃' ? '오류' : '의심'
+                    }))
+                    .slice(0, 100);  // 최근 100개만 유지
 
                 const now = new Date();
-                const normalValue = Math.round(Math.random() * 60 + 60);
+                const fiveMinutesAgo = Date.now() - 180000; // 3분 전 시간 계산
 
-                this.transactionFlowOption.series[0].data.push([now, normalValue]);
-
-
-                // 최근 100개 데이터만 유지
-                if (this.transactionFlowOption.series[0].data.length > 100) {
-                    this.transactionFlowOption.series[0].data.shift();
-                }
-                // 이상 거래 추가
-                if (Math.random() < 0.03) {  // 3% 확률로 이상 거래 발생
-                    this.anomalyTransactions.unshift({
-                        timestamp: now.toLocaleString(),
-                        transactionId: 'TX' + Math.random().toString(36).substr(2, 6),
-                        type: ['이체', '결제', '출금'][Math.floor(Math.random() * 3)],
-                        amount: this.$util.numberWithComma(Math.floor(Math.random() * 1000000)) + '원',
-                        status: Math.random() < 0.5 ? '의심' : '오류'
-                    });
-
-                    const anomalyValue = Math.round(Math.random() * 60 + 60);
-                    this.transactionFlowOption.series[1].data.push([now, anomalyValue]);
-
-                    // 최근 100개 이상 거래만 유지
-                    if (this.anomalyTransactions.length > 100) {
-                        this.anomalyTransactions.pop();
-                    }
-                }
+                
             } catch (error) {
                 console.error('새 데이터를 가져오는 중 오류가 발생했습니다:', error);
             }
@@ -424,6 +419,7 @@ const comp = module.exports = {
         stopUpdating: function () {
             clearInterval(this.updateInterval);
             clearInterval(this.realChartData.updateInterval);
+            clearInterval(this.transactionFlowUpdateInterval);
         },
         updateSummaryItems(data) {
             const totalTransactions = data.reduce((sum, item) => sum + item.normal + item.anomaly, 0);
@@ -450,10 +446,10 @@ const comp = module.exports = {
             // 평균 응답시간 계산 로직
         },
     },
-    created() {
-        const initialData = this.generateInitialData();
+    async created() {
+        const initialData = await this.generateInitialData();
         this.updateChartData(initialData);
-        this.updateSummaryItems(initialData);
+        ///this.updateSummaryItems(initialData);
     },
     mounted: async function () {
         await this.fetchNewData(); // 초기 데이터 로드
@@ -484,7 +480,7 @@ const comp = module.exports = {
             .attr("rx", 50)  // 둥근 모서리로 원통형 효과
             .attr("ry", 50);
 
-        setInterval(() => {
+        this.transactionFlowUpdateInterval = setInterval(() => {
             const transaction = this.generateTransaction();
             this.animateTransaction(transaction);
         }, 300);  // 1초마다 1개 트랜잭션 생성 (10배 감소)
@@ -500,9 +496,9 @@ const comp = module.exports = {
     beforeDestroy: function () {
         //console.log(`${this.$route.meta.title} beforeDestroy`);
         this.stopUpdating();
-        try{
+        try {
             this.resizeObserver.disconnect();
-        }catch(e){
+        } catch (e) {
             console.error('resizeObserver 종료 중 오류가 발생했습니다:', e);
         }
     }

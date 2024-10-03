@@ -499,11 +499,11 @@ const comp = module.exports = {
                 getTxData: {
                     name: '거래 데이터 조회',
                     endpoint: '/api/gettxdata',
-                    method: 'GET',
+                    method: 'POST',
                     description: '지정된 시간 범위 내의 거래 데이터 목록을 조회합니다.',
                     parameters: [
-                        { name: 'startDttm', type: 'String', required: true, default: '20241003214304', description: '조회 시작 일시 (YYYYMMDDHHmmss 형식)' },
-                        { name: 'endDttm', type: 'String', required: true, default: '20241003214310', description: '조회 종료 일시 (YYYYMMDDHHmmss 형식)' }
+                        { name: 'startDttm', type: 'String', required: true, default: this.$util.getDateTime(new Date(Date.now() - 10000)), description: '조회 시작 일시 (YYYYMMDDHHmmss 형식)' },
+                        { name: 'endDttm', type: 'String', required: true, default: this.$util.getDateTime(new Date()), description: '조회 종료 일시 (YYYYMMDDHHmmss 형식)' }
                     ],
                     responseSampleHtml: '',
                     responseSample: [
