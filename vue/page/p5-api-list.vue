@@ -127,7 +127,7 @@
 const comp = module.exports = {
     data() {
         return {
-            selectedApi: 'transfer',
+            selectedApi: 'getTxData',
             selectedApiDetails: null,
             apiResponse: null,
             curlExample: '',
