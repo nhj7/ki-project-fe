@@ -6,14 +6,14 @@
         <v-list-item-content>
           <v-list-item-title class="title">
             <v-row>
-              <v-col cols="6" md="6" class="text-right">
+              <v-col cols="6" md="6" class="text-right primary--text">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
-                    <v-list-item v-bind="attrs" v-on="on" @click.stop="drawer = !drawer">
+                    <v-list-item v-bind="attrs" v-on="on" @click.stop="drawer = !drawer" class="primary--text">
                       {{ title }}
                     </v-list-item>
                   </template>
-                  <span>Korea Investment Service Quality Management</span>
+                  <span class="primary--text">Korea Investment Service Quality Management</span>
                 </v-tooltip>
 
                 <!--v-img src="/assets/ci.png" :width="30" cover /-->
@@ -23,7 +23,7 @@
 
             <!--v-icon class="float-right">mdi-close</v-icon-->
           </v-list-item-title>
-          <v-list-item-subtitle>
+          <v-list-item-subtitle class="primary--text">
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 한국투자 서비스 품질 관리 시스템
           </v-list-item-subtitle>
         </v-list-item-content>
@@ -234,12 +234,11 @@
     </v-navigation-drawer>
 
     <v-footer absolute fixed inset padless>
-      <v-spacer />
-      <span>
-        All content &copy; {{ "KI-FDS" }}. {{ new Date().getFullYear() }} All
-        rights reserved.
+      <v-spacer ></v-spacer>
+      <span class="text-center">
+        &copy; {{ new Date().getFullYear() }} 한국투자 {{ title }}.  All rights reserved.
       </span>
-      <v-spacer />
+      <v-spacer ></v-spacer>
     </v-footer>
 
     <v-snackbar>

@@ -67,9 +67,7 @@ const comp = module.exports = {
         return {
             transactionFlowOption: {
 
-                tooltip: {
-                    trigger: 'axis'
-                },
+
                 legend: {
                     data: ['정상 거래', '이상 거래']
                 },
@@ -176,7 +174,13 @@ const comp = module.exports = {
                     icon: 'roundRect',
                 },
                 tooltip: {
-                    trigger: 'axis',
+                    trigger: 'item',
+                    axisPointer: {
+                        type: 'shadow',
+                        label: {
+                            backgroundColor: this.themeColors.secondary
+                        }
+                    }
                 },
                 xAxis: {
                     ...this.transactionFlowOption.xAxis,
@@ -380,7 +384,7 @@ const comp = module.exports = {
 
                 this.updateChartData(transactions);
 
-                
+
 
                 // 차트 데이터 업데이트
                 //this.updateChartData(chartData);
@@ -400,7 +404,7 @@ const comp = module.exports = {
                 const now = new Date();
                 const fiveMinutesAgo = Date.now() - 180000; // 3분 전 시간 계산
 
-                
+
             } catch (error) {
                 console.error('새 데이터를 가져오는 중 오류가 발생했습니다:', error);
             }
