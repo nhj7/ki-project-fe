@@ -4,24 +4,6 @@
             <v-col cols="12">
                 <v-card>
                     <v-card-text>
-
-                        <!-- KPI 요약 -->
-                        <!--v-row dense class="mb-4">
-                            <v-col v-for="(item, index) in summaryItems" :key="index" cols="12" sm="6" md="3">
-                                <v-card>
-                                    <v-card-text class="pa-2">
-                                        <div class="d-flex justify-space-between align-center">
-                                            <span class="text-subtitle-1 font-weight-bold pl-6" :class="item.color">{{
-                                item.label }}</span>
-                                            <span class="text-subtitle-1 font-weight-bold pr-6" :class="item.color">
-                                                {{ $util.numberWithComma(item.value) + item.unit }}
-                                            </span>
-                                        </div>
-                                    </v-card-text>
-                                </v-card>
-                            </v-col>
-                        </v-row-->
-
                         <v-row>
                             <v-col cols="12" align="center">
                                 <div id="realtime-transaction-chart"></div>
@@ -320,9 +302,8 @@ const comp = module.exports = {
             const endDttm = this.$util.getDateTime(now);
             const startDttm = this.$util.getDateTime(minutesAgo);
             try {
-                const response = await request(
+                const response = await this.$axios.post(
                     '/api/gettxdata',
-                    'POST',
                     {
                         startDttm: startDttm,
                         endDttm: endDttm
@@ -367,9 +348,8 @@ const comp = module.exports = {
                 const startDttm = this.$util.getDateTime(new Date(Date.now() - 5 * 1000));
 
 
-                const response = await request(
+                const response = await this.$axios.post(
                     '/api/gettxdata',
-                    'POST',
                     {
                         startDttm: startDttm,
                         endDttm: endDttm

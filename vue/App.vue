@@ -56,8 +56,8 @@
             </template>
 
             <v-list-item v-for="subItem in route.subRoutes" :key="subItem.path" :to="subItem.path" link
-              class="lnb-subItem rounded-lg pl-4">
-              <v-list-item-action dense>
+              class="lnb-subItem rounded-lg pl-4" >
+              <v-list-item-action dense >
                 <v-icon>{{ findRouteByPath(subItem.path).meta.icon }}</v-icon>
               </v-list-item-action>
               <v-list-item-content dense>
@@ -68,7 +68,7 @@
             </v-list-item>
           </v-list-group>
 
-          <v-list-item v-else :key="route.path" :to="route.path" class="lnb-item rounded-lg" dense>
+          <v-list-item v-else :key="route.path" :to="route.path" class="lnb-item rounded-lg" dense >
             <v-list-item-action>
               <v-icon>{{ route.meta.icon }}</v-icon>
             </v-list-item-action>
@@ -127,7 +127,7 @@
 
     <v-main>
       <v-container lass="fill-height pa-0" fluid>
-        <h2 class="text-subtitle-2 mb-2 d-flex align-center">
+        <h2 class="text-subtitle-2 mb-2 d-flex align-center cursor-pointer" @click.stop="drawer = !drawer">
           <v-icon size="24" :color="this.$route.meta.iconColor || 'primary'" class="mr-2">{{ this.$route.meta.icon
             }}</v-icon>
           {{ this.$route.meta.title }}
@@ -506,8 +506,19 @@ const globalMethods = {
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   },
-  getDate() {
-    return this.formatDate(new Date());
+  getDate(days = 0) {
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+    return this.formatDate(date);
+  },
+  getTime(min = 0 , sec = 0, sep = '') {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + min);
+    now.setSeconds(now.getSeconds() + sec);
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    return `${hours}${sep}${minutes}${sep}${seconds}`;
   },
   getCurrentDateTime() {
     const now = new Date();

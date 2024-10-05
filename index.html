@@ -31,6 +31,7 @@
     <script src="https://cdn.jsdelivr.net/npm/echarts"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-echarts"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-liquidfill@3.1.0/dist/echarts-liquidfill.min.js"></script>
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
 
@@ -191,7 +192,15 @@
                         showInMenu: true,
                         icon: "mdi-lan-check",
                         iconColor: "orange",
-                        title: "서비스 품질 이력 조회",
+                        title: "서비스 품질 이벤트 이력 조회",
+                    }
+                }
+                , {
+                    path: '/tx-history-view', name: 'tx-history-view', component: loadVue('./page/p7-tx-history-view'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-database-search",
+                        iconColor: "orange",
+                        title: "서비스 호출 내역 조회",
                     }
                 }
                 , {
@@ -292,6 +301,9 @@
                         }
                         , {
                             path: '/sample-echarts'
+                        }                        
+                        , {
+                            path: '/sample-d3'
                         }
                         , {
                             path: '/sample-transaction-flow'
@@ -342,6 +354,13 @@
                         icon: "mdi-clipboard-check-outline",
                         iconColor: "green",
                         title: "테스트 자동화 수행 현황",
+                    }
+                }
+                , {
+                    path: '/sample-d3', name: 'sample-d3', component: loadVue('./page/page8-sample-d3'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-chart-line",
+                        title: "대시보드(샘플-d3)",
                     }
                 }
                 , {
@@ -416,10 +435,11 @@
 
         
         Vue.prototype.$config = {
-            endpoint_url: 'https://ki.iinfo.kr:18080'
+            endpoint_url: 'https://ki.iinfo.kr:18080',
+            color_btn : 'secondary'
         }
-
-
+        axios.defaults.baseURL = Vue.prototype.$config.endpoint_url;
+        Vue.prototype.$axios = axios;
              
         async function request(url, method, data) {            
             try{

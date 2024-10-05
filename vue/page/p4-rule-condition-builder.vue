@@ -31,7 +31,7 @@
           </v-row>
           <v-row>
             <v-col cols="12">
-              <v-btn color="primary" @click="addCondition">조건 추가</v-btn>
+              <v-btn :color="$config.color_btn" @click="addCondition">조건 추가</v-btn>
             </v-col>
           </v-row>
           <v-row>

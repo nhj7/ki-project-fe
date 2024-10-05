@@ -48,7 +48,7 @@
                             </v-card-text>
                         </v-card>
                         <!-- 신용대출 한도 확인 버튼 -->
-                        <v-btn color="primary" x-large block class="my-4" @click="checkLoanLimit">
+                        <v-btn :color="$config.color_btn" block class="my-4" @click="checkLoanLimit">
                             신용대출 한도 확인하기
                         </v-btn>
 

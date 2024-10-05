@@ -4,7 +4,7 @@
       <v-card-title>
 
         <v-spacer></v-spacer>
-        <v-btn color="primary" @click="openUserDialog">
+        <v-btn :color="$config.color_btn" @click="openUserDialog" small dense>
           사용자 등록
         </v-btn>
       </v-card-title>
@@ -117,7 +117,7 @@ const comp = module.exports = {
       // 여기서 실제 API를 호출하여 사용자 목록을 가져와야 합니다.
       // 지금은 예시 데이터를 사용합니다.
 
-      const response = await request('/api/user-list', 'get');
+      const response = await this.$axios.get('/api/user-list');
       console.log("response", response);
 
       this.users = response.data.body;

@@ -1,0 +1,6 @@
+{
+    "typescript.validate.enable": false,
+    "tslint.enable": false,
+    "eslint.validate": ["javascript", "javascriptreact"],
+    "vetur.format.defaultFormatter.ts": "none"
+}

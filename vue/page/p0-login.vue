@@ -10,7 +10,7 @@
                 validate-on-blur data-test="userId-input" hint="제공받은 아이디를 입력해주세요." clearable @input="userIdRules = []"></v-text-field>
               <v-text-field v-model="password" :rules="passwordRules" label="패스워드" type="password"
                 @keypress.enter="login" :validate-on-blur="false" autocomplete="current-password" data-test="password-input" hint="제공받은 패스워드를 입력해주세요." clearable @input="passwordRules = []"></v-text-field>
-              <v-btn color="success" @click="login" data-test="login-button" class="mt-4">로그인</v-btn>
+              <v-btn :color="$config.color_btn" @click="login" data-test="login-button" class="mt-4">로그인</v-btn>
             </v-form>
 
             <v-divider class="mt-2 mb-2"></v-divider>
@@ -56,7 +56,7 @@ const comp = (module.exports = {
 
 
           this.$loading.show('로그인 중...');
-          const response = await request("/api/login-signin", "POST", {
+          const response = await this.$axios.post("/api/login-signin", {
             username: this.userId,
             password: this.password,
           });

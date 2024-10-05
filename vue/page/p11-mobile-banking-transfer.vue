@@ -35,7 +35,7 @@
                     label="처리 상태" outlined dense :rules="[rules.required]"></v-select>
                 </v-col>
               </v-row>
-              <v-btn color="primary" block @click="submitTransfer">이체하기</v-btn>
+              <v-btn :color="$config.color_btn" block @click="submitTransfer" small dense>이체하기</v-btn>
             </v-form>
           </v-card-text>
         </v-card>

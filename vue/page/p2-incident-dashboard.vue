@@ -84,7 +84,7 @@
                                 </v-menu>
                             </v-col>
                             <v-col cols="12" sm="12" md="6" class="d-flex justify-end align-center">
-                                <v-btn color="primary" @click="search" small dense>조회</v-btn>
+                                <v-btn :color="$config.color_btn" @click="search" small dense>조회</v-btn>
                             </v-col>
                         </v-row>
 
@@ -127,7 +127,7 @@
                         </v-chip>
                     </template>
                     <template v-slot:[`item.actions`]="{ item }">
-                        <v-btn small color="primary" @click="showDetails(item)">상세</v-btn>
+                        <v-btn small  @click="showDetails(item)">상세</v-btn>
                     </template>
                 </v-data-table>
             </v-col>
@@ -175,7 +175,7 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="primary" text @click="detailDialog = false">닫기</v-btn>
+                    <v-btn :color="$config.color_btn" text @click="detailDialog = false">닫기</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -287,8 +287,39 @@ const comp = module.exports = {
 
                 await new Promise(resolve => setTimeout(resolve, 300)); // 예시: 0.5초 지연
 
+                /*
+                try {                    
+                    const requestData = {
+                        startDate: this.filters.startDate,
+                        endDate: this.filters.endDate,
+                        status: this.filters.status
+                    };                    
+                    this.$loading.show('인시던트 목록을 불러오는 중입니다...');
+                    
+                    const response = await request( '/api/incidents', 'POST', requestData);
+                    
+                    if (response.data && response.data.incidents) {
+                        this.incidents = response.data.incidents.map(incident => ({
+                            timestamp: incident.createdAt,
+                            system: '시스템', // API 응답에 시스템 정보가 없어 임의로 설정
+                            severity: '심각', // API 응답에 심각도 정보가 없어 임의로 설정
+                            description: incident.title,
+                            status: incident.status
+                        }));
+                    } else {
+                        console.error('API 응답 형식이 올바르지 않습니다:', response.data);
+                        this.incidents = [];
+                    }
+                } catch (error) {
+                    console.error('인시던트 목록을 불러오는 중 오류가 발생했습니다:', error);
+                    this.incidents = [];
+                } finally {
+                    this.$loading.hide();
+                }
+                */
                 // 실제로는 API 호출을 통해 데이터를 가져와야 합니다.
                 // 여기서는 예시 데이터를 사용합니다.
+                
                 this.incidents = [
                     { timestamp: '2023-05-01 10:30:00', system: '소비자금융시스템', severity: '심각', description: '대출 한도조회 오류', status: '조치중' },
                     { timestamp: '2023-05-01 10:25:00', system: '소비자금융시스템', severity: '심각', description: '1원 송금 오류', status: '완료' },
@@ -307,7 +338,8 @@ const comp = module.exports = {
                     { timestamp: '2023-05-03 06:13:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
                     { timestamp: '2023-05-03 06:03:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
                     { timestamp: '2023-05-03 05:53:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
-                ];
+                ];  
+                
 
                 console.log('조회 응답 : ', this.incidents);
 
@@ -357,7 +389,9 @@ const comp = module.exports = {
         },
         fetchDetailTransactions(incidentGuid) {
             // 실제로는 API를 호출하여 데이터를 가져와야 합니다.
+            
             // 여기서는 예시 데이터를 사용합니다.
+            
             this.detailTransactions = [
                 { guid: 'tx001', programId: 'PROG001', transactionTime: '2023-05-01 10:30:15', transactionType: '입금', userId: 'user123', amount: 50000, status: '성공' },
                 { guid: 'tx002', programId: 'PROG002', transactionTime: '2023-05-01 10:31:20', transactionType: '출금', userId: 'user456', amount: 30000, status: '실패' },
@@ -372,6 +406,7 @@ const comp = module.exports = {
                 { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
                 // ... 더 많은 거래 데이터 ...
             ];
+            
         },
 
     },

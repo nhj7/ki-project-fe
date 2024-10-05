@@ -66,7 +66,7 @@
                             <v-card-text class="font-weight-bold"
                                 v-html="curlExample"></v-card-text><!--eslint-disable-line-->
                         </v-card>
-                        <v-btn color="primary" @click="callApi" class="mt-2">API 호출</v-btn>
+                        <v-btn :color="$config.color_btn" @click="callApi" class="mt-2" small dense>API 호출</v-btn>
 
                         <v-subheader class="mt-4">응답 결과</v-subheader>
                         <v-card outlined v-if="apiResponse">
@@ -160,7 +160,7 @@ const comp = module.exports = {
                     method: 'POST',
                     description: '인시던트 목록을 조회합니다.',
                     parameters: [
-                        { name: 'startDate', type: 'String', required: true, default: this.$util.getDate(), description: '조회 시작 날짜 (YYYY-MM-DD 형식)' },
+                        { name: 'startDate', type: 'String', required: true, default: this.$util.getDate(-7), description: '조회 시작 날짜 (YYYY-MM-DD 형식)' },
                         { name: 'endDate', type: 'String', required: true, default: this.$util.getDate(), description: '조회 종료 날짜 (YYYY-MM-DD 형식)' },
                         { name: 'status', type: 'String', required: false, default: '', description: '인시던트 상태 (예: "open", "closed")' }
                     ],

@@ -4,7 +4,7 @@
             <v-card-title>
                 거래 장애 탐지 룰셋 설정
                 <v-spacer></v-spacer>
-                <v-btn color="primary" @click="addRule">
+                <v-btn :color="$config.color_btn" @click="addRule" small dense>
                     새 규칙 추가
                 </v-btn>
             </v-card-title>
@@ -55,8 +55,8 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" text @click="close">취소</v-btn>
-                    <v-btn color="blue darken-1" text @click="save">저장</v-btn>
+                    <v-btn :color="$config.color_btn" text @click="close">취소</v-btn>
+                    <v-btn :color="$config.color_btn" text @click="save">저장</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>

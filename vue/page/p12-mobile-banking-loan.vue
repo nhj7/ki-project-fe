@@ -35,10 +35,14 @@
                     :rules="[rules.required]"></v-select>
                 </v-col>
               </v-row>
-
-              <v-btn color="primary" block @click="submitLoanApplication" class="mb-2">신청하기</v-btn>
-              <v-divider></v-divider>
-              <v-btn color="primary" block @click="checkLoanLimit">한도조회</v-btn>
+              <v-row dense>
+                <v-col cols="6">
+                  <v-btn :color="$config.color_btn" block @click="submitLoanApplication" small dense>신청하기</v-btn>              
+                </v-col>
+                <v-col cols="6">
+                  <v-btn :color="$config.color_btn" block @click="checkLoanLimit" small dense>한도조회</v-btn>
+                </v-col>
+              </v-row>              
             </v-form>
           </v-card-text>
         </v-card>
