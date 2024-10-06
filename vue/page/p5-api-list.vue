@@ -127,14 +127,16 @@
 const comp = module.exports = {
     data() {
         return {
-            selectedApi: 'transfer',
+            
             selectedApiDetails: null,
             apiResponse: null,
             curlExample: '',
             paramValues: {},
             isFormValid: true,
+            selectedApi: 'getAlarms',
             apiList: [
-                
+
+                { text: '알람 목록 조회(미완)', value: 'getAlarms' },
                 { text: '간편 이체(미완-1)', value: 'transfer' },
                 { text: '대출 신청(미완-2)', value: 'applyLoan' },
                 { text: '한도 조회(미완-3)', value: 'checkLoanLimit' },
@@ -148,8 +150,8 @@ const comp = module.exports = {
                 { text: '로그아웃(완료)', value: 'logout' },
                 { text: '사용자 등록(완료)', value: 'loginSignup' },
                 { text: '사용자 목록 조회(완료)', value: 'getUserList' },
-                
-                
+
+
 
 
             ],
@@ -549,6 +551,58 @@ const comp = module.exports = {
                         { name: 'req_json', type: 'String', required: true, description: '요청 JSON' },
                         { name: 'res_json', type: 'String', required: true, description: '응답 JSON' },
                         { name: 'elapsed', type: 'Number', required: true, description: '경과 시간 (밀리초)' }
+                    ],
+                },
+
+                getAlarms: {
+                    name: '알람 목록 조회',
+                    endpoint: '/api/alarms',
+                    method: 'GET',
+                    description: '시스템 알람 목록을 조회합니다.',
+                    parameters: [
+                        { name: 'startDate', type: 'String', required: false, default: this.$util.getDate(-1), description: '조회 시작 날짜 (YYYY-MM-DD 형식)' },
+                        { name: 'endDate', type: 'String', required: false, default: this.$util.getDate(), description: '조회 종료 날짜 (YYYY-MM-DD 형식)' },
+                        { name: 'severity', type: 'String', required: false, default: '', description: '심각도 필터 (예: 심각, 경고, 정보)' },
+                    ],
+                    responseSampleHtml: '',
+                    responseSample: {
+                        header: {
+                            resultCode: "0000",
+                            resultMessage: "알람 목록 조회 성공"
+                        },
+                        body: {
+                            alarms: [
+                                {
+                                    timestamp: "2023-05-10 14:30:00",
+                                    system: "소비자금융시스템",
+                                    severity: "심각",
+                                    description: "대출 한도조회 오류",
+                                },
+                                {
+                                    timestamp: "2023-05-10 15:15:00",
+                                    system: "일반여신시스템",
+                                    severity: "심각",
+                                    description: "스크래핑 오류",
+                                },
+                                {
+                                    timestamp: "2023-05-10 16:00:00",
+                                    system: "모바일앱",
+                                    severity: "심각",
+                                    description: "1원 인증 오류",
+                                },
+                            ]
+                        }
+                    },
+                    responseFormat: [
+                        { name: 'header', type: 'Object', required: true, description: '응답 헤더' },
+                        { name: 'header.resultCode', type: 'String', required: true, description: '결과 코드' },
+                        { name: 'header.resultMessage', type: 'String', required: true, description: '결과 메시지' },
+                        { name: 'body', type: 'Object', required: true, description: '응답 본문' },
+                        { name: 'body.alarms', type: 'Array', required: true, description: '알람 목록' },
+                        { name: 'body.alarms[].timestamp', type: 'String', required: true, description: '알람 발생 시간 (YYYY-MM-DD HH:mm:ss 형식)' },
+                        { name: 'body.alarms[].system', type: 'String', required: true, description: '알람이 발생한 시스템' },
+                        { name: 'body.alarms[].severity', type: 'String', required: true, description: '알람 심각도' },
+                        { name: 'body.alarms[].description', type: 'String', required: true, description: '알람 설명' },
                     ],
                 },
             }

@@ -1,8 +1,7 @@
 <template>
     <v-container fluid>
         <v-card>
-            <v-card-title>
-                거래 장애 탐지 룰셋 설정
+            <v-card-title class="pa-2">
                 <v-spacer></v-spacer>
                 <v-btn :color="$config.color_btn" @click="addRule" small dense>
                     새 규칙 추가
@@ -18,11 +17,14 @@
                             mdi-delete
                         </v-icon>
                     </template>
+                    <template v-slot:[`item.condition`]="{ item }">
+                        {{ formatCondition(item.condition) }}
+                    </template>
                 </v-data-table>
             </v-card-text>
         </v-card>
 
-        <v-dialog v-model="dialog" max-width="600px">
+        <v-dialog v-model="dialog" max-width="680px">
             <v-card>
                 <v-card-title>
                     <span class="headline">{{ formTitle }}</span>
@@ -33,30 +35,45 @@
                             <v-col cols="12">
                                 <v-text-field v-model="editedItem.name" label="규칙 이름"></v-text-field>
                             </v-col>
-                            <v-col cols="12">
-                                <v-select v-model="editedItem.type" :items="ruleTypes" label="규칙 유형"></v-select>
+                            <v-col cols="12" sm="6" md="4">
+                                <v-select v-model="editedItem.condition.type" :items="ruleTypes"
+                                    label="규칙 유형"></v-select>
                             </v-col>
-                            <v-col cols="12" v-if="editedItem.type === '거래 부재'">
-                                <v-text-field v-model="editedItem.duration" label="기간 (분)" type="number"></v-text-field>
+                            <v-col cols="12" sm="6" md="4">
+                                <v-select v-model="editedItem.condition.direction"
+                                    :items="editedItem.condition.type === '거래량' ? [...ruleDirections, '무거래'] : ruleDirections"
+                                    label="방향"></v-select>
                             </v-col>
-                            <v-col cols="12" v-if="editedItem.type === '오류율 증가'">
-                                <v-select v-model="editedItem.comparisonPeriod" :items="comparisonPeriods"
-                                    label="비교 기간"></v-select>
+                            <v-col cols="12" sm="6" md="4">
+                                <v-switch v-model="editedItem.enabled" label="사용여부"></v-switch>
                             </v-col>
-                            <v-col cols="12" v-if="editedItem.type === '오류율 증가'">
-                                <v-text-field v-model="editedItem.threshold" label="임계값 (%)"
+
+                            <v-col cols="12" sm="6" md="4" v-if="['거래량', '오류율','반복수행'].includes(editedItem.condition.type)">
+                                <v-text-field v-model="editedItem.condition.duration" label="기간"
+                                    type="number"></v-text-field>
+                            </v-col>
+                            <v-col cols="12" sm="6" md="4" v-if="['거래량', '오류율','반복수행'].includes(editedItem.condition.type)">
+                                <v-select v-model="editedItem.condition.unit" :items="units"
+                                    label="단위"></v-select>
+                            </v-col>                                
+                           
+                            <v-col cols="4" v-if="['오류율','응답시간','반복수행'].includes(editedItem.condition.type)">
+                                <v-text-field v-model="editedItem.condition.threshold" label="임계값 (%)"
                                     type="number"></v-text-field>
                             </v-col>
                             <v-col cols="12">
-                                <v-textarea v-model="editedItem.action" label="조치 사항"></v-textarea>
+                                <v-text-field :value="formatCondition(editedItem.condition)" readonly label="규칙설명" ></v-text-field>
+                            </v-col>
+                            <v-col cols="12">
+                                <v-textarea v-model="editedItem.action" label="조치 사항" rows="3"></v-textarea>
                             </v-col>
                         </v-row>
                     </v-container>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn :color="$config.color_btn" text @click="close">취소</v-btn>
-                    <v-btn :color="$config.color_btn" text @click="save">저장</v-btn>
+                    <v-btn :color="$config.color_btn" @click="close" small>취소</v-btn>
+                    <v-btn :color="$config.color_btn" @click="save" small>저장</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -71,7 +88,7 @@ const comp = module.exports = {
             dialog: false,
             headers: [
                 { text: '규칙 이름', value: 'name' },
-                { text: '규칙 유형', value: 'type' },
+                { text: '규칙 유형', value: 'condition.type' },
                 { text: '조건', value: 'condition' },
                 { text: '조치 사항', value: 'action' },
                 { text: '작업', value: 'actions', sortable: false }
@@ -82,22 +99,28 @@ const comp = module.exports = {
             editedIndex: -1,
             editedItem: {
                 name: '',
-                type: '',
-                duration: '',
-                comparisonPeriod: '',
-                threshold: '',
+                condition: {
+                    type: '',
+                    duration: '',
+                    comparisonPeriod: '',
+                    threshold: '',
+                },
                 action: ''
             },
             defaultItem: {
                 name: '',
-                type: '',
-                duration: '',
-                comparisonPeriod: '',
-                threshold: '',
+                condition: {
+                    type: '',
+                    duration: '',
+                    comparisonPeriod: '',
+                    threshold: '',
+                },
                 action: ''
             },
-            ruleTypes: ['거래 부재', '오류율 증가', '응답지연', '거래증가', '반복수행'],
-            comparisonPeriods: ['1시간', '1일', '1주일', '1개월']
+            ruleTypes: ['거래량', '오류율', '응답시간', '반복수행'],
+            comparisonPeriods: ['1시간', '1일', '1주일', '1개월'],
+            units: ['분', '시간', '일', '주', '월'],
+            ruleDirections: ['증가', '감소']
         }
     },
     computed: {
@@ -106,6 +129,32 @@ const comp = module.exports = {
         }
     },
     methods: {
+        formatCondition: function (condition) {
+            switch (condition.type) {
+                case '거래량':
+                    if( condition.duration && condition.unit && condition.direction)
+                        return `${condition.duration}${condition.unit} 동안 ${condition.type} ${condition.direction}`;
+                    else
+                        return `${condition.direction?'':'방향'} ${condition.duration?'':'기간'} ${condition.unit?'':'단위'}를 선택해주세요`;
+                case '오류율':
+                    if( condition.duration && condition.unit && condition.threshold && condition.direction)
+                        return `이전 ${condition.duration}${condition.unit} 대비 오류율 ${condition.threshold}% 이상 ${condition.direction}`;
+                    else
+                        return `${condition.direction?'':'방향'} ${condition.duration?'':'기간'} ${condition.unit?'':'단위'} ${condition.threshold?'':'임계값'} 을 선택해주세요`;
+                case '응답시간':
+                    if( condition.duration && condition.unit && condition.threshold && condition.direction)
+                        return `이전 서비스 평균 ${condition.duration}${condition.unit} 대비 응답시간 ${condition.threshold}% 이상 ${condition.direction}`;
+                    else
+                        return `${condition.direction?'':'방향'} ${condition.duration?'':'기간'} ${condition.unit?'':'단위'} ${condition.threshold?'':'임계값'} 을 선택해주세요`;
+                case '반복수행':
+                    if( condition.duration && condition.unit && condition.threshold)
+                        return `단일 사용자가 ${condition.duration}${condition.unit} 내 ${condition.threshold}회 이상 동일 거래 시도`;
+                    else
+                        return `${condition.duration?'':'기간'} ${condition.unit?'':'단위'} ${condition.threshold?'':'임계값'} 을 선택해주세요`;
+                default:
+                    return '규칙 유형을 선택해주세요';
+            }
+        },
         async fetchRules() {
             try {
                 this.$loading.show('룰셋을 불러오는 중입니다...');
@@ -117,63 +166,85 @@ const comp = module.exports = {
                     // 여기에 기존의 rules 데이터를 넣으세요
                     {
                         name: '1시간 무거래 탐지',
-                        type: '거래 부재',
-                        condition: '1시간 동안 거래 없음',
-                        action: '시스템 관리자에게 알림 발송'
+                        condition: {
+                            type: '거래량',
+                            direction: '무거래',
+                            duration: '1',
+                            unit: '시간',
+                        },
+                        action: '시스템 관리자에게 알림 발송',
+                        enabled: true
                     },
                     {
                         name: '시간당 오류율 급증',
-                        type: '오류율 증가',
-                        condition: '이전 1시간 대비 오류율 50% 이상 증가',
-                        action: '담당자 호출 및 로그 분석 시작'
+                        condition: {
+                            type: '오류율',
+                            direction: '증가',
+                            duration: '1',
+                            unit: '시간',
+                            threshold: 50,
+                        },
+                        action: '담당자 호출 및 로그 분석 시작',
+                        enabled: true
                     },
                     {
                         name: '일일 오류율 이상',
-                        type: '오류율 증가',
-                        condition: '전일 대비 오류율 30% 이상 증가',
-                        action: '일일 리포트에 포함 및 원인 분석 요청'
+                        condition: {
+                            type: '오류율',
+                            direction: '증가',
+                            duration: '1',
+                            unit: '일',
+                            threshold: 50,
+                        },
+                        action: '일일 리포트에 포함 및 원인 분석 요청',
+                        enabled: true
                     },
                     {
                         name: '주간 거래량 감소',
-                        type: '거래 부재',
-                        condition: '이전 주 대비 거래량 40% 이상 감소',
-                        action: '비즈니스 팀에 보고 및 마케팅 활동 검토'
+                        condition: {
+                            type: '거래량',
+                            direction: '감소',
+                            duration: '1',
+                            unit: '주',
+                            threshold: 50,
+                        },
+                        action: '비즈니스 팀에 보고 및 마케팅 활동 검토',
+                        enabled: true
                     },                    
-                    {
-                        name: '특정 거래 유형 오류 증가',
-                        type: '오류율 증가',
-                        condition: '특정 거래 유형의 오류율이 전체 평균 대비 100% 이상 증가',
-                        action: '해당 거래 유형에 대한 상세 로그 분석 및 개발팀 리뷰 요청'
-                    },                    
-                    {
-                        name: '대량 거래 처리 지연',
-                        type: '거래 부재',
-                        condition: '1분 내 100건 이상의 거래 요청 중 80% 이상 처리 지연',
-                        action: '로드 밸런서 및 서버 자원 즉시 점검, 필요시 자동 스케일 아웃'
-                    },
                     {
                         name: '거래 처리 응답 지연',
-                        type: '응답지연',
-                        condition: '평균 거래 처리 시간 60초 이상 지속 (정상: 30초 이내)',
-                        action: '시스템 리소스 점검 및 데이터베이스 쿼리 최적화 검토'
-                    },                    
+                        condition: {
+                            type: '응답시간',
+                            direction: '증가',
+                            duration: '1',
+                            unit: '시간',
+                            threshold: 60,
+                        },
+                        action: '시스템 리소스 점검 및 데이터베이스 쿼리 최적화 검토',
+                        enabled: true
+                    },
                     {
                         name: '갑작스러운 거래량 증가',
-                        type: '거래증가',
-                        condition: '10분 내 거래량이 전일 동시간대 대비 200% 이상 증가',
-                        action: '자동 스케일 아웃 트리거 및 마케팅팀에 확인'
-                    },
-                    {
-                        name: '특정 서비스 거래 급증',
-                        type: '거래증가',
-                        condition: '특정 서비스 시간당 거래량이 평균의 100% 이상 증가',
-                        action: '해당 서비스 확인 및 검토'
-                    },
+                        condition: {
+                            type: '거래량',
+                            direction: '증가',
+                            duration: '10',
+                            unit: '분',
+                            threshold: 200,
+                        },
+                        action: '자동 스케일 아웃 트리거 및 마케팅팀에 확인',
+                        enabled: true
+                    },                    
                     {
                         name: '동일 서비스 반복 시도',
-                        type: '반복수행',
-                        condition: '단일 사용자가 1분 내 10회 이상 동일 서비스 시도',
-                        action: '해당 사용자 알림'
+                        condition: {
+                            type: '반복수행',
+                            duration: '1',
+                            unit: '분',
+                            threshold: 10,
+                        },
+                        action: '해당 사용자 알림',
+                        enabled: true
                     }
                 ];
             } catch (error) {
@@ -188,6 +259,7 @@ const comp = module.exports = {
             this.dialog = true
         },
         editRule: function (item) {
+            console.log('editRule', item);
             this.editedIndex = this.rules.indexOf(item)
             this.editedItem = Object.assign({}, item)
             this.dialog = true
@@ -204,13 +276,7 @@ const comp = module.exports = {
             })
         },
         save: function () {
-            let condition = ''
-            if (this.editedItem.type === '거래 부재') {
-                condition = `${this.editedItem.duration}분 동안 거래 없음`
-            } else if (this.editedItem.type === '오류율 증가') {
-                condition = `이전 ${this.editedItem.comparisonPeriod} 대비 오류율 ${this.editedItem.threshold}% 이상 증가`
-            }
-            this.editedItem.condition = condition
+            //this.editedItem.condition = condition
 
             if (this.editedIndex > -1) {
                 Object.assign(this.rules[this.editedIndex], this.editedItem)
@@ -221,8 +287,9 @@ const comp = module.exports = {
         }
     },
     // 컴포넌트에 mounted 훅 추가
-    mounted() {
-        this.fetchRules();
+    async mounted() {
+        await this.fetchRules();
+        //this.editRule(this.rules[0]);
     },
 }
 </script>

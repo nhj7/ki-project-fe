@@ -7,7 +7,7 @@
                     <v-card-text dense>
                         <v-row dense>
                             <v-col cols="12" sm="8" md="6">
-                                <v-select v-model="filters.systems" :items="systems" label="시스템" outlined multiple chips
+                                <v-select v-model="filters.systems" :items="systems" label="시스템" multiple chips
                                     dense hide-details>
 
                                     <template v-slot:prepend-item>
@@ -34,7 +34,7 @@
                                 </v-select>
                             </v-col>
                             <v-col cols="12" sm="8" md="6">
-                                <v-select v-model="filters.severities" :items="severities" label="심각도" outlined dense
+                                <v-select v-model="filters.severities" :items="severities" label="심각도" dense
                                     multiple chips hide-details>
                                     <template v-slot:prepend-item>
                                         <v-list-item ripple @mousedown.prevent @click="toggleAll('severities')">
@@ -60,13 +60,13 @@
                                 </v-select>
                             </v-col>
                         </v-row>
-                        <v-row dense class="mt-3">
+                        <v-row dense class="mt-6">
                             <v-col cols="12" sm="6" md="3">
                                 <v-menu v-model="startDateMenu" :close-on-content-click="false"
                                     transition="scale-transition" offset-y max-width="290px" min-width="290px">
                                     <template v-slot:activator="{ on, attrs }">
                                         <v-text-field v-model="filters.startDate" label="시작 날짜" readonly v-bind="attrs"
-                                            v-on="on" outlined dense hide-details></v-text-field>
+                                            v-on="on" dense hide-details></v-text-field>
                                     </template>
                                     <v-date-picker v-model="filters.startDate" no-title
                                         @input="startDateMenu = false"></v-date-picker>
@@ -77,7 +77,7 @@
                                     transition="scale-transition" offset-y max-width="290px" min-width="290px">
                                     <template v-slot:activator="{ on, attrs }">
                                         <v-text-field v-model="filters.endDate" label="종료 날짜" readonly v-bind="attrs"
-                                            v-on="on" outlined dense hide-details></v-text-field>
+                                            v-on="on" dense hide-details></v-text-field>
                                     </template>
                                     <v-date-picker v-model="filters.endDate" no-title
                                         @input="endDateMenu = false"></v-date-picker>
@@ -175,7 +175,7 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn :color="$config.color_btn" text @click="detailDialog = false">닫기</v-btn>
+                    <v-btn :color="$config.color_btn" @click="detailDialog = false" small>닫기</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>

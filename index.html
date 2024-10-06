@@ -214,7 +214,7 @@
 
                 , {
                     path: '/rule-condition-builder', name: 'rule-condition-builder', component: loadVue('./page/p4-rule-condition-builder'), meta: {
-                        showInMenu: true,
+                        showInMenu: false,
                         icon: "mdi-clipboard-check-outline",
                         iconColor: "green",
                         title: "규칙 조건 빌더",
@@ -265,7 +265,14 @@
                         icon: "mdi-login",
                     }
                 }
-
+                , {
+                    path: '/simulator-control', name: 'simulator-control', component: loadVue('./page/p14-simulator-control'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-cog-play-outline",
+                        iconColor: "info",
+                        title: "서비스 거래 시뮬레이터 제어",
+                    }
+                }
                 , {
                     path: '#1', name: 'test', meta: {
                         showInMenu: true,
@@ -274,6 +281,9 @@
                         isGroupOpen: false,
                     }, subRoutes: [
                         {
+                            path: '/simulator-control'
+                        }
+                        , {
                             path: '/mobile-banking-transfer'
                         }
                         , {

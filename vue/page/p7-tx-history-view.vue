@@ -9,28 +9,28 @@
               max-width="290px" min-width="290px">
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field v-model="startDate" label="시작 일자" readonly v-bind="attrs" v-on="on" persistent-hint
-                  hint="YYYY-MM-DD"></v-text-field>
+                hide-details></v-text-field>
               </template>
               <v-date-picker v-model="startDate" no-title @input="startDateMenu = false"></v-date-picker>
             </v-menu>
           </v-col>
           <v-col cols="6" md="2" sm="3" xs="4">
-            <v-text-field v-model="startTimeFormatted" label="시작 시간" persistent-hint hint="HH24MISS로 입력 (예: 235959)"
-              @input="formatTimeInput($event, 'startTime')"></v-text-field>
+            <v-text-field v-model="startTimeFormatted" label="시작 시간" persistent-hint 
+              @input="formatTimeInput($event, 'startTime')" hide-details></v-text-field>
           </v-col>
           <v-col cols="6" md="2" sm="3" xs="4">
             <v-menu v-model="endDateMenu" :close-on-content-click="false" transition="scale-transition" offset-y
               max-width="290px" min-width="290px">
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field v-model="endDate" label="종료 일자" readonly v-bind="attrs" v-on="on" persistent-hint
-                  hint="YYYY-MM-DD"></v-text-field>
+                hide-details ></v-text-field>
               </template>
               <v-date-picker v-model="endDate" no-title @input="endDateMenu = false"></v-date-picker>
             </v-menu>
           </v-col>
           <v-col cols="6" md="2" sm="3" xs="4">
-            <v-text-field v-model="endTimeFormatted" label="종료 시간" persistent-hint hint="HH24MISS로 입력 (예: 235959)"
-              @input="formatTimeInput($event, 'endTime')"></v-text-field>
+            <v-text-field v-model="endTimeFormatted" label="종료 시간" persistent-hint 
+              @input="formatTimeInput($event, 'endTime')" hide-details></v-text-field>
           </v-col>
           <v-col cols="6" md="2" sm="3" xs="4">
             <v-btn :color="$config.color_btn" @click="fetchTransactions" small dense>&nbsp;&nbsp;검색&nbsp;&nbsp;</v-btn>
@@ -66,7 +66,7 @@
           </v-row>
         </v-expand-transition>
         <v-data-table :headers="headers" :items="transactions" :search="search" :items-per-page="10"
-          class="elevation-1">
+          class="elevation-1 small-font-table" >          
           <template v-slot:[`item.req_dttm`]="{ item }">
             {{ formatDateTime(item.req_dttm) }}
           </template>
@@ -93,7 +93,7 @@ const comp = module.exports = {
       endDttm: '',
       headers: [
         { text: 'ID', value: 'id' },
-        { text: 'GUID', value: 'guid' },
+        
         { text: '트랜잭션 ID', value: 'tx_id' },
         { text: '인터페이스 ID', value: 'if_id' },
         { text: '프로그램명', value: 'prg_nm' },
@@ -187,4 +187,27 @@ const comp = module.exports = {
 .v-data-table {
   margin-top: 20px;
 }
+
+.small-font-table {
+  font-size: 0.75rem !important;
+}
+
+.small-font-table >>> .v-data-table-header {
+  font-size: 0.8rem !important;
+}
+
+.small-font-table >>> .v-data-table__wrapper {
+  overflow-x: auto;
+}
+
+.small-font-table td {
+  padding: 0 8px !important;
+  height: 32px !important;
+}
+
+.small-font-table th {
+  padding: 0 8px !important;
+  height: 36px !important;
+}
+
 </style>
