@@ -127,21 +127,22 @@
 const comp = module.exports = {
     data() {
         return {
-            
+
             selectedApiDetails: null,
             apiResponse: null,
             curlExample: '',
             paramValues: {},
             isFormValid: true,
-            selectedApi: 'getAlarms',
+            selectedApi: 'getRules',
             apiList: [
-
+                { text: '룰셋 조회(미완)', value: 'getRules' },
+                { text: '룰셋 저장(미완)', value: 'saveRule' },
                 { text: '알람 목록 조회(미완)', value: 'getAlarms' },
                 { text: '간편 이체(미완-1)', value: 'transfer' },
                 { text: '대출 신청(미완-2)', value: 'applyLoan' },
                 { text: '한도 조회(미완-3)', value: 'checkLoanLimit' },
                 { text: '서비스 거래 목록 조회(미완-4)', value: 'getIncidents' },
-                { text: '룰셋 조회(미완)', value: 'getRules' },
+
                 { text: '실시간 서비스 분석(미완)', value: 'getLiveTransactions' },
 
                 { text: '거래 데이터 조회(완료)', value: 'getTxData' },
@@ -244,32 +245,76 @@ const comp = module.exports = {
                     description: '설정된 룰셋 목록을 조회합니다.',
                     parameters: [],
                     responseSampleHtml: '',
+                    responseSample: {},
+                    responseFormat: [
+                        { name: 'header', type: 'Object', required: true, description: '응답 헤더' },
+                        { name: 'header.resultCode', type: 'String', required: true, description: '결과 코드' },
+                        { name: 'header.resultMessage', type: 'String', required: true, description: '결과 메시지' },
+                        { name: 'body', type: 'Object', required: true, description: '응답 본문' },
+                        { name: 'body.rules', type: 'Array', required: true, description: '룰셋 목록' },
+                        { name: 'body.rules[].id', type: 'String', required: true, description: '룰 ID' },
+                        { name: 'body.rules[].name', type: 'String', required: true, description: '룰 이름' },
+                        { name: 'body.rules[].condition', type: 'Object', required: true, description: '룰 조건' },
+                        { name: 'body.rules[].condition.type', type: 'String', required: true, description: '룰 타입' },
+                        { name: 'body.rules[].condition.direction', type: 'String', required: true, description: '방향' },
+                        { name: 'body.rules[].condition.duration', type: 'String', required: true, description: '기간' },
+                        { name: 'body.rules[].condition.unit', type: 'String', required: true, description: '단위' },
+                        { name: 'body.rules[].condition.threshold', type: 'Number', required: true, description: '임계값' },
+                        { name: 'body.rules[].action', type: 'String', required: true, description: '룰 액션' }
+                    ],
+                },
+                saveRule: {
+                    name: '룰셋 저장',
+                    endpoint: '/api/save-rule',
+                    method: 'POST',
+                    description: '새로운 룰을 저장하거나 기존 룰을 수정합니다.',
+                    parameters: [
+                        { name: 'id', type: 'String', required: false, default: 'RULE-001', description: '룰 ID (수정 시 필요)' },
+                        { name: 'name', type: 'String', required: true, default: '1시간 무거래 탐지', description: '룰 이름' },
+                        { name: 'condition', type: 'Object', required: true, default: {}, description: '룰 조건' },
+                        { name: 'condition.type', type: 'String', required: true, default: '거래량', description: '룰 타입 (예: 거래량, 오류율, 응답시간, 반복수행)' },
+                        { name: 'condition.direction', type: 'String', required: true, default: '무거래', description: '방향 (예: 증가, 감소, 무거래)' },
+                        { name: 'condition.duration', type: 'String', required: true, default: '1', description: '기간' },
+                        { name: 'condition.unit', type: 'String', required: true, default: '시간', description: '단위 (예: 분, 시간, 일, 주, 월)' },
+                        { name: 'condition.threshold', type: 'Number', required: true, default: '0', description: '임계값' },
+                        { name: 'action', type: 'String', required: true, default: '시스템 관리자에게 알림 발송', description: '룰 액션' },
+                        { name: 'enabled', type: 'Boolean', required: true, default: true, description: '사용 여부' }
+                    ],
+                    responseSampleHtml: '',
                     responseSample: {
                         header: {
                             resultCode: "0000",
-                            resultMessage: "룰셋 목록 조회 성공"
+                            resultMessage: "룰 저장 성공"
                         },
                         body: {
-                            rules: [
-                                {
-                                    id: 'RULE-001',
-                                    name: '10분 무거래 탐지',
-                                    type: '거래 부재',
-                                    condition: '10분 동안 거래 없음',
-                                    action: '시스템 관리자에게 알림 발송'
-                                }
-                            ]
+                            id: 'RULE-006',
+                            name: '갑작스러운 거래량 증가',
+                            condition: {
+                                type: '거래량',
+                                direction: '증가',
+                                duration: '10',
+                                unit: '분',
+                                threshold: 200,
+                            },
+                            action: '자동 스케일 아웃 트리거 및 마케팅팀에 확인',
+                            enabled: true
                         }
                     },
                     responseFormat: [
-                        { name: 'rules', type: 'Array', required: true, description: '룰셋 목록' },
-                        { name: 'rules[].id', type: 'String', required: true, description: '룰 ID' },
-                        { name: 'rules[].name', type: 'String', required: true, description: '룰 이름' },
-                        { name: 'rules[].type', type: 'String', required: true, description: '룰 타입' },
-                        { name: 'rules[].condition', type: 'String', required: true, description: '룰 조건' },
-                        { name: 'rules[].action', type: 'String', required: true, description: '룰 액션' },
-                        { name: 'rules[].createdAt', type: 'String', required: true, description: '생성 시간 (yyyymmddhh24miss 형식)' },
-                        { name: 'rules[].updatedAt', type: 'String', required: true, description: '수정 시간 (yyyymmddhh24miss 형식)' }
+                        { name: 'header', type: 'Object', required: true, description: '응답 헤더' },
+                        { name: 'header.resultCode', type: 'String', required: true, description: '결과 코드' },
+                        { name: 'header.resultMessage', type: 'String', required: true, description: '결과 메시지' },
+                        { name: 'body', type: 'Object', required: true, description: '응답 본문' },
+                        { name: 'body.id', type: 'String', required: true, description: '저장된 룰 ID' },
+                        { name: 'body.name', type: 'String', required: true, description: '룰 이름' },
+                        { name: 'body.condition', type: 'Object', required: true, description: '룰 조건' },
+                        { name: 'body.condition.type', type: 'String', required: true, description: '룰 타입' },
+                        { name: 'body.condition.direction', type: 'String', required: true, description: '방향' },
+                        { name: 'body.condition.duration', type: 'String', required: true, description: '기간' },
+                        { name: 'body.condition.unit', type: 'String', required: true, description: '단위' },
+                        { name: 'body.condition.threshold', type: 'Number', required: true, description: '임계값' },
+                        { name: 'body.action', type: 'String', required: true, description: '룰 액션' },
+                        { name: 'body.enabled', type: 'Boolean', required: true, description: '사용 여부' }
                     ],
                 },
                 applyLoan: {
@@ -719,7 +764,12 @@ const comp = module.exports = {
 
                 const requestData = this.getRequestData();
                 console.log('requestData', requestData);
-                const response = await axios.post(this.$config.endpoint_url + apiDetails.endpoint, requestData);
+                //const response = await axios.post(this.$config.endpoint_url + apiDetails.endpoint, requestData);
+                const response = await axios({
+                    method: apiDetails.method,
+                    url: this.$config.endpoint_url + apiDetails.endpoint,
+                    data: requestData
+                });
                 //console.log('response', response);
                 try {
                     //this.apiResponse = ' ' + JSON.stringify(response.data, null, 2);

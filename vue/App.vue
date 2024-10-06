@@ -93,7 +93,7 @@
       <v-menu offset-y v-if="$session.userName">
         <template v-slot:activator="{ on, attrs }">
           <v-btn text v-bind="attrs" v-on="on">
-            <v-icon>mdi-account-circle</v-icon>
+            <v-icon >mdi-account-circle</v-icon>
             {{ $session.userName + "님" || "" }}
           </v-btn>
         </template>
@@ -115,7 +115,7 @@
       </v-btn>
       <v-btn icon @click="showAlarmPopup">
         <v-badge :content="alarmCount" :value="alarmCount > 0" color="error" overlap>
-          <v-icon>mdi-bell</v-icon>
+          <v-icon >mdi-bell</v-icon>
         </v-badge>
       </v-btn>
       <v-btn icon @click="toggleDarkTheme">

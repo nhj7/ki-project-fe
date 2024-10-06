@@ -8,8 +8,25 @@
             {
                 "id": "RULE-001",
                 "name": "10분 무거래 탐지",
-                "type": "거래 부재",
-                "condition": "10분 동안 거래 없음",
+                "condition": {
+                    "type": "거래량",
+                    "direction": "증가",
+                    "duration": "10",
+                    "unit": "분",
+                    "threshold": 200
+                },
+                "action": "시스템 관리자에게 알림 발송"
+            },
+            {
+                "id": "RULE-002",
+                "name": "1시간 무거래 탐지",
+                "condition": {
+                    "type": "거래량",
+                    "direction": "증가",
+                    "duration": "1",
+                    "unit": "시간",
+                    "threshold": 200
+                },
                 "action": "시스템 관리자에게 알림 발송"
             }
         ]
