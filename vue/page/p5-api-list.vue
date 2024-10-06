@@ -127,7 +127,6 @@
 const comp = module.exports = {
     data() {
         return {
-
             selectedApiDetails: null,
             apiResponse: null,
             curlExample: '',
@@ -151,10 +150,6 @@ const comp = module.exports = {
                 { text: '로그아웃(완료)', value: 'logout' },
                 { text: '사용자 등록(완료)', value: 'loginSignup' },
                 { text: '사용자 목록 조회(완료)', value: 'getUserList' },
-
-
-
-
             ],
             apiDetails: {
                 getIncidents: {
@@ -265,7 +260,7 @@ const comp = module.exports = {
                 },
                 saveRule: {
                     name: '룰셋 저장',
-                    endpoint: '/api/save-rule',
+                    endpoint: '/api/rule-save',
                     method: 'POST',
                     description: '새로운 룰을 저장하거나 기존 룰을 수정합니다.',
                     parameters: [
