@@ -164,7 +164,30 @@ const comp = module.exports = {
                 // 실제로는 서버에서 룰셋을 가져와야 합니다.
                 // 여기서는 가상의 트랜잭션을 사용합니다.
                 await new Promise(resolve => setTimeout(resolve, 250));
-
+                try {
+                    const response = await this.$axios.post('/api/rule-list');
+                    if (response.data && response.data.body && response.data.body.rules) {
+                        this.rules = response.data.body.rules.map(rule => ({
+                            id: rule.id,
+                            name: rule.name,
+                            condition: {
+                                type: rule.conditions.type,
+                                direction: rule.conditions.direction,
+                                duration: rule.conditions.duration,
+                                unit: rule.conditions.unit,
+                                threshold: rule.conditions.threshold
+                            },
+                            action: rule.action,
+                            enabled: rule.enabled
+                        }));
+                    } else {
+                        console.error('API 응답 형식이 올바르지 않습니다.');
+                    }
+                } catch (error) {
+                    console.error('룰셋을 가져오는 중 오류가 발생했습니다:', error);
+                }
+                
+                /*
                 this.rules = [
                     // 여기에 기존의 rules 데이터를 넣으세요
                     {
@@ -257,6 +280,8 @@ const comp = module.exports = {
                         enabled: true
                     }
                 ];
+                */
+
             } catch (error) {
                 console.error('룰셋을 불러오는 중 오류가 발생했습니다:', error);
             } finally {
@@ -271,7 +296,8 @@ const comp = module.exports = {
         editRule: function (item) {
             console.log('editRule', item);
             this.editedIndex = this.rules.indexOf(item)
-            this.editedItem = Object.assign({}, item)
+            //this.editedItem = Object.assign({}, item)
+            this.editedItem = JSON.parse(JSON.stringify(item));
             this.dialog = true
         },
         deleteRule: function (item) {
