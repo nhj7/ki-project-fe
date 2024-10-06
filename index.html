@@ -49,6 +49,8 @@
 
     <!--script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script-->
     <script src="/js/axios.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/14.1.2/marked.min.js" integrity="sha512-bXyBT2/sYjZg1D7ykDS6eJSE4DFDVPJHvbRAfdfYKr6IusrCz7wAmSm36vz9G8zMob25Rvqu90vft3JI71ygcQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 
 <body>
@@ -284,6 +286,14 @@
                         icon: "mdi-cog-play-outline",
                         iconColor: "info",
                         title: "서비스 거래 시뮬레이터 제어",
+                    }
+                }
+                , {
+                    path: '/readme-viewer', name: 'readme-viewer', component: loadVue('./page/p20-readme-viewer'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-file-document-outline",
+                        iconColor: "info",
+                        title: "README 뷰어",
                     }
                 }
                 , {
