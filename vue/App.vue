@@ -373,7 +373,7 @@ const comp = (module.exports = {
     goToAccountSettings() {
 
       this.accountSettingsVisible = true;
-      console.log("goToAccountSettings", this.accountSettingsVisible);
+      //console.log("goToAccountSettings", this.accountSettingsVisible);
     },
     logout() {
       this.$session.clear();
@@ -424,7 +424,7 @@ const comp = (module.exports = {
     },
   },
   async mounted() {
-    console.log("App.vue mounted", Object.keys(this.$options.components));
+    //console.log("App.vue mounted", Object.keys(this.$options.components));
 
     this.drawer = window.innerWidth >= 1264; // Vuetify의 lg 브레이크포인트
   },
@@ -433,7 +433,7 @@ const comp = (module.exports = {
     "account-settings": loadVue("/component/AccountSettings"),
   },
   beforeCreate() {
-    console.log("App.vue beforeCreate");
+    //console.log("App.vue beforeCreate");
     this.$router.options.routes.forEach(route => {
       if (route.subRoutes && route.subRoutes.some(subRoute => subRoute.path === this.$router.currentRoute.path)) {
         if (route.meta) {
@@ -466,7 +466,7 @@ const comp = (module.exports = {
       if (accessToken && refreshToken) {
         try {
           const response = await request("/api/login-check", "POST", { accessToken, refreshToken });
-          console.log("response", response);
+          //console.log("response", response);
 
           if (response?.data?.header?.resultCode === "0000") {
             // 로그인 성공 처리

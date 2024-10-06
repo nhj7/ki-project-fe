@@ -32,7 +32,10 @@
                 <v-card-text>
                     <v-container>
                         <v-row>
-                            <v-col cols="12">
+                            <v-col cols="6">
+                                <v-text-field v-model="editedItem.id" label="규칙 ID"></v-text-field>
+                            </v-col>
+                            <v-col cols="6">
                                 <v-text-field v-model="editedItem.name" label="규칙 이름"></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
@@ -165,6 +168,7 @@ const comp = module.exports = {
                 this.rules = [
                     // 여기에 기존의 rules 데이터를 넣으세요
                     {
+                        id: 'RULE-001',
                         name: '1시간 무거래 탐지',
                         condition: {
                             type: '거래량',
@@ -176,6 +180,7 @@ const comp = module.exports = {
                         enabled: true
                     },
                     {
+                        id: 'RULE-002',
                         name: '시간당 오류율 급증',
                         condition: {
                             type: '오류율',
@@ -188,6 +193,7 @@ const comp = module.exports = {
                         enabled: true
                     },
                     {
+                        id: 'RULE-003',
                         name: '일일 오류율 이상',
                         condition: {
                             type: '오류율',
@@ -200,6 +206,7 @@ const comp = module.exports = {
                         enabled: true
                     },
                     {
+                        id: 'RULE-004',
                         name: '주간 거래량 감소',
                         condition: {
                             type: '거래량',
@@ -212,6 +219,7 @@ const comp = module.exports = {
                         enabled: true
                     },                    
                     {
+                        id: 'RULE-005',
                         name: '거래 처리 응답 지연',
                         condition: {
                             type: '응답시간',
@@ -224,6 +232,7 @@ const comp = module.exports = {
                         enabled: true
                     },
                     {
+                        id: 'RULE-006',
                         name: '갑작스러운 거래량 증가',
                         condition: {
                             type: '거래량',
@@ -236,6 +245,7 @@ const comp = module.exports = {
                         enabled: true
                     },                    
                     {
+                        id: 'RULE-007',
                         name: '동일 서비스 반복 시도',
                         condition: {
                             type: '반복수행',

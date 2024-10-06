@@ -1,148 +1,125 @@
 <template>
-    <v-container fluid>
+    <v-container>
+        <!-- 다른 컴포넌트들 -->
         <v-row>
-            <v-col cols="12">
+            <v-col cols="12" sm="12" md="12">
                 <v-card>
-                    <v-card-title>D3.js 물결 게이지 차트</v-card-title>
-                    <v-card-text>
-                        <div id="wave-gauge"></div>
+                    <v-card-title></v-card-title>
+                    <v-card-text md="2">
+                        <div class="d-flex justify-space-around">
+                            <div v-for="(system, index) in systems" :key="index" class="system-container">
+                                <div class="text-center">{{ system.name }}</div>
+                                <div :id="`cylinder-${index}`" class="cylinder-container"></div>
+                            </div>
+                        </div>
                     </v-card-text>
                 </v-card>
             </v-col>
         </v-row>
     </v-container>
 </template>
+
 <script>
 
+
 const comp = module.exports = {
+    // ... 기존 코드 ...
     data() {
         return {
-            usage: 50,
-            svg: null,
-            wave: null,
-            waveGroup: null,
-            waveGroupXPosition: null,
-            width: 300,
-            height: 300,
-            radius: 150,
-            fillColor: "steelblue",
-            waveHeight: 0.05,
-            waveCount: 3,
-            waveRiseTime: 1000,
-            waveAnimateTime: 1800,
-            waveOffset: 0,
-            textSize: 0.5,
-            textColor: "#045681",
-            circleThickness: 0.05,
-            circleFillGap: 0.05,
-            circleColor: "#178BCA",
-            updateInterval: 3000
+            // ... 기존 데이터 ...
+            systems: [
+                { name: '여신', transactions: 0, maxTransactions: 100 },
+                { name: '모바일 ', transactions: 0, maxTransactions: 100 },
+                { name: '수신', transactions: 0, maxTransactions: 100 },
+            ],
         };
     },
-    mounted() {
-        this.initChart();
-        this.animateChart();
-        setInterval(() => {
-            this.usage = Math.random() * 100;
-            this.updateChart(this.usage); 
-        }, this.updateInterval);
-    },
     methods: {
-        initChart() {
-            const svg = d3.select("#wave-gauge")
-                .append("svg")
-                .attr("width", this.width)
-                .attr("height", this.height)
-                .append("g")
-                .attr("transform", `translate(${this.width / 2},${this.height / 2})`);
+        // ... 기존 메서드 ...
+        initializeCylinders() {
+            this.systems.forEach((system, index) => {
+                const svg = d3.select(`#cylinder-${index}`)
+                    .append('svg')
+                    .attr('width', '100%')
+                    .attr('height', 100)
+                    .style('display', 'block')
+                    .style('margin', 'auto');  // 높이를 100으로 변경
 
-            const circleThickness = this.radius * this.circleThickness;
-            const circleFillGap = this.radius * this.circleFillGap;
-            const fillCircleMargin = circleThickness + circleFillGap;
-            const fillCircleRadius = this.radius - fillCircleMargin;
+                const gradient = svg.append('defs')
+                    .append('linearGradient')
+                    .attr('id', `gradient-${index}`)
+                    .attr('x1', '0%')
+                    .attr('y1', '0%')
+                    .attr('x2', '0%')
+                    .attr('y2', '100%');
 
-            const waveHeight = fillCircleRadius * this.waveHeight;
-            const waveLength = this.width / this.waveCount;
-            const waveClipCount = 1 + this.waveCount;
-            const waveClipWidth = waveLength * waveClipCount;
+                gradient.append('stop')
+                    .attr('offset', '0%')
+                    .attr('stop-color', '#4CAF50');
 
-            // Outer circle
-            svg.append("circle")
-                .attr("cx", 0)
-                .attr("cy", 0)
-                .attr("r", this.radius)
-                .style("fill", this.circleColor);
+                gradient.append('stop')
+                    .attr('offset', '100%')
+                    .attr('stop-color', '#2196F3');
 
-            // Text
-            const text = svg.append("text")
-                .attr("text-anchor", "middle")
-                .attr("dy", "0em")
-                .style("font-size", `${this.textSize}em`)
-                .style("fill", this.textColor);
+                svg.append('rect')
+                    .attr('x', 17)  // x 위치를 5로 변경
+                    .attr('y', 5)  // y 위치를 5로 변경
+                    .attr('width', 45)  // 너비를 90으로 변경
+                    .attr('height', 90)  // 높이를 90으로 변경
+                    .attr('rx', 10)  // 모서리 반경을 10으로 변경
+                    .attr('ry', 10)  // 모서리 반경을 10으로 변경
+                    .style('fill', 'none')
+                    .style('stroke', '#ccc');
 
-            // Wave group
-            const waveGroup = svg.append("defs")
-                .append("clipPath")
-                .attr("id", "waveClip");
-
-            const wave = waveGroup.append("path")
-                .attr("d", `M0,0 Q${waveLength / 4},${waveHeight} ${waveLength / 2},0 T${waveLength},0 V${2 * this.radius}H0Z`)
-                .attr("T", "0");
-
-            // Wave rectangle
-            svg.append("rect")
-                .attr("x", -this.radius)
-                .attr("y", -this.radius)
-                .attr("width", 2 * this.radius)
-                .attr("height", 2 * this.radius)
-                .attr("clip-path", "url(#waveClip)")
-                .style("fill", this.fillColor);
-
-            this.svg = svg;
-            this.wave = wave;
-            this.waveGroup = waveGroup;
-            this.text = text;
-        },
-        animateChart() {
-            this.waveGroup.attr("transform", `translate(${this.waveOffset},0)`);
-
-            this.wave.attr("d", (d) => {
-                const waveHeight = this.radius * this.waveHeight * 2;
-                const waveLength = this.width / this.waveCount;
-                return `M0,0 Q${waveLength / 4},${waveHeight} ${waveLength / 2},0 T${waveLength},0 V${2 * this.radius}H0Z`;
+                svg.append('rect')
+                    .attr('class', 'fill-rect')
+                    .attr('x', 17)  // x 위치를 5로 변경
+                    .attr('y', 95)  // y 위치를 95로 변경
+                    .attr('width', 45)  // 너비를 90으로 변경
+                    .attr('height', 0)
+                    .attr('rx', 10)  // 모서리 반경을 10으로 변경
+                    .attr('ry', 10)  // 모서리 반경을 10으로 변경
+                    .style('fill', `url(#gradient-${index})`);
             });
-
-            this.wave.transition()
-                .duration(this.waveAnimateTime)
-                .ease(d3.easeLinear)
-                .attr("transform", `translate(${this.width},0)`)
-                .on("end", () => this.animateChart());
         },
-        updateChart(value) {
-            const fillPercent = Math.max(0, Math.min(1, value / 100));
-            const waveHeight = this.radius * this.waveHeight * 2;
-            const waveRiseScale = d3.scaleLinear()
-                .range([0, waveHeight])
-                .domain([0, 1]);
-
-            const newHeight = waveRiseScale(fillPercent);
-            const waveScaleX = d3.scaleLinear().range([0, this.width]).domain([0, 1]);
-            const waveScaleY = d3.scaleLinear().range([0, waveHeight]).domain([0, 1]);
-
-            this.waveGroup.transition()
-                .duration(this.waveRiseTime)
-                .attr("transform", `translate(${waveScaleX(1)},${newHeight})`);
-
-            this.text.text(`${Math.round(fillPercent * 100)}%`);
-        }
-    }
+        updateCylinders() {
+            this.systems.forEach((system, index) => {
+                const height = (system.transactions / system.maxTransactions) * 90;  // 최대 높이를 90으로 변경
+                d3.select(`#cylinder-${index}`)
+                    .select('.fill-rect')
+                    .transition()
+                    .duration(1000)
+                    .attr('y', 95 - height)  // y 위치 계산 변경
+                    .attr('height', height);
+            });
+        },
+        simulateTransactions() {
+            setInterval(() => {
+                this.systems.forEach(system => {
+                    system.transactions = Math.floor(Math.random() * 50);
+                });
+                this.updateCylinders();
+            }, 500);
+        },
+    },
+    mounted() {
+        // ... 기존 mounted 로직 ...
+        this.initializeCylinders();
+        this.simulateTransactions();
+    },
 };
 </script>
 
 <style scoped>
-#wave-gauge {
-    width: 300px;
-    height: 300px;
-    margin: 0 auto;
+.system-container {
+    width: 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cylinder-container {
+    width: 100%;
+    height: 100px;
 }
 </style>

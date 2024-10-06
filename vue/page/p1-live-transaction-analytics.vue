@@ -24,6 +24,9 @@
                                     'items-per-page-options': itemsPerPageOptions,
 
                                 }" class="elevation-1">
+                                    <template v-slot:[`item.timestamp`]="{ item }">
+                                        {{ item.timestamp.replace(/(.{4})(.{2})(.{2})(.{2})(.{2})(.{2})/, '$1-$2-$3 $4:$5:$6') }}
+                                    </template>
                                     <template v-slot:[`item.status`]="{ item }">
                                         <v-chip :color="getStatusColor(item.status)" small>
                                             {{ item.status }}
@@ -102,8 +105,7 @@ const comp = module.exports = {
             anomalyHeaders: [
                 { text: '시간', value: 'timestamp' },
                 { text: '거래 ID', value: 'transactionId' },
-                { text: '유형', value: 'type' },
-                { text: '금액', value: 'amount' },
+                { text: '유형', value: 'type' },                
                 { text: '상태', value: 'status' }
             ],
             anomalyTransactions: [],
@@ -281,11 +283,12 @@ const comp = module.exports = {
         },
 
 
-        generateTransaction() {
+        generateTransaction(tx) {
             const randomValue = Math.random();
             const transaction = {
                 id: randomValue,
-                speed: (randomValue * 1500 + 1000) * 2,  // 속도는 기존의 절반으로 더 빠르게
+                //speed: (randomValue * 1500 + 1000) * 2,  // 속도는 기존의 절반으로 더 빠르게
+                speed: tx.elapsed,
                 //color: this.realChartData.colors[this.realChartData.colorIndex % this.realChartData.colors.length],  // 무지개 색 순서대로 지정
                 //color: randomValue < 0.05 ? 'red' : 'dodgerblue',
                 color: 'dodgerblue',
@@ -355,12 +358,9 @@ const comp = module.exports = {
                         endDttm: endDttm
                     }
                 );
-
-
-
                 const transactions = response.data.txDataList;
 
-                console.log('fetchNewData response', response, transactions.length);
+                //console.log('fetchNewData response', response, transactions.length);
 
                 this.updateChartData(transactions);
 
@@ -370,19 +370,35 @@ const comp = module.exports = {
                 //this.updateChartData(chartData);
 
                 // 이상 거래 목록 업데이트
-                this.anomalyTransactions = transactions
+                // 새로운 비정상 거래 필터링 및 매핑
+                const newAnomalies = transactions
                     .filter(tx => tx.tx_status !== '정상')
+                    .filter(tx => !this.anomalyTransactions.some(existingItem => existingItem.id === tx.id ))
                     .map(tx => ({
+                        id : tx.id,
                         timestamp: tx.req_dttm,
                         transactionId: tx.tx_id,
                         type: tx.tx_biz_id,
                         amount: this.$util.numberWithComma(JSON.parse(tx.req_json).amount || 0) + '원',
                         status: tx.tx_status === '타임아웃' ? '오류' : '의심'
-                    }))
-                    .slice(0, 100);  // 최근 100개만 유지
+                    }));
 
-                const now = new Date();
-                const fiveMinutesAgo = Date.now() - 180000; // 3분 전 시간 계산
+                // 기존 anomalyTransactions와 새로운 비정상 거래를 합치고 정렬
+                this.anomalyTransactions = [...this.anomalyTransactions, ...newAnomalies]
+                    .sort((a, b) => new Date(b.id) - new Date(a.id))
+                    .slice(0, 10);  // 최근 100개만 유지
+
+                //console.log('anomalyTransactions', this.anomalyTransactions)
+
+
+
+                transactions.sort((a, b) => b.id - a.id);
+                transactions.forEach((tx, idx) =>
+                    setTimeout(() => {
+                        const transaction = this.generateTransaction(tx);
+                        this.animateTransaction(transaction);
+                    }, 300 * idx)
+                )
 
 
             } catch (error) {
@@ -464,10 +480,12 @@ const comp = module.exports = {
             .attr("rx", 50)  // 둥근 모서리로 원통형 효과
             .attr("ry", 50);
 
+        /*
         this.transactionFlowUpdateInterval = setInterval(() => {
             const transaction = this.generateTransaction();
             this.animateTransaction(transaction);
         }, 300);  // 1초마다 1개 트랜잭션 생성 (10배 감소)
+        */
 
         this.resizeObserver = new ResizeObserver(entries => {
             for (let entry of entries) {
