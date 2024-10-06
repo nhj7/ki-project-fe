@@ -677,6 +677,24 @@ const comp = module.exports = {
     },
     methods: {
         getRequestData() {
+            const processParamValues = (params) => {
+                const result = {};
+                Object.entries(params).forEach(([key, value]) => {
+                    if (value !== '') {
+                        const [objName, propName] = key.split('.');
+                        if (propName) {
+                            if (!result[objName]) result[objName] = {};
+                            result[objName][propName] = value;
+                        } else {
+                            result[key] = value;
+                        }
+                    }
+                });
+                return result;
+            };
+
+            const processedParams = processParamValues(this.paramValues);
+
             if (this.selectedApiDetails.requestHeader) {
                 return {
                     header: {
@@ -687,12 +705,10 @@ const comp = module.exports = {
                         userId: this.$session.userId,
                         userNm: this.$session.userName,
                     },
-                    body: Object.fromEntries(Object.entries(this.paramValues).filter(([_, value]) => value !== '')),
-                }
+                    body: processedParams,
+                };
             } else {
-                return {
-                    ...Object.fromEntries(Object.entries(this.paramValues).filter(([_, value]) => value !== '')),
-                }
+                return processedParams;
             }
         },
         updateParamValue(paramName, value) {
