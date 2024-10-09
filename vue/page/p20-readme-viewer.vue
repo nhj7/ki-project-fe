@@ -1,6 +1,6 @@
 <template>
     <v-container fluid>
-        <v-card>            
+        <v-card>
             <v-card-text>
                 <div v-html="parsedContent"></div>
             </v-card-text>
@@ -9,20 +9,23 @@
 </template>
 
 <script>
+
+const data = {
+    readmeContent: '',
+};
+
 const comp = module.exports = {
     name: 'ReadmeViewer',
     data() {
-        return {
-            readmeContent: '',
-        };
+        return data;
     },
     computed: {
         parsedContent() {
-            return marked.parse(this.readmeContent);
+            return this.readmeContent ? marked.parse(this.readmeContent) : '';
         },
     },
-    mounted() {
-        this.fetchReadmeContent();
+    async mounted() {
+        await this.fetchReadmeContent();
     },
     methods: {
         async fetchReadmeContent() {
@@ -41,7 +44,7 @@ const comp = module.exports = {
 <style scoped>
 /* 마크다운 스타일링 */
 :deep(h1) {
-    font-size: 2em;
+    font-size: 1.7em;
     margin-bottom: 0.5em;
 }
 

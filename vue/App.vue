@@ -456,7 +456,7 @@ const comp = (module.exports = {
       }
     } // end 테마 설정
 
-
+    if(false)
     { // ===== 로그인 상태 확인 =====
       let nextRoute = "/login";
 
@@ -506,6 +506,11 @@ const globalMethods = {
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   },
+  /**
+   * 날짜를 가져오는 함수
+   * @param {number} days 날짜 차이
+   * @returns {string} 날짜
+   */
   getDate(days = 0) {
     const date = new Date();
     date.setDate(date.getDate() + days);
@@ -530,6 +535,11 @@ const globalMethods = {
     const seconds = String(now.getSeconds()).padStart(2, '0');
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   },
+  /**
+   * 날짜를 가져오는 함수
+   * @param {Date} date 날짜
+   * @returns {string} 날짜
+   */
   getDateTime(date) {    
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');

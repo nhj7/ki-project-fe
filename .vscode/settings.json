@@ -2,5 +2,6 @@
     "typescript.validate.enable": false,
     "tslint.enable": false,
     "eslint.validate": ["javascript", "javascriptreact"],
-    "vetur.format.defaultFormatter.ts": "none"
+    "vetur.format.defaultFormatter.ts": "none",
+    "typescript.tsconfig": ".vscode/tsconfig.json"
 }

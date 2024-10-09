@@ -167,19 +167,7 @@ const comp = module.exports = {
                 try {
                     const response = await this.$axios.post('/api/rule-list');
                     if (response.data && response.data.body && response.data.body.rules) {
-                        this.rules = response.data.body.rules.map(rule => ({
-                            id: rule.id,
-                            name: rule.name,
-                            condition: {
-                                type: rule.conditions.type,
-                                direction: rule.conditions.direction,
-                                duration: rule.conditions.duration,
-                                unit: rule.conditions.unit,
-                                threshold: rule.conditions.threshold
-                            },
-                            action: rule.action,
-                            enabled: rule.enabled
-                        }));
+                        this.rules = response.data.body.rules;
                     } else {
                         console.error('API 응답 형식이 올바르지 않습니다.');
                     }

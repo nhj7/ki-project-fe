@@ -10,6 +10,37 @@
                             </v-col>
                         </v-row>
 
+                        <!-- 서비스 별 거래량 데이터 테이블 추가 -->
+                        <v-row>
+                            <v-col cols="12">
+                                <v-data-table :headers="serviceHeaders" :items="serviceTransactions" :items-per-page="5"
+                                    :footer-props="{
+                                        'items-per-page-options': [5, 10, 15]
+                                    }" class="elevation-1">
+                                    <template v-slot:[`item.errorRate`]="{ item }">
+                                        <v-chip :color="getRateColor(item.errorRate)" small>
+                                            {{ item.errorRate }}%
+                                        </v-chip>
+                                    </template>
+                                    <template v-slot:[`item.tps`]="{ item }">
+                                        {{ item.tps }}
+                                    </template>
+                                    <!-- 전일자 대비 표시 -->
+                                    <template v-slot:[`item.compare`]="{ item }">
+                                        <span
+                                            :class="{'text-green': item.compareTrend === 'down', 'text-red': item.compareTrend === 'up'}">
+                                            <v-icon small>
+                                                {{ item.compareTrend === 'up' ? 'mdi-trending-up' : 'mdi-trending-down'
+                                                }}
+                                            </v-icon>
+                                            {{ item.compareValue }}
+                                        </span>
+                                    </template>
+                                </v-data-table>
+                            </v-col>
+                        </v-row>
+
+
                         <!-- 거래 흐름 차트 -->
                         <v-row>
                             <v-col cols="12" md="12">
@@ -17,15 +48,16 @@
                             </v-col>
                         </v-row>
 
+
+
                         <v-row>
                             <v-col cols="12">
                                 <v-data-table :headers="anomalyHeaders" :items="anomalyTransactions" :items-per-page="3"
-                                    :footer-props="{
-                                    'items-per-page-options': itemsPerPageOptions,
-
-                                }" class="elevation-1">
+                                    :footer-props="{'items-per-page-options': itemsPerPageOptions,}"
+                                    class="elevation-1">
                                     <template v-slot:[`item.timestamp`]="{ item }">
-                                        {{ item.timestamp.replace(/(.{4})(.{2})(.{2})(.{2})(.{2})(.{2})/, '$1-$2-$3 $4:$5:$6') }}
+                                        {{ item.timestamp.replace(/(.{4})(.{2})(.{2})(.{2})(.{2})(.{2})/,
+                                        '$1-$2-$3$4:$5:$6') }}
                                     </template>
                                     <template v-slot:[`item.status`]="{ item }">
                                         <v-chip :color="getStatusColor(item.status)" small>
@@ -105,11 +137,12 @@ const comp = module.exports = {
             anomalyHeaders: [
                 { text: '시간', value: 'timestamp' },
                 { text: '거래 ID', value: 'transactionId' },
-                { text: '유형', value: 'type' },                
+                { text: '유형', value: 'type' },
                 { text: '상태', value: 'status' }
             ],
             anomalyTransactions: [],
-            updateInterval: null,
+            /**@type {number} 업데이트 주기 */
+            updateInterval: null, 
             summaryItems: [
                 { label: '총 거래량', value: 0, unit: '건', color: 'primary--text' },
                 { label: '분당 거래량', value: 0, unit: '건', color: 'info--text' },
@@ -127,9 +160,25 @@ const comp = module.exports = {
                 ellipseRy: 7, // 세로 반지름
                 colors: ["red", "orange", "yellow", "green", "blue", "indigo", "violet"],  // 무지개 색상
                 colorIndex: 0,
+                /**@type {number} 업데이트 주기 */
                 updateInterval: null,
             },
-            resizeObserver: null
+            resizeObserver: null,
+            // 서비스 거래량 데이터 테이블을 위한 헤더 정의
+            serviceHeaders: [
+                { text: '서비스명', value: 'serviceName' },
+                { text: '오류율', value: 'errorRate' },
+                { text: '전일대비', value: 'compare', sortable: false },
+                { text: 'TPS', value: 'tps' },
+                { text: '시간당', value: 'transactionsPerHour' },
+                { text: '금일', value: 'todayTransactions' },
+                { text: '전일', value: 'yesterdayTransactions' },
+                { text: '전주', value: 'lastWeekTransactions' },
+                { text: '전월', value: 'lastMonthTransactions' },
+
+            ],
+            /**@type {array} 서비스 거래량 데이터 */
+            serviceTransactions: [],
         };
     },
     computed: {
@@ -201,6 +250,12 @@ const comp = module.exports = {
         }
     },
     methods: {
+        // 오류율에 따른 색상 반환
+        getRateColor(rate) {
+            if (rate < 5) return 'green';
+            if (rate < 10) return 'orange';
+            return 'red';
+        },
 
         animateTransaction(transaction) {
             const ellipse = this.realChartData.svg.append("ellipse")
@@ -282,7 +337,11 @@ const comp = module.exports = {
             */
         },
 
-
+        /**
+         * 트랜잭션 데이터를 생성하는 함수
+         * @param {object} tx 트랜잭션 데이터
+         * @returns 트랜잭션 데이터
+         */
         generateTransaction(tx) {
             const randomValue = Math.random();
             const transaction = {
@@ -297,6 +356,11 @@ const comp = module.exports = {
             this.realChartData.colorIndex++;  // 다음 트랜잭션에 대해 색상 순서 업데이트
             return transaction;
         },
+
+        /**
+         * 초기 데이터를 가져오는 함수
+         * @returns 초기 데이터
+         */
         async generateInitialData() {
             const now = new Date();
             const minutesAgo = new Date(now.getTime() - 3 * 60 * 1000);
@@ -318,6 +382,11 @@ const comp = module.exports = {
                 return [];
             }
         },
+
+        /**
+         * 차트 데이터를 업데이트하는 함수
+         * @param {array} transactions 트랜잭션 데이터
+         */
         updateChartData(transactions) {
             const now = Date.now();
             const threeMinutesAgo = now - 180000; // 3분 전
@@ -343,6 +412,11 @@ const comp = module.exports = {
             this.transactionFlowOption.xAxis.min = threeMinutesAgo;
             this.transactionFlowOption.xAxis.max = now;
         },
+
+        /**
+         * 새로운 데이터를 가져오는 함수
+         * @returns 새로운 데이터
+         */
         async fetchNewData() {
             try {
                 // 실제로는 서버에서 데이터를 가져와야 합니다.                
@@ -360,22 +434,15 @@ const comp = module.exports = {
                 );
                 const transactions = response.data.txDataList;
 
-                //console.log('fetchNewData response', response, transactions.length);
-
                 this.updateChartData(transactions);
-
-
-
-                // 차트 데이터 업데이트
-                //this.updateChartData(chartData);
 
                 // 이상 거래 목록 업데이트
                 // 새로운 비정상 거래 필터링 및 매핑
                 const newAnomalies = transactions
                     .filter(tx => tx.tx_status !== '정상')
-                    .filter(tx => !this.anomalyTransactions.some(existingItem => existingItem.id === tx.id ))
+                    .filter(tx => !this.anomalyTransactions.some(existingItem => existingItem.id === tx.id))
                     .map(tx => ({
-                        id : tx.id,
+                        id: tx.id,
                         timestamp: tx.req_dttm,
                         transactionId: tx.tx_id,
                         type: tx.tx_biz_id,
@@ -405,6 +472,12 @@ const comp = module.exports = {
                 console.error('새 데이터를 가져오는 중 오류가 발생했습니다:', error);
             }
         },
+
+        /**
+         * 상태에 따른 색상을 반환하는 함수
+         * @param {string} status 상태
+         * @returns 상태에 따른 색상
+         */
         getStatusColor: function (status) {
             switch (status) {
                 case '오류': return 'error';
@@ -413,47 +486,134 @@ const comp = module.exports = {
                 default: return 'grey';
             }
         },
+
+        /**
+         * 업데이트를 시작하는 함수
+         * @param none
+         * @returns none
+         */
         startUpdating: function () {
             this.updateInterval = setInterval(this.fetchNewData, 5000);  // 5초마다 업데이트
         },
+        /**
+         * 숫자를 입력받아 단위를 붙여 반환하는 함수
+         * @param {number} num 입력 숫자
+         * @returns {string} 단위가 붙은 문자열
+         */
+        formatNumber: function (num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'm';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+            } else {
+                return num.toString();
+            }
+        },
+
+        /**
+         * 업데이트를 중지하는 함수
+         */
         stopUpdating: function () {
             clearInterval(this.updateInterval);
             clearInterval(this.realChartData.updateInterval);
             clearInterval(this.transactionFlowUpdateInterval);
         },
-        updateSummaryItems(data) {
-            const totalTransactions = data.reduce((sum, item) => sum + item.normal + item.anomaly, 0);
-            const averageTransactionsPerMinute = totalTransactions / 5;
-            const totalAnomalies = data.reduce((sum, item) => sum + item.anomaly, 0);
-            const errorRate = (totalAnomalies / totalTransactions) * 100;
-            const averageResponseTime = Math.random() * 0.5 + 0.5; // 0.5 ~ 1.0 초 사이의 랜덤값
 
-            this.summaryItems[0].value = totalTransactions;
-            this.summaryItems[1].value = Math.round(averageTransactionsPerMinute);
-            this.summaryItems[2].value = errorRate.toFixed(2);
-            this.summaryItems[3].value = averageResponseTime.toFixed(2);
+        /**
+         * 서비스 거래량 데이터를 가져오는 함수
+         * @returns none
+         */
+        fetchServiceData() {
+            // 서비스 목록 정의
+            const services = ['여신 한도조회', '모바일 비대면 대출', '수신 계좌개설', '수신 간편송금'];
+
+            // 현재 서비스 데이터가 비어있다면 초기화
+            if (this.serviceTransactions.length === 0) {
+                services.forEach(serviceName => {
+                    this.serviceTransactions.push({
+                        serviceName: serviceName,
+                        normal: 0,
+                        errorRate: 0,
+                        tps: 0,
+                        transactionsPerHour: 0,
+                        todayTransactions: 0,
+                        compareTrend: 'up',
+                        compareValue: '+0%'
+                    });
+                });
+                return;
+            }
+
+            // 각 서비스에 대해 랜덤 데이터 생성 및 업데이트
+            this.serviceTransactions = this.serviceTransactions.map(service => {
+                // 이전 데이터를 저장하여 비교에 사용
+                const previousTransactionsPerHour = service.transactionsPerHour;
+                const previousTodayTransactions = service.todayTransactions;
+
+                // 랜덤으로 정상 거래량과 오류율 생성
+                const newNormal = Math.floor(Math.random() * 100) + 100; // 100 ~ 199
+                const newErrorRate = parseFloat((Math.random() * 10).toFixed(2)); // 0.00 ~ 9.99%
+
+                // 초당 거래량(TPS) 계산 (예: transactionsPerHour / 3600)
+                const newTps = parseFloat((service.transactionsPerHour / 3600).toFixed(2));
+
+                // 거래량 누적
+                const updatedTransactionsPerHour = service.transactionsPerHour + newNormal;
+                const updatedTodayTransactions = service.todayTransactions + newNormal;
+
+                // 전일 대비 비교
+                let compareTrend = 'up';
+                let compareValue = '+0%';
+
+                if (previousTransactionsPerHour > 0) {
+                    const difference = updatedTransactionsPerHour - previousTransactionsPerHour;
+                    compareTrend = difference >= 0 ? 'up' : 'down';
+                    const percentageChange = ((Math.abs(difference) / previousTransactionsPerHour) * 100).toFixed(2);
+                    compareValue = `${difference >= 0 ? '+' : '-'}${percentageChange}%`;
+                }
+
+                return {
+                    ...service,
+                    normal: service.normal + newNormal,
+                    errorRate: newErrorRate ,
+                    tps: newTps,
+                    transactionsPerHour: updatedTransactionsPerHour,
+                    todayTransactions: updatedTodayTransactions,
+                    compareTrend: compareTrend,
+                    compareValue: compareValue
+                };
+            });
         },
-        calculateTotalTransactions: function () {
-            // 총 거래량 계산 로직
+
+        /**
+         * 서비스 데이터 업데이트를 시작하는 함수
+         * @returns none
+         */
+        startServiceDataUpdate() {
+            this.fetchServiceData(); // 초기 데이터 로드
+            this.serviceDataInterval = setInterval(this.fetchServiceData, 5000); // 5초마다 갱신
         },
-        calculateTransactionsPerMinute: function () {
-            // 분당 거래량 계산 로직
-        },
-        calculateErrorRate: function () {
-            // 오류율 계산 로직
-        },
-        calculateAverageResponseTime: function () {
-            // 평균 응답시간 계산 로직
-        },
+
+        /**
+         * 서비스 데이터 업데이트를 중지하는 함수
+         * @returns none
+         */
+        stopServiceDataUpdate() {
+            clearInterval(this.serviceDataInterval);
+        }
     },
     async created() {
         const initialData = await this.generateInitialData();
         this.updateChartData(initialData);
+        this.fetchServiceData(); // 초기 데이터 로드 (가상 데이터 사용)
         ///this.updateSummaryItems(initialData);
     },
-    mounted: async function () {
+    async mounted() {
         await this.fetchNewData(); // 초기 데이터 로드
         this.startUpdating();
+
+        // 서비스 거래량 데이터 업데이트 시작
+        this.startServiceDataUpdate();
 
         // SVG 생성
         this.realChartData.svg = d3.select("#realtime-transaction-chart")
@@ -498,6 +658,7 @@ const comp = module.exports = {
     beforeDestroy: function () {
         //console.log(`${this.$route.meta.title} beforeDestroy`);
         this.stopUpdating();
+        this.stopServiceDataUpdate();
         try {
             this.resizeObserver.disconnect();
         } catch (e) {
@@ -509,7 +670,7 @@ const comp = module.exports = {
 
 <style scoped>
 .chart {
-    height: 400px;
+    height: 200px;
 }
 
 .transaction {
@@ -523,5 +684,14 @@ const comp = module.exports = {
 
 .theme--dark .bar {
     fill: #333333;
+}
+
+/* 추가 스타일 */
+.text-green {
+    color: green;
+}
+
+.text-red {
+    color: red;
 }
 </style>
