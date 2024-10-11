@@ -132,14 +132,17 @@ const comp = module.exports = {
             curlExample: '',
             paramValues: {},
             isFormValid: true,
-            selectedApi: 'getRules',
+            selectedApi: 'getMetric',
             apiList: [
+                { text: '서비스 지표 목록', value: 'getMetric' },
                 { text: '룰셋 조회(미완)', value: 'getRules' },
                 { text: '룰셋 저장(미완)', value: 'saveRule' },
                 { text: '알람 목록 조회(미완)', value: 'getAlarms' },
                 { text: '간편 이체(미완-1)', value: 'transfer' },
                 { text: '대출 신청(미완-2)', value: 'applyLoan' },
                 { text: '한도 조회(미완-3)', value: 'checkLoanLimit' },
+                
+
                 { text: '서비스 거래 목록 조회(미완-4)', value: 'getIncidents' },
 
                 { text: '실시간 서비스 분석(미완)', value: 'getLiveTransactions' },
@@ -645,6 +648,46 @@ const comp = module.exports = {
                         { name: 'body.alarms[].description', type: 'String', required: true, description: '알람 설명' },
                     ],
                 },
+                getMetric: {
+                    name: '매트릭스 데이터 조회',
+                    endpoint: '/incident/getMetric',
+                    method: 'GET',
+                    description: '시스템의 매트릭스 데이터를 조회합니다.',
+                    parameters: [],
+                    responseSampleHtml: '',
+                    responseSample: [
+                        {
+                            ifId: "IF_00001",
+                            svcNm: "토스 가심사 요청",
+                            errPer: 3.44,
+                            errDiffPer: 7.84,
+                            tps: 0.1697,
+                            todayCnt: 611,
+                            previousDayCnt: 94,
+                            previousWeekCnt: 953
+                        },
+                        {
+                            ifId: "IF_00002",
+                            svcNm: "송금",
+                            errPer: 4.03,
+                            errDiffPer: 9.81,
+                            tps: 0.1792,
+                            todayCnt: 645,
+                            previousDayCnt: 109,
+                            previousWeekCnt: 978
+                        }
+                    ],
+                    responseFormat: [
+                        { name: 'ifId', type: 'String', required: true, description: '인터페이스 ID' },
+                        { name: 'svcNm', type: 'String', required: true, description: '서비스 이름' },
+                        { name: 'errPer', type: 'Number', required: true, description: '오류율 (%)' },
+                        { name: 'errDiffPer', type: 'Number', required: true, description: '전일 대비 오류율 변화 (%)' },
+                        { name: 'tps', type: 'Number', required: true, description: '초당 거래량 (TPS)' },
+                        { name: 'todayCnt', type: 'Number', required: true, description: '금일 거래량' },
+                        { name: 'previousDayCnt', type: 'Number', required: true, description: '전일 거래량' },
+                        { name: 'previousWeekCnt', type: 'Number', required: true, description: '전주 거래량' }
+                    ],
+                },
             }
 
         };
@@ -745,7 +788,7 @@ const comp = module.exports = {
             this.paramValues = {};
 
             this.selectedApiDetails = this.apiDetails[this.selectedApi];
-            this.selectedApiDetails.parameters.forEach(param => {
+            this.selectedApiDetails?.parameters.forEach(param => {
                 this.paramValues[param.name] = param.default || '';
             });
 

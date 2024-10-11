@@ -174,7 +174,7 @@ const comp = module.exports = {
                 { text: '금일', value: 'todayTransactions' },
                 { text: '전일', value: 'yesterdayTransactions' },
                 { text: '전주', value: 'lastWeekTransactions' },
-                { text: '전월', value: 'lastMonthTransactions' },
+                //{ text: '전월', value: 'lastMonthTransactions' },
 
             ],
             /**@type {array} 서비스 거래량 데이터 */
@@ -523,11 +523,12 @@ const comp = module.exports = {
          * 서비스 거래량 데이터를 가져오는 함수
          * @returns none
          */
-        fetchServiceData() {
+        async fetchServiceData() {
             // 서비스 목록 정의
             const services = ['여신 한도조회', '모바일 비대면 대출', '수신 계좌개설', '수신 간편송금'];
 
             // 현재 서비스 데이터가 비어있다면 초기화
+            /*
             if (this.serviceTransactions.length === 0) {
                 services.forEach(serviceName => {
                     this.serviceTransactions.push({
@@ -543,8 +544,10 @@ const comp = module.exports = {
                 });
                 return;
             }
+            */
 
             // 각 서비스에 대해 랜덤 데이터 생성 및 업데이트
+            /*
             this.serviceTransactions = this.serviceTransactions.map(service => {
                 // 이전 데이터를 저장하여 비교에 사용
                 const previousTransactionsPerHour = service.transactionsPerHour;
@@ -583,6 +586,35 @@ const comp = module.exports = {
                     compareValue: compareValue
                 };
             });
+            */
+
+        // getMetric API를 사용하여 데이터 가져오기
+            
+            try {
+                const response = await this.$axios.get('/incident/getMetric');
+
+                console.log('getMetric response', response);
+
+                if (response.data && response.data) {
+                    this.serviceTransactions = response.data.map(service => ({
+                        serviceName: service.svcNm,
+                        normal: service.todayCnt,
+                        errorRate: service.errPer,
+                        tps: service.tps, // 하루 평균 TPS 계산
+                        //transactionsPerHour: service.todayCnt / 24, // 시간당 평균 거래량 계산
+                        todayTransactions: service.todayCnt,
+                        yesterdayTransactions: service.previousDayCnt,
+                        lastWeekTransactions: service.previousWeekCnt,
+                        compareTrend: service.errDiffPer >= 0 ? 'up' : 'down',
+                        compareValue: `${service.errDiffPer >= 0 ? '+' : ''}${service.errDiffPer}%`
+                    }));
+                }
+            } catch (error) {
+                console.error('서비스 데이터 가져오기 실패:', error);
+                // 에러 처리 로직 추가 (예: 사용자에게 알림)
+            }
+            
+
         },
 
         /**
