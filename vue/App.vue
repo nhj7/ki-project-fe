@@ -200,7 +200,59 @@
               <v-btn color="primary" x-large rounded text @click="$msg.hide">닫기</v-btn>
             </v-card-actions>
           </v-card>
-        </v-dialog>
+        </v-dialog><!-- 메시지 팝업 -->
+
+        <!-- 상세 정보 팝업 -->
+        <v-dialog v-model="$vo.svcDetailDialog" max-width="80%" transition="" :retain-focus="false">
+          <v-card class="dialog-card">
+            <v-card-title class="d-flex justify-space-between align-center">
+              <div>
+                <v-icon>mdi-information-outline</v-icon>
+                &nbsp;&nbsp; 서비스 상세 정보
+              </div>
+              <v-btn icon @click="$vo.svcDetailDialog = false">
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+            </v-card-title>
+            <v-divider></v-divider>
+            <v-card-text>
+              <v-simple-table class="fixed-table mb-2">
+                <template v-slot:default>
+                  <tbody>
+                    <tr v-for="(row, index) in $vo.groupedIncidentDetails" :key="index">
+                      <template v-for="(value, key) in row">
+                        <td class="label-column">{{ $vo.getHeaderText(key) }}<!--eslint-disable-line-->
+                        </td>
+                        <td class="value-column"><!--eslint-disable-line-->
+                          <template v-if="key !== 'status'">{{ value }}</template>
+                          <v-select v-else v-model="$vo.selectedIncident.status" :items="status" dense outlined
+                            hide-details class="small-select"></v-select>
+                        </td>
+                      </template>
+                    </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+              <v-divider></v-divider>
+              <v-card-subtitle class="text-subtitle-1">
+                <v-icon>mdi-list-box</v-icon>
+                &nbsp;&nbsp; 서비스 상세 거래 목록
+              </v-card-subtitle>
+              <v-data-table :headers="$vo.detailTransactionHeaders" :items="$vo.detailTransactions" :items-per-page="5"
+                class="elevation-1" dense :height="200" fixed-header>
+                <template v-slot:[`item.status`]="{ item }">
+                  <v-chip :color="$vo.getStatusColor(item.status)" small>
+                    {{ item.status }}
+                  </v-chip>
+                </template>
+              </v-data-table>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn :color="$config.color_btn" @click="$vo.svcDetailDialog = false" small>닫기</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog><!-- detailDialog -->
 
 
       </v-container>
@@ -348,6 +400,126 @@ const MessagePlugin = {
   }
 };
 Vue.use(MessagePlugin);
+
+
+const VoPlugin = {
+  install(Vue) {
+    const vo = new Vue({
+      data: {
+        svcDetailDialog: false,
+        selectedIncident: {},
+        groupedIncidentDetails: [],
+        incidentHeaders: [
+          { text: '발생시간', align: 'start', sortable: true, value: 'timestamp' },
+          { text: '서비스ID', value: 'guid' },
+          { text: '시스템', value: 'system' },
+          { text: '심각도', value: 'severity' },
+          { text: '서비스내용', value: 'description' },
+          { text: '처리상태', value: 'status' },
+          { text: '정책ID', value: 'ruleId' },
+          { text: '정책명', value: 'ruleNm' },
+          { text: '상세', value: 'actions', sortable: false },
+        ],
+        incidents: {
+
+        },
+        detailTransactionHeaders: [
+          { text: '거래ID', value: 'txId' },
+          { text: '프로그램 ID', value: 'programId' },
+          { text: '프로그램 명', value: 'programNm' },
+          { text: '거래 시간', value: 'transactionTime' },
+          { text: '처리 시간(초)', value: 'processTime' },
+          { text: '상태', value: 'status' },
+        ],
+        detailTransactions: [],
+      },
+      methods: {
+        set(options = {}) {
+          Object.assign(this.$data, options);
+        },
+        async openSvcDetailDialog(incident) {
+          this.selectedIncident = incident;
+          this.setGroupedIncidentDetails();
+          await this.fetchDetailTransactions(incident.guid);
+          this.svcDetailDialog = true;
+        },
+        setGroupedIncidentDetails() {
+          //console.log('groupedIncidentDetails', this.selectedIncident);
+          const grouped = [];
+          const keys = Object.keys(this.selectedIncident);
+          for (let i = 0; i < keys.length; i += 3) {
+            const row = {};
+            row[keys[i]] = this.selectedIncident[keys[i]];
+            if (i + 1 < keys.length) {
+              row[keys[i + 1]] = this.selectedIncident[keys[i + 1]];
+            }
+            if (i + 2 < keys.length) {
+              row[keys[i + 2]] = this.selectedIncident[keys[i + 2]];
+            }
+            grouped.push(row);
+          }
+          this.groupedIncidentDetails = grouped;
+        },
+        getHeaderText(key) {
+          const header = this.incidentHeaders.find(h => h.value === key);
+          return header ? header.text : key;
+        },
+        getStatusColor(status) {
+          if (!status) return 'grey';
+          switch (status) {
+            case '정상': return 'green';
+            default: return 'orange';
+          }
+        },
+        async fetchDetailTransactions(incidentGuid) {
+          console.log('fetchDetailTransactions : ', incidentGuid);
+          try {
+            this.$loading.show('거래 목록을 불러오는 중입니다...');
+
+            const response = await axios.post('/getGuidData', { guid: incidentGuid });
+
+            if (response.data) {
+              response.data.sort((a, b) => a.if_id.localeCompare(b.if_id));
+              this.detailTransactions = response.data.map(transaction => ({
+                txId: transaction.tx_id,
+                programId: transaction.if_id,
+                programNm: transaction.prg_nm,
+                transactionTime: this.$util.formatDttm(transaction.req_dttm, '-', ':'),
+                processTime: (transaction.elapsed / 1000).toFixed(2),
+                status: transaction.tx_status
+              }));
+            } else {
+              console.error('API 응답 형식이 올바르지 않습니다:', response.data, error);
+              this.detailTransactions = [];
+            }
+            console.log('fetchDetailTransactions 응답 : ', response);
+          } catch (error) {
+
+          } finally {
+            this.$loading.hide();
+          }
+          /*
+          this.detailTransactions = [
+              { guid: 'tx001', txId: 'tx001', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:30:15', processTime: '15', status: '성공' },
+              { guid: 'tx002', txId: 'tx002', programId: 'PROG002', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:31:20', processTime: '20', status: '실패' },
+              { guid: 'tx003', txId: 'tx003', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:32:30', processTime: '30', status: '성공' },
+              { guid: 'tx004', txId: 'tx004', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:32:30', processTime: '30', status: '성공' },
+              { guid: 'tx005', txId: 'tx005', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:32:30', processTime: '30', status: '성공' },
+              { guid: 'tx006', txId: 'tx006', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:32:30', processTime: '30', status: '성공' },
+              { guid: 'tx007', txId: 'tx007', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:32:30', processTime: '30', status: '성공' },
+              { guid: 'tx008', txId: 'tx008', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:32:30', processTime: '30', status: '성공' },
+              // ... 더 많은 거래 데이터 ...
+          ];
+          */
+        },
+      }
+    });
+
+    Vue.prototype.$vo = vo;
+  }
+};
+Vue.use(VoPlugin);
+
 
 const data = {
   currentView: "",
@@ -557,10 +729,24 @@ const globalMethods = {
     };
   },
   formatDate(date, sep = '') {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}${sep}${month}${sep}${day}`;
+    if (date instanceof Date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}${sep}${month}${sep}${day}`;
+    } else {
+      return `${date.substr(0, 4)}${sep}${date.substr(4, 2)}${sep}${date.substr(6, 2)}`;
+    }
+  },
+  formatDttm(dttm, sep1 = '', sep2 = '') {
+    if (dttm instanceof Date) {
+      const year = dttm.getFullYear();
+      const month = String(dttm.getMonth() + 1).padStart(2, "0");
+      const day = String(dttm.getDate()).padStart(2, "0");
+      return `${year}${sep1}${month}${sep1}${day}`;
+    } else {
+      return `${dttm.substr(0, 4)}${sep1}${dttm.substr(4, 2)}${sep1}${dttm.substr(6, 2)} ${dttm.substr(8, 2)}${sep2}${dttm.substr(10, 2)}${sep2}${dttm.substr(12, 2)}`;
+    }
   },
   /**
    * 날짜를 가져오는 함수

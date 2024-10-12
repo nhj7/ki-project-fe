@@ -13,16 +13,10 @@
             <!-- 서비스 별 거래량 데이터 테이블 추가 -->
             <v-row>
               <v-col cols="12">
-                <v-data-table
-                  :headers="serviceHeaders"
-                  :items="serviceTransactions"
-                  :items-per-page="4"
-                  :hide-default-footer="true"
-                  :footer-props="{
+                <v-data-table :headers="serviceHeaders" :items="serviceTransactions" :items-per-page="4"
+                  :hide-default-footer="true" :footer-props="{
                     'items-per-page-options': [4, 5, 10, 15],
-                  }"
-                  class="elevation-1"
-                >
+                  }" class="elevation-1">
                   <template v-slot:[`item.errorRate`]="{ item }">
                     <v-chip :color="getRateColor(item.errorRate)" small>
                       {{ item.errorRate }}%
@@ -33,17 +27,15 @@
                   </template>
                   <!-- 전일자 대비 표시 -->
                   <template v-slot:[`item.compare`]="{ item }">
-                    <span
-                      :class="{
+                    <span :class="{
                         'text-green': item.compareTrend === 'down',
                         'text-red': item.compareTrend === 'up',
-                      }"
-                    >
+                      }">
                       <v-icon small>
                         {{
-                          item.compareTrend === "up"
-                            ? "mdi-trending-up"
-                            : "mdi-trending-down"
+                        item.compareTrend === "up"
+                        ? "mdi-trending-up"
+                        : "mdi-trending-down"
                         }}
                       </v-icon>
                       {{ item.compareValue }}
@@ -56,32 +48,21 @@
             <!-- 거래 흐름 차트 -->
             <v-row>
               <v-col cols="12" md="12">
-                <v-chart
-                  class="chart"
-                  :option="chartOption"
-                  :autoresize="true"
-                  :key="isDarkMode"
-                />
+                <v-chart class="chart" :option="chartOption" :autoresize="true" :key="isDarkMode" />
               </v-col>
             </v-row>
 
             <v-row>
               <v-col cols="12">
-                <v-data-table
-                  :headers="anomalyHeaders"
-                  :items="anomalyTransactions"
-                  :items-per-page="3"
-                  :footer-props="{
+                <v-data-table :headers="anomalyHeaders" :items="anomalyTransactions" :items-per-page="3" :footer-props="{
                     'items-per-page-options': itemsPerPageOptions,
-                  }"
-                  class="elevation-1"
-                >
+                  }" class="elevation-1" @click:row="$vo.openSvcDetailDialog">
                   <template v-slot:[`item.timestamp`]="{ item }">
                     {{
-                      item.timestamp.replace(
-                        /(.{4})(.{2})(.{2})(.{2})(.{2})(.{2})/,
-                        "$1-$2-$3$4:$5:$6"
-                      )
+                    item.timestamp.replace(
+                    /(.{4})(.{2})(.{2})(.{2})(.{2})(.{2})/,
+                    "$1-$2-$3$4:$5:$6"
+                    )
                     }}
                   </template>
                   <template v-slot:[`item.status`]="{ item }">
@@ -326,10 +307,10 @@ const comp = (module.exports = {
         .transition()
         .duration(transaction.speed)
         .ease(d3.easeLinear)
-        .attrTween("transform", function () {          
+        .attrTween("transform", function () {
           const interpolateX = d3.interpolate(100, fadeStartX); // 시작과 끝 좌표 사이의 보간
           return function (t) {
-            const x = parseInt(interpolateX(t));            
+            const x = parseInt(interpolateX(t));
             return `translate(${x},0)`; // translate로 x 좌표 변경
           };
         })
@@ -430,16 +411,16 @@ const comp = (module.exports = {
       transactions.forEach((tx) => {
         const time = new Date(
           tx.req_dttm.slice(0, 4) +
-            "-" +
-            tx.req_dttm.slice(4, 6) +
-            "-" +
-            tx.req_dttm.slice(6, 8) +
-            "T" +
-            tx.req_dttm.slice(8, 10) +
-            ":" +
-            tx.req_dttm.slice(10, 12) +
-            ":" +
-            tx.req_dttm.slice(12, 14)
+          "-" +
+          tx.req_dttm.slice(4, 6) +
+          "-" +
+          tx.req_dttm.slice(6, 8) +
+          "T" +
+          tx.req_dttm.slice(8, 10) +
+          ":" +
+          tx.req_dttm.slice(10, 12) +
+          ":" +
+          tx.req_dttm.slice(12, 14)
         ).getTime();
         if (time >= threeMinutesAgo) {
           if (tx.tx_status === "정상") {
@@ -497,12 +478,10 @@ const comp = (module.exports = {
           )
           .map((tx) => ({
             id: tx.id,
+            guid: tx.guid,
             timestamp: tx.req_dttm,
             transactionId: tx.tx_id,
-            type: tx.tx_biz_id,
-            amount:
-              this.$util.numberWithComma(JSON.parse(tx.req_json).amount || 0) +
-              "원",
+            type: tx.tx_biz_id,            
             status: tx.tx_status === "타임아웃" ? "오류" : "의심",
           }));
 
@@ -512,9 +491,7 @@ const comp = (module.exports = {
           ...newAnomalies,
         ]
           .sort((a, b) => new Date(b.id) - new Date(a.id))
-          .slice(0, 10); // 최근 100개만 유지
-
-        //console.log('anomalyTransactions', this.anomalyTransactions)
+          .slice(0, 10); // 최근 10개만 유지
 
         transactions.sort((a, b) => b.id - a.id);
         transactions.forEach((tx, idx) =>
@@ -672,9 +649,8 @@ const comp = (module.exports = {
               service.previousWeekCnt
             ),
             compareTrend: service.errDiffPer >= 0 ? "up" : "down",
-            compareValue: `${service.errDiffPer >= 0 ? "+" : ""}${
-              service.errDiffPer
-            }%`,
+            compareValue: `${service.errDiffPer >= 0 ? "+" : ""}${service.errDiffPer
+              }%`,
           }));
         }
       } catch (error) {

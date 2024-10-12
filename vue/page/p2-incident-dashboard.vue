@@ -143,7 +143,7 @@
                 </v-card-->
 
                 <!-- 장애 목록 -->
-                <v-data-table :headers="headers" :items="incidents" :items-per-page="10"
+                <v-data-table :headers="$vo.incidentHeaders" :items="incidents" :items-per-page="10"
                     class="elevation-1 custom-table" :mobile-breakpoint="0" @click:row="showDetails">
                     <template v-slot:[`item.severity`]="{ item }">
                         <v-chip :color="getSeverityColor(item.severity)" dark small>
@@ -162,57 +162,7 @@
             </v-col>
         </v-row>
 
-        <!-- 상세 정보 팝업 -->
-        <v-dialog v-model="detailDialog" max-width="80%">
-            <v-card class="dialog-card">
-                <v-card-title class="d-flex justify-space-between align-center">
-                    <div>
-                        <v-icon>mdi-information-outline</v-icon>
-                        &nbsp;&nbsp; 서비스 상세 정보
-                    </div>
-                    <v-btn icon @click="detailDialog = false">
-                        <v-icon>mdi-close</v-icon>
-                    </v-btn>
-                </v-card-title>
-                <v-divider></v-divider>
-                <v-card-text>
-                    <v-simple-table class="fixed-table mb-2">
-                        <template v-slot:default>
-                            <tbody>
-                                <tr v-for="(row, index) in groupedIncidentDetails" :key="index">
-                                    <template v-for="(value, key) in row">
-                                        <td class="label-column">{{ getHeaderText(key) }}<!--eslint-disable-line-->
-                                        </td>
-                                        <td class="value-column"><!--eslint-disable-line-->
-                                            <template v-if="key !== 'status'">{{ value }}</template>
-                                            <v-select v-else v-model="selectedIncident.status" :items="status" dense
-                                                outlined hide-details class="small-select"></v-select>
-                                        </td>
-                                    </template>
-                                </tr>
-                            </tbody>
-                        </template>
-                    </v-simple-table>
-                    <v-divider></v-divider>
-                    <v-card-subtitle class="text-subtitle-1">
-                        <v-icon>mdi-list-box</v-icon>
-                        &nbsp;&nbsp; 서비스 상세 거래 목록
-                    </v-card-subtitle>
-                    <v-data-table :headers="detailTransactionHeaders" :items="detailTransactions" :items-per-page="5"
-                        class="elevation-1" dense :height="200" fixed-header>
-                        <template v-slot:[`item.status`]="{ item }">
-                            <v-chip :color="getStatusColor(item.status)" small>
-                                {{ item.status }}
-                            </v-chip>
-                        </template>
-                    </v-data-table>
-                </v-card-text>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn :color="$config.color_btn" @click="detailDialog = false" small>닫기</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
+        
 
     </v-container>
 </template>
@@ -247,19 +197,7 @@ const comp = module.exports = {
                 startTimeMinute: '',
                 endTimeMinute: '',
                 useOnlyDate: true,
-            },
-            headers: [
-                { text: '발생시간', align: 'start', sortable: true, value: 'timestamp' },
-                
-                { text: '서비스ID', value: 'guid' },
-                { text: '시스템', value: 'system' },
-                { text: '심각도', value: 'severity' },
-                { text: '서비스내용', value: 'description' },
-                { text: '처리상태', value: 'status' },
-                { text: '정책ID', value: 'ruleId' },
-                { text: '정책명', value: 'ruleNm' },
-                { text: '상세', value: 'actions', sortable: false },
-            ],
+            },            
             incidents: [],
             totalIncidents: 0,
             criticalIncidents: 0,
@@ -267,15 +205,7 @@ const comp = module.exports = {
             infoIncidents: 0,
             detailDialog: false,
             selectedIncident: null,
-            detailTransactionHeaders: [
-                { text: '거래ID', value: 'txId' },
-                { text: '프로그램 ID', value: 'programId' },
-                { text: '프로그램 명', value: 'programNm' },
-                { text: '거래 시간', value: 'transactionTime' },
-                { text: '처리 시간', value: 'processTime' },
-                { text: '상태', value: 'status' },
-            ],
-            detailTransactions: [],
+            
         }
     },
 
@@ -290,23 +220,7 @@ const comp = module.exports = {
                 { label: '경고', value: this.warningIncidents, color: 'orange--text' },
                 { label: '정보', value: this.infoIncidents, color: 'blue--text' },
             ];
-        },
-        groupedIncidentDetails() {
-            const grouped = [];
-            const keys = Object.keys(this.selectedIncident);
-            for (let i = 0; i < keys.length; i += 3) {
-                const row = {};
-                row[keys[i]] = this.selectedIncident[keys[i]];
-                if (i + 1 < keys.length) {
-                    row[keys[i + 1]] = this.selectedIncident[keys[i + 1]];
-                }
-                if (i + 2 < keys.length) {
-                    row[keys[i + 2]] = this.selectedIncident[keys[i + 2]];
-                }
-                grouped.push(row);
-            }
-            return grouped;
-        }
+        },        
     },
     methods: {
         changeUseOnlyDate() {
@@ -327,10 +241,7 @@ const comp = module.exports = {
                 console.error('replaceNumber 중 오류 발생:', error)
             }
         },
-        getHeaderText(key) {
-            const header = this.headers.find(h => h.value === key);
-            return header ? header.text : key;
-        },
+        
         async search() {
             // 실제 검색 로직 구현
             await this.fetchIncidents();
@@ -363,7 +274,7 @@ const comp = module.exports = {
                     if (response.data) {
                         this.incidents = response.data.map(incident => ({
                             guid : incident.guid,
-                            timestamp: incident.req_dttm,
+                            timestamp: this.$util.formatDttm(incident.req_dttm, '-', ':'),
                             system: incident.system_cd,
                             severity: incident.res_cd == 'Succ' ? '정상' : '오류', // API 응답에 심각도 정보가 없어 임의로 설정
                             description: incident.svc_nm,
@@ -428,12 +339,10 @@ const comp = module.exports = {
                 return 'grey';
         },
         getStatusColor(status) {
-            if (true) return 'grey';
-            switch (status) {
-                case '조치중': return 'red';
-                case '모니터링중': return 'orange';
-                case '완료': return 'green';
-                default: return 'grey';
+            if (!status) return 'grey';
+            switch (status) {                
+                case '정상': return 'green';
+                default: return 'orange';
             }
         },
         toggleAll(filterType) {
@@ -446,57 +355,10 @@ const comp = module.exports = {
             return this.$util.getIcon(this.isAllSelected(filterType));
         },
         async showDetails(item) {
-
-            await this.fetchDetailTransactions(item.guid);
-
             console.log('showDetails : ', item);
             this.selectedIncident = item;            
-            this.detailDialog = true;
+            await this.$vo.openSvcDetailDialog(item);
         },
-        async fetchDetailTransactions(incidentGuid) {
-            // 실제로는 API를 호출하여 데이터를 가져와야 합니다.
-            // 여기서는 예시 데이터를 사용합니다.
-
-            try {
-                this.$loading.show('거래 목록을 불러오는 중입니다...');
-
-                const response = await axios.post('/getGuidData', { guid : incidentGuid });
-
-                if (response.data) {
-                    response.data.sort((a, b) => a.if_id.localeCompare(b.if_id));
-                    this.detailTransactions = response.data.map(transaction => ({
-                        txId : transaction.tx_id,
-                        programId: transaction.if_id,
-                        programNm: transaction.prg_nm,
-                        transactionTime: transaction.req_dttm,
-                        processTime: transaction.elapsed,
-                        status: transaction.tx_status
-                    }));
-                } else {
-                    console.error('API 응답 형식이 올바르지 않습니다:', response.data, error);
-                    this.detailTransactions = [];
-                }
-                console.log('fetchDetailTransactions 응답 : ', response);
-            } catch (error) {
-                
-            } finally {
-                this.$loading.hide();
-            }
-            /*
-            this.detailTransactions = [
-                { guid: 'tx001', txId: 'tx001', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:30:15', processTime: '15', status: '성공' },
-                { guid: 'tx002', txId: 'tx002', programId: 'PROG002', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:31:20', processTime: '20', status: '실패' },
-                { guid: 'tx003', txId: 'tx003', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:32:30', processTime: '30', status: '성공' },
-                { guid: 'tx004', txId: 'tx004', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:32:30', processTime: '30', status: '성공' },
-                { guid: 'tx005', txId: 'tx005', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:32:30', processTime: '30', status: '성공' },
-                { guid: 'tx006', txId: 'tx006', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:32:30', processTime: '30', status: '성공' },
-                { guid: 'tx007', txId: 'tx007', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:32:30', processTime: '30', status: '성공' },
-                { guid: 'tx008', txId: 'tx008', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:32:30', processTime: '30', status: '성공' },
-                // ... 더 많은 거래 데이터 ...
-            ];
-            */
-        },
-
     },
     created() {
         const dates = this.$util.setLastWeekDates();
@@ -510,6 +372,8 @@ const comp = module.exports = {
     },
     async mounted() {
         await this.search();
+
+        //console.log('mounted : ', this.$vo.incidentHeaders);
         //await this.showDetails(this.incidents[0]);
     }
 }
