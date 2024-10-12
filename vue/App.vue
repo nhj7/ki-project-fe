@@ -400,6 +400,12 @@ const comp = (module.exports = {
       this.$vuetify.theme.dark = data.isDark;
       console.log(this.$vuetify.theme.dark);
       localStorage.setItem("darkTheme", this.isDark);
+
+      if( data.isDark ) {
+        document.body.style.backgroundColor = '#000';
+      } else {
+        document.body.style.backgroundColor = '#fff';
+      }
     },
     findRouteByPath(path) {
       return this.$router.options.routes.find((route) => route.path === path);
@@ -469,6 +475,11 @@ const comp = (module.exports = {
       if (savedTheme !== null) {
         this.isDark = JSON.parse(savedTheme);
         this.$vuetify.theme.dark = this.isDark;
+        if( this.isDark ) {
+          document.body.style.backgroundColor = '#000';
+        } else {
+          document.body.style.backgroundColor = '#fff';
+        }
       }
     } // end 테마 설정
 

@@ -1,12 +1,11 @@
 <template>
     <v-container fluid>
-        <v-card>
-            <v-card-title>API 명세</v-card-title>
+        <v-card>            
             <v-card-text>
                 <v-select v-model="selectedApi" :items="apiList" label="API 선택" @change="showApiDetails"></v-select>
 
-                <v-card v-if="selectedApiDetails" class="mt-4">
-                    <v-card-title>{{ selectedApiDetails.name }}</v-card-title>
+                <v-card v-if="selectedApiDetails" class="mt-0 ">
+                    <v-card-title class="text-h6 pt-0 pb-0">{{ selectedApiDetails.name }}</v-card-title>
                     <v-card-text>
                         <v-simple-table>
                             <template v-slot:default>
@@ -15,7 +14,7 @@
                                         <td>엔드포인트</td>
                                         <td>
                                             <!--code>{{ selectedApiDetails.endpoint }}</code-->
-                                            <v-text-field v-model="selectedApiDetails.endpoint"></v-text-field>
+                                            <v-text-field v-model="selectedApiDetails.endpoint" dense hide-details="auto"></v-text-field>
                                         </td>
                                     </tr>
                                     <tr>
@@ -30,7 +29,7 @@
                             </template>
                         </v-simple-table>
 
-                        <v-subheader class="mt-4">요청 파라미터</v-subheader>
+                        <v-subheader class="mt-2">요청 파라미터</v-subheader>
                         <v-form v-if="selectedApiDetails.parameters.length" ref="form" v-model="isFormValid">
                             <v-simple-table>
                                 <template v-slot:default>
@@ -61,14 +60,14 @@
                             </v-simple-table>
                         </v-form>
 
-                        <v-subheader class="mt-4">요청 형식</v-subheader>
+                        <v-subheader class="mt-2">요청 형식</v-subheader>
                         <v-card outlined>
                             <v-card-text class="font-weight-bold"
                                 v-html="curlExample"></v-card-text><!--eslint-disable-line-->
                         </v-card>
                         <v-btn :color="$config.color_btn" @click="callApi" class="mt-2" small dense>API 호출</v-btn>
 
-                        <v-subheader class="mt-4">응답 결과</v-subheader>
+                        <v-subheader class="mt-2">응답 결과</v-subheader>
                         <v-card outlined v-if="apiResponse">
                             <v-card-text class="font-weight-bold"
                                 v-html="apiResponse"></v-card-text><!--eslint-disable-line-->
@@ -105,7 +104,7 @@
                                 </v-simple-table>
                             </v-col>
                             <v-col cols="12" md="6">
-                                <v-subheader class="mt-4">응답 샘플</v-subheader>
+                                <v-subheader class="mt-2">응답 샘플</v-subheader>
                                 <v-card outlined>
                                     <v-card-text class="font-weight-bold"
                                         v-html="selectedApiDetails.responseSampleHtml"></v-card-text><!--eslint-disable-line-->
@@ -134,19 +133,16 @@ const comp = module.exports = {
             isFormValid: true,
             selectedApi: 'getMetric',
             apiList: [
-                { text: '서비스 지표 목록', value: 'getMetric' },
-                { text: '룰셋 조회(미완)', value: 'getRules' },
-                { text: '룰셋 저장(미완)', value: 'saveRule' },
-                { text: '알람 목록 조회(미완)', value: 'getAlarms' },
+                { text: '서비스 지표 목록', value: 'getMetric' },                
+                { text: '룰셋 저장(미완)', value: 'saveRule' },                
                 { text: '간편 이체(미완-1)', value: 'transfer' },
                 { text: '대출 신청(미완-2)', value: 'applyLoan' },
                 { text: '한도 조회(미완-3)', value: 'checkLoanLimit' },
-                
-
                 { text: '서비스 거래 목록 조회(미완-4)', value: 'getIncidents' },
+                { text: '알람 목록 조회(미완)', value: 'getAlarms' },
+                // { text: '실시간 서비스 분석(미완)', value: 'getLiveTransactions' },
 
-                { text: '실시간 서비스 분석(미완)', value: 'getLiveTransactions' },
-
+                { text: '룰셋 조회(완료)', value: 'getRules' },
                 { text: '거래 데이터 조회(완료)', value: 'getTxData' },
                 { text: '로그인(완료)', value: 'loginSignin' },
                 { text: '로그인 상태 체크(완료)', value: 'loginCheck' },
