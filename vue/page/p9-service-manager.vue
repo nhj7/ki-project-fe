@@ -6,9 +6,9 @@
           <v-card-title>
             서비스 관리
             <v-spacer></v-spacer>
-            <v-btn color="primary" >
+            <!--v-btn color="primary" small @click="openDialog">
               <v-icon left>mdi-plus-circle</v-icon> 서비스 등록
-            </v-btn>
+            </v-btn-->
           </v-card-title>
           <v-card-text>
             <v-treeview
@@ -35,14 +35,14 @@
                   <div>
                     <strong>{{ item.serviceName || item.txName }}</strong> ({{ item.serviceName ? item.serviceID : item.txID }})
                   </div>
-                  <div>
+                  <!--div>
                     <v-btn icon small @click.stop="editService(item)">
                       <v-icon color="info">mdi-pencil</v-icon>
                     </v-btn>
                     <v-btn icon small @click.stop="deleteService(item)">
                       <v-icon color="error">mdi-delete</v-icon>
                     </v-btn>
-                  </div>
+                  </div-->
                 </div>
               </template>
               <template v-slot:append="{ item }">
@@ -122,17 +122,17 @@ module.exports = {
           description: '사용자의 여신 한도를 조회하는 서비스입니다.',
           transactions: [
             {
-              txID: 'TX001',
+              txID: 'IF001',
               txName: 'NICE 신용조회',
               status: '성공'
             },
             {
-              txID: 'TX002',
+              txID: 'IF002',
               txName: 'KCB 신용조회',
               status: '성공'
             },
             {
-              txID: 'TX003',
+              txID: 'IF003',
               txName: 'CSS 한도/금리 조회',
               status: '성공'
             },
@@ -144,32 +144,32 @@ module.exports = {
           description: '모바일을 통한 비대면 대출 신청 서비스입니다.',
           transactions: [
             {
-              txID: 'TX003',
+              txID: 'IF003',
               txName: 'FSB Open API 거래',
               status: '성공'
             },
             {
-              txID: 'TX004',
+              txID: 'IF004',
               txName: '건강보험/국세청 스크래핑',
               status: '성공'
             },
             {
-              txID: 'TX005',
+              txID: 'IF005',
               txName: '계정계 한도조회',
               status: '성공'
             },
             {
-              txID: 'TX006',
+              txID: 'IF006',
               txName: '전자약정 솔루션 처리',
               status: '성공'
             },
             {
-              txID: 'TX007',
+              txID: 'IF007',
               txName: '신분증 본인인증',
               status: '성공'
             },
             {
-              txID: 'TX008',
+              txID: 'IF008',
               txName: '대출금 계좌송금',
               status: '성공'
             },
