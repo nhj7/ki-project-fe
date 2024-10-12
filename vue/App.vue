@@ -605,7 +605,7 @@ const globalMethods = {
     const seconds = String(date.getSeconds()).padStart(2, '0');
     return `${year}${month}${day}${hours}${minutes}${seconds}`;
   },
-  generateUUID() {
+  uuidv4() {
     const HEX = '0123456789ABCDEF';  // 대문자로 변경
     let uuid = '';
     for (let i = 0; i < 32; i++) {  // 32로 변경 (하이픈 제거)
@@ -616,6 +616,15 @@ const globalMethods = {
       } else {
         uuid += HEX[(Math.random() * 16 | 0)];
       }
+    }
+    return uuid;
+  },
+  uuid() {
+    const HEX = '0123456789ABCDEF';
+    const timestamp = new Date().getTime().toString(16).toUpperCase(); // 시간 요소 추가
+    let uuid = timestamp;
+    while (uuid.length < 16) { // 나머지 8자리는 랜덤
+      uuid += HEX[(Math.random() * 16 | 0)];
     }
     return uuid;
   },

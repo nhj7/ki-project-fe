@@ -22,7 +22,12 @@
                                     @input="formatTimeInput($event, 'startTime')" hide-details dense></v-text-field-->
                                 <v-select v-model="filters.startTime"
                                     :items="Array.from({length: 24}, (_, i) => i.toString().padStart(2, '0'))"
-                                    label="시작 시간" dense hide-details></v-select>
+                                    label="시작 시간" dense hide-details :disabled="filters.useOnlyDate"></v-select>
+                            </v-col>
+                            <v-col cols="6" md="1" sm="2" xs="4">
+                                <v-select v-model="filters.startTimeMinute"
+                                    :items="Array.from({length: 60}, (_, i) => i.toString().padStart(2, '0'))"
+                                    label="시작 분" dense hide-details :disabled="filters.useOnlyDate"></v-select>
                             </v-col>
 
                             <v-col cols="6" md="2" sm="3" xs="4">
@@ -39,9 +44,14 @@
                             <v-col cols="6" md="1" sm="2" xs="4">
                                 <v-select v-model="filters.endTime"
                                     :items="Array.from({length: 24}, (_, i) => i.toString().padStart(2, '0'))"
-                                    label="종료 시간" dense hide-details></v-select>
+                                    label="종료 시간" dense hide-details :disabled="filters.useOnlyDate"></v-select>
                                 <!--v-text-field v-model="filters.endTimeFormatted" label="종료 시간" persistent-hint
                                     @input="formatTimeInput($event, 'endTime')" hide-details dense></v-text-field-->
+                            </v-col>
+                            <v-col cols="6" md="1" sm="2" xs="4">
+                                <v-select v-model="filters.endTimeMinute"
+                                    :items="Array.from({length: 60}, (_, i) => i.toString().padStart(2, '0'))"
+                                    label="종료 분" dense hide-details :disabled="filters.useOnlyDate"></v-select>
                             </v-col>
 
                             <!-- 
@@ -70,9 +80,9 @@
                                 </v-select>
                             </v-col>
                             -->
-                            <v-col cols="12" sm="4" md="3">
-                                <v-combobox v-model="filters.severities" :items="severities" label="심각도" multiple
-                                    dense></v-combobox>
+                            <v-col cols="12" sm="4" md="2">
+                                <v-select v-model="filters.severities" :items="severities" label="심각도"
+                                    dense hide-details @change="changeSeverity"></v-select>
                                 <!--v-select v-model="filters.severities" :items="severities" label="심각도" dense
                                     multiple chips hide-details>
                                     <template v-slot:prepend-item>
@@ -96,10 +106,10 @@
                                 </v-select-->
 
                             </v-col>
-                            <v-col cols="12" sm="12" md="6" class="d-flex justify-end align-center">
-
+                            <v-col cols="12" sm="3" md="2" >
+                                <v-checkbox v-model="filters.useOnlyDate" label="일자조회" dense hide-details @change="changeUseOnlyDate"></v-checkbox>
                             </v-col>
-                            <v-col cols="12" sm="12" md="6" class="d-flex justify-end align-center">
+                            <v-col cols="12" sm="12" md="12" class="d-flex justify-end align-center">
                                 <v-btn :color="$config.color_btn" @click="search" small dense>조회</v-btn>
                             </v-col>
 
@@ -211,8 +221,8 @@
 
 
 const systems = ['소비자여신시스템', '일반여신시스템', '모바일앱', '통합웹'];
-const severities = ['오류', '정상'];
-const severities_color = ['red', 'orange', 'blue'];
+const severities = ['전체', '정상', '감지', '오류'];
+const severities_color = ['blue', 'green', 'orange', 'red' ];
 const status = ['확인전', '조치중', '모니터링중', '완료'];
 
 const comp = module.exports = {
@@ -226,7 +236,7 @@ const comp = module.exports = {
             status: status,
             filters: {
                 systems: systems,
-                severities: severities.slice(0, 1),
+                severities: '오류',
                 status: status,
                 startDate: '',
                 endDate: '',
@@ -234,13 +244,20 @@ const comp = module.exports = {
                 startTimeFormatted: '',
                 endTime: '',
                 endTimeFormatted: '',
+                startTimeMinute: '',
+                endTimeMinute: '',
+                useOnlyDate: true,
             },
             headers: [
                 { text: '발생시간', align: 'start', sortable: true, value: 'timestamp' },
+                
+                { text: '서비스ID', value: 'guid' },
                 { text: '시스템', value: 'system' },
                 { text: '심각도', value: 'severity' },
                 { text: '서비스내용', value: 'description' },
-                { text: '상태', value: 'status' },
+                { text: '처리상태', value: 'status' },
+                { text: '정책ID', value: 'ruleId' },
+                { text: '정책명', value: 'ruleNm' },
                 { text: '상세', value: 'actions', sortable: false },
             ],
             incidents: [],
@@ -251,11 +268,11 @@ const comp = module.exports = {
             detailDialog: false,
             selectedIncident: null,
             detailTransactionHeaders: [
-                { text: 'GUID', value: 'guid' },
+                { text: '거래ID', value: 'txId' },
                 { text: '프로그램 ID', value: 'programId' },
+                { text: '프로그램 명', value: 'programNm' },
                 { text: '거래 시간', value: 'transactionTime' },
-                { text: '거래 유형', value: 'transactionType' },
-                { text: '사용자 ID', value: 'userId' },
+                { text: '처리 시간', value: 'processTime' },
                 { text: '상태', value: 'status' },
             ],
             detailTransactions: [],
@@ -292,6 +309,14 @@ const comp = module.exports = {
         }
     },
     methods: {
+        changeUseOnlyDate() {
+            console.log('changeUseOnlyDate : ', this.filters.useOnlyDate);
+            this.filters.severities = this.filters.useOnlyDate ? '감지' : '전체';
+        },
+        changeSeverity() {
+            console.log('changeSeverity : ', this.filters.severities);
+            this.filters.useOnlyDate = ['오류', '감지'].includes(this.filters.severities);
+        },
         formatTimeInput(value, dataId) {
             //console.log('replaceNumber', value, dataId)
             // 숫자만 입력 가능하도록 처리
@@ -324,27 +349,28 @@ const comp = module.exports = {
 
                 await new Promise(resolve => setTimeout(resolve, 300)); // 예시: 0.5초 지연
 
-                /*
+                
                 try {                    
                     const requestData = {
-                        startDate: this.filters.startDate,
-                        endDate: this.filters.endDate,
-                        status: this.filters.status
+                        startDttm: this.filters.startDate.replace(/-/g, '') + this.filters.startTime + this.filters.startTimeMinute + '00',
+                        endDttm: this.filters.endDate.replace(/-/g, '') + this.filters.endTime + this.filters.endTimeMinute + '00',
+                        status: '', // this.filters.status
                     };                    
                     this.$loading.show('인시던트 목록을 불러오는 중입니다...');
                     
                     const response = await request( '/api/incidents', 'POST', requestData);
-                    
-                    if (response.data && response.data.incidents) {
-                        this.incidents = response.data.incidents.map(incident => ({
-                            timestamp: incident.createdAt,
-                            system: '시스템', // API 응답에 시스템 정보가 없어 임의로 설정
-                            severity: '심각', // API 응답에 심각도 정보가 없어 임의로 설정
-                            description: incident.title,
-                            status: incident.status
+                    console.log('조회 응답 : ', response);
+                    if (response.data) {
+                        this.incidents = response.data.map(incident => ({
+                            guid : incident.guid,
+                            timestamp: incident.req_dttm,
+                            system: incident.system_cd,
+                            severity: incident.svc_status == 'Succ' ? '정상' : '오류', // API 응답에 심각도 정보가 없어 임의로 설정
+                            description: incident.svc_nm,
+                            /* status: incident.status */
                         }));
                     } else {
-                        console.error('API 응답 형식이 올바르지 않습니다:', response.data);
+                        console.error('API 응답 형식이 올바르지 않습니다:', response.data, error);
                         this.incidents = [];
                     }
                 } catch (error) {
@@ -353,32 +379,32 @@ const comp = module.exports = {
                 } finally {
                     this.$loading.hide();
                 }
-                */
+                
                 // 실제로는 API 호출을 통해 데이터를 가져와야 합니다.
                 // 여기서는 예시 데이터를 사용합니다.
-
+                /*
                 this.incidents = [
-                    { timestamp: '2023-05-01 10:30:00', system: '소비자금융시스템', severity: '오류', description: '여신 한도조회', status: '조치중' },
-                    { timestamp: '2023-05-01 10:25:00', system: '소비자금융시스템', severity: '오류', description: '여신 한도조회', status: '완료' },
-                    { timestamp: '2023-05-01 10:27:00', system: '소비자금융시스템', severity: '오류', description: '여신 한도조회', status: '완료' },
-                    { timestamp: '2023-05-02 14:15:00', system: '일반여신시스템', severity: '오류', description: '여신 한도조회', status: '모니터링중' },
+                    { ruleId: '', ruleNm: '', guid: this.$util.uuid(), timestamp: '2023-05-01 10:30:00', system: '소비자금융시스템', severity: '오류', description: '여신 한도조회', status: '조치중' },
+                    { ruleId: '', ruleNm: '',guid: this.$util.uuid(), timestamp: '2023-05-01 10:25:00', system: '소비자금융시스템', severity: '오류', description: '여신 한도조회', status: '완료' },
+                    { ruleId: 'RULE-003', ruleNm: '10분간 거래 증가',guid: this.$util.uuid(), timestamp: '2023-05-01 10:27:00', system: '소비자금융시스템', severity: '감지', description: '여신 한도조회', status: '완료' },
+                    { ruleId: 'RULE-004', ruleNm: '10분간 거래 증가',guid: this.$util.uuid(), timestamp: '2023-05-02 14:15:00', system: '일반여신시스템', severity: '감지', description: '여신 한도조회', status: '모니터링중' },
 
-                    { timestamp: '2023-05-03 09:00:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '완료' },
-                    { timestamp: '2023-05-03 07:33:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 07:23:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 07:13:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 07:03:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 06:53:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 06:43:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 06:33:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 06:23:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 06:13:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 06:03:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 05:53:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { ruleId: 'RULE-001', ruleNm: '10분간 거래 증가', guid: this.$util.uuid(), timestamp: '2023-05-03 09:00:00', system: '모바일앱', severity: '감지', description: '모바일 비대면 대출', status: '완료' },
+                    { ruleId: 'RULE-001',ruleNm: '10분간 거래 증가',guid: this.$util.uuid(), timestamp: '2023-05-03 07:33:00', system: '모바일앱', severity: '감지', description: '모바일 비대면 대출', status: '조치중' },
+                    { ruleId: '',ruleNm: '',guid: this.$util.uuid(), timestamp: '2023-05-03 07:23:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { ruleId: '',ruleNm: '',guid: this.$util.uuid(), timestamp: '2023-05-03 07:13:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { ruleId: '',ruleNm: '',guid: this.$util.uuid(), timestamp: '2023-05-03 07:03:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { ruleId: '',ruleNm: '',guid: this.$util.uuid(), timestamp: '2023-05-03 06:53:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { ruleId: '',ruleNm: '',guid: this.$util.uuid(), timestamp: '2023-05-03 06:43:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { ruleId: '',ruleNm: '',guid: this.$util.uuid(), timestamp: '2023-05-03 06:33:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { ruleId: '',ruleNm: '',guid: this.$util.uuid(), timestamp: '2023-05-03 06:23:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { ruleId: '',ruleNm: '',guid: this.$util.uuid(), timestamp: '2023-05-03 06:13:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { ruleId: '',ruleNm: '',guid: this.$util.uuid(), timestamp: '2023-05-03 06:03:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { ruleId: '',ruleNm: '',guid: this.$util.uuid(), timestamp: '2023-05-03 05:53:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
                 ];
+                */
 
-
-                console.log('조회 응답 : ', this.incidents);
+                
 
 
                 this.updateIncidentSummary();
@@ -427,21 +453,17 @@ const comp = module.exports = {
         },
         async fetchDetailTransactions(incidentGuid) {
             // 실제로는 API를 호출하여 데이터를 가져와야 합니다.
-
             // 여기서는 예시 데이터를 사용합니다.
 
             this.detailTransactions = [
-                { guid: 'tx001', programId: 'PROG001', transactionTime: '2023-05-01 10:30:15', transactionType: '입금', userId: 'user123', amount: 50000, status: '성공' },
-                { guid: 'tx002', programId: 'PROG002', transactionTime: '2023-05-01 10:31:20', transactionType: '출금', userId: 'user456', amount: 30000, status: '실패' },
-                { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
-                { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
-                { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
-                { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
-                { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
-                { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
-                { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
-                { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
-                { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
+                { guid: 'tx001', txId: 'tx001', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:30:15', processTime: '15', status: '성공' },
+                { guid: 'tx002', txId: 'tx002', programId: 'PROG002', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:31:20', processTime: '20', status: '실패' },
+                { guid: 'tx003', txId: 'tx003', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:32:30', processTime: '30', status: '성공' },
+                { guid: 'tx004', txId: 'tx004', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:32:30', processTime: '30', status: '성공' },
+                { guid: 'tx005', txId: 'tx005', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:32:30', processTime: '30', status: '성공' },
+                { guid: 'tx006', txId: 'tx006', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:32:30', processTime: '30', status: '성공' },
+                { guid: 'tx007', txId: 'tx007', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:32:30', processTime: '30', status: '성공' },
+                { guid: 'tx008', txId: 'tx008', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:32:30', processTime: '30', status: '성공' },
                 // ... 더 많은 거래 데이터 ...
             ];
 
@@ -450,19 +472,19 @@ const comp = module.exports = {
     },
     created() {
         const dates = this.$util.setLastWeekDates();
-        this.filters.startDate = dates.startDate;
+        this.filters.startDate = dates.endDate;
         this.filters.endDate = dates.endDate;
 
-        this.filters.startTime = this.$util.getTime(-60, 0, '').slice(0, 2);
+        this.filters.startTime = this.$util.getTime(-5, 0, '').slice(0, 2);
+        this.filters.startTimeMinute = this.$util.getTime(-5, 0, '').slice(2, 4);
         this.filters.endTime = this.filters.startTime;
+        this.filters.endTimeMinute = this.$util.getTime(0, 0, '').slice(2, 4);
     },
     async mounted() {
         await this.search();
-        await this.showDetails(this.incidents[0]);
+        //await this.showDetails(this.incidents[0]);
     }
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

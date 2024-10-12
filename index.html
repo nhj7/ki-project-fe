@@ -226,7 +226,7 @@
                         showInMenu: true,
                         icon: "mdi-lan-check",
                         iconColor: "orange",
-                        title: "서비스 품질 이벤트 이력 조회",
+                        title: "서비스 거래 이력 조회",
                     }
                 }
                 , {
@@ -234,7 +234,7 @@
                         showInMenu: true,
                         icon: "mdi-database-search",
                         iconColor: "orange",
-                        title: "서비스 호출 내역 조회",
+                        title: "서비스 상세 내역 조회",
                     }
                 }
                 , {
@@ -254,6 +254,16 @@
                         title: "규칙 조건 빌더",
                     }
                 }
+
+                , {
+                    path: '/service-manager', name: 'service-manager', component: loadVue('./page/p9-service-manager'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-clipboard-check",
+                        iconColor: "info",
+                        title: "서비스 관리",
+                    }
+                }
+                
 
                 , {
                     path: '/user-management', name: 'user-management', component: loadVue('./page/p6-user-management'), meta: {
@@ -307,14 +317,7 @@
                         title: "서비스 거래 시뮬레이터 제어",
                     }
                 }
-                , {
-                    path: '/service-manager', name: 'service-manager', component: loadVue('./page/p9-service-manager'), meta: {
-                        showInMenu: true,
-                        icon: "mdi-clipboard-check",
-                        iconColor: "info",
-                        title: "서비스 관리",
-                    }
-                }
+                
                 , {
                     path: '/readme-viewer', name: 'readme-viewer', component: loadVue('./page/p20-readme-viewer'), meta: {
                         showInMenu: true,

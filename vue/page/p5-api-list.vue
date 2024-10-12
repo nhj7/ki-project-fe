@@ -133,12 +133,14 @@ const comp = module.exports = {
             isFormValid: true,
             selectedApi: 'getIncidents',
             apiList: [
+                { text: '서비스 거래 목록 조회(미완-4)', value: 'getIncidents' },
+                { text: '서비스 지표 목록', value: 'getGuidData' },
                 { text: '서비스 지표 목록', value: 'getMetric' },                
                 { text: '룰셋 저장(미완)', value: 'saveRule' },                
                 { text: '간편 이체(미완-1)', value: 'transfer' },
                 { text: '대출 신청(미완-2)', value: 'applyLoan' },
                 { text: '한도 조회(미완-3)', value: 'checkLoanLimit' },
-                { text: '서비스 거래 목록 조회(미완-4)', value: 'getIncidents' },
+                
                 { text: '알람 목록 조회(미완)', value: 'getAlarms' },
                 // { text: '실시간 서비스 분석(미완)', value: 'getLiveTransactions' },
 
@@ -152,13 +154,13 @@ const comp = module.exports = {
             ],
             apiDetails: {
                 getIncidents: {
-                    name: '인시던트 목록 조회',
+                    name: '서비스 거래 목록 조회',
                     endpoint: '/api/incidents',
                     method: 'POST',
-                    description: '인시던트 목록을 조회합니다.',
+                    description: '서비스 거래 목록을 조회합니다.',
                     parameters: [
-                        { name: 'startDttm', type: 'String', required: true, default: this.$util.getDate()+ this.$util.getTime(60, 0 ), description: '조회 시작 날짜 (YYYY-MM-DD 형식)' },
-                        { name: 'endDttm', type: 'String', required: true, default: this.$util.getDate()+ this.$util.getTime(0, 0 ), description: '조회 종료 날짜 (YYYY-MM-DD 형식)' },
+                        { name: 'startDttm', type: 'String', required: true, default: this.$util.getDate()+ this.$util.getTime(-1, 0 ), description: '조회 시작 날짜 (yyyymmddhh24miss 형식)' },
+                        { name: 'endDttm', type: 'String', required: true, default: this.$util.getDate()+ this.$util.getTime(0, 0 ), description: '조회 종료 날짜 (yyyymmddhh24miss 형식)' },
                         { name: 'status', type: 'String', required: false, default: '', description: '인시던트 상태 (예: "오류,정상")' }
                     ],
                     responseSampleHtml: '',
@@ -743,7 +745,7 @@ const comp = module.exports = {
                     header: {
                         prgId: this.selectedApiDetails.endpoint,
                         prgNm: this.selectedApiDetails.name,
-                        txId: this.$util.generateUUID(),
+                        txId: this.$util.uuid(),
                         txDtm: this.$util.getCurrentDateTime(),
                         userId: this.$session.userId,
                         userNm: this.$session.userName,
