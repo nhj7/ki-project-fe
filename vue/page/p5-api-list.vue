@@ -131,9 +131,9 @@ const comp = module.exports = {
             curlExample: '',
             paramValues: {},
             isFormValid: true,
-            selectedApi: 'getIncidents',
+            selectedApi: 'saveRule',
             apiList: [
-                { text: '서비스 거래 목록 조회(미완-4)', value: 'getIncidents' },
+                { text: '서비스 거래 목록 조회(미완)', value: 'getIncidents' },
                 { text: '서비스 지표 목록', value: 'getGuidData' },
                 { text: '서비스 지표 목록', value: 'getMetric' },                
                 { text: '룰셋 저장(미완)', value: 'saveRule' },                

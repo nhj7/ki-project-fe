@@ -13,9 +13,9 @@
                         <v-icon small class="mr-2" @click="editRule(item)">
                             mdi-pencil
                         </v-icon>
-                        <v-icon small @click="deleteRule(item)">
+                        <!--v-icon small @click="deleteRule(item)">
                             mdi-delete
-                        </v-icon>
+                        </v-icon-->
                     </template>
                     <template v-slot:[`item.condition`]="{ item }">
                         {{ formatCondition(item.condition) }}
@@ -51,21 +51,23 @@
                                 <v-switch v-model="editedItem.enabled" label="사용여부"></v-switch>
                             </v-col>
 
-                            <v-col cols="12" sm="6" md="4" v-if="['거래량', '오류율','반복수행'].includes(editedItem.condition.type)">
+                            <v-col cols="12" sm="6" md="4"
+                                v-if="['거래량', '오류율','반복수행'].includes(editedItem.condition.type)">
                                 <v-text-field v-model="editedItem.condition.duration" label="기간"
                                     type="number"></v-text-field>
                             </v-col>
-                            <v-col cols="12" sm="6" md="4" v-if="['거래량', '오류율','반복수행'].includes(editedItem.condition.type)">
-                                <v-select v-model="editedItem.condition.unit" :items="units"
-                                    label="단위"></v-select>
-                            </v-col>                                
-                           
+                            <v-col cols="12" sm="6" md="4"
+                                v-if="['거래량', '오류율','반복수행'].includes(editedItem.condition.type)">
+                                <v-select v-model="editedItem.condition.unit" :items="units" label="단위"></v-select>
+                            </v-col>
+
                             <v-col cols="4" v-if="['오류율','응답시간','반복수행'].includes(editedItem.condition.type)">
                                 <v-text-field v-model="editedItem.condition.threshold" label="임계값 (%)"
                                     type="number"></v-text-field>
                             </v-col>
                             <v-col cols="12">
-                                <v-text-field :value="formatCondition(editedItem.condition)" readonly label="규칙설명" ></v-text-field>
+                                <v-text-field :value="formatCondition(editedItem.condition)" readonly
+                                    label="규칙설명"></v-text-field>
                             </v-col>
                             <v-col cols="12">
                                 <v-textarea v-model="editedItem.action" label="조치 사항" rows="3"></v-textarea>
@@ -90,6 +92,7 @@ const comp = module.exports = {
         return {
             dialog: false,
             headers: [
+                { text: '규칙 ID', value: 'id' },
                 { text: '규칙 이름', value: 'name' },
                 { text: '규칙 유형', value: 'condition.type' },
                 { text: '조건', value: 'condition' },
@@ -135,25 +138,25 @@ const comp = module.exports = {
         formatCondition: function (condition) {
             switch (condition.type) {
                 case '거래량':
-                    if( condition.duration && condition.unit && condition.direction)
+                    if (condition.duration && condition.unit && condition.direction)
                         return `${condition.duration}${condition.unit} 동안 ${condition.type} ${condition.direction}`;
                     else
-                        return `${condition.direction?'':'방향'} ${condition.duration?'':'기간'} ${condition.unit?'':'단위'}를 선택해주세요`;
+                        return `${condition.direction ? '' : '방향'} ${condition.duration ? '' : '기간'} ${condition.unit ? '' : '단위'}를 선택해주세요`;
                 case '오류율':
-                    if( condition.duration && condition.unit && condition.threshold && condition.direction)
+                    if (condition.duration && condition.unit && condition.threshold && condition.direction)
                         return `이전 ${condition.duration}${condition.unit} 대비 오류율 ${condition.threshold}% 이상 ${condition.direction}`;
                     else
-                        return `${condition.direction?'':'방향'} ${condition.duration?'':'기간'} ${condition.unit?'':'단위'} ${condition.threshold?'':'임계값'} 을 선택해주세요`;
+                        return `${condition.direction ? '' : '방향'} ${condition.duration ? '' : '기간'} ${condition.unit ? '' : '단위'} ${condition.threshold ? '' : '임계값'} 을 선택해주세요`;
                 case '응답시간':
-                    if( condition.duration && condition.unit && condition.threshold && condition.direction)
+                    if (condition.duration && condition.unit && condition.threshold && condition.direction)
                         return `이전 서비스 평균 ${condition.duration}${condition.unit} 대비 응답시간 ${condition.threshold}% 이상 ${condition.direction}`;
                     else
-                        return `${condition.direction?'':'방향'} ${condition.duration?'':'기간'} ${condition.unit?'':'단위'} ${condition.threshold?'':'임계값'} 을 선택해주세요`;
+                        return `${condition.direction ? '' : '방향'} ${condition.duration ? '' : '기간'} ${condition.unit ? '' : '단위'} ${condition.threshold ? '' : '임계값'} 을 선택해주세요`;
                 case '반복수행':
-                    if( condition.duration && condition.unit && condition.threshold)
+                    if (condition.duration && condition.unit && condition.threshold)
                         return `단일 사용자가 ${condition.duration}${condition.unit} 내 ${condition.threshold}회 이상 동일 거래 시도`;
                     else
-                        return `${condition.duration?'':'기간'} ${condition.unit?'':'단위'} ${condition.threshold?'':'임계값'} 을 선택해주세요`;
+                        return `${condition.duration ? '' : '기간'} ${condition.unit ? '' : '단위'} ${condition.threshold ? '' : '임계값'} 을 선택해주세요`;
                 default:
                     return '규칙 유형을 선택해주세요';
             }
@@ -163,9 +166,10 @@ const comp = module.exports = {
                 this.$loading.show('룰셋을 불러오는 중입니다...');
                 // 실제로는 서버에서 룰셋을 가져와야 합니다.
                 // 여기서는 가상의 트랜잭션을 사용합니다.
-                await new Promise(resolve => setTimeout(resolve, 250));
+                //await new Promise(resolve => setTimeout(resolve, 250));
                 try {
                     const response = await this.$axios.post('/api/rule-list');
+                    console.log('룰셋 조회 응답 : ', response);
                     if (response.data && response.data.body && response.data.body.rules) {
                         this.rules = response.data.body.rules;
                     } else {
@@ -174,7 +178,7 @@ const comp = module.exports = {
                 } catch (error) {
                     console.error('룰셋을 가져오는 중 오류가 발생했습니다:', error);
                 }
-                
+
                 /*
                 this.rules = [
                     // 여기에 기존의 rules 데이터를 넣으세요
@@ -299,14 +303,34 @@ const comp = module.exports = {
                 this.editedIndex = -1
             })
         },
-        save: function () {
+        async save() {
             //this.editedItem.condition = condition
 
-            if (this.editedIndex > -1) {
-                Object.assign(this.rules[this.editedIndex], this.editedItem)
-            } else {
-                this.rules.push(this.editedItem)
+
+
+            try {
+                this.$loading.show('룰셋을 저장하는 중입니다...');
+                console.log('룰셋 저장 요청 : ', this.editedItem);
+                const response = await this.$axios.post('/api/rule-save', this.editedItem);
+                console.log('룰셋 저장 응답 : ', response);
+
+                if (response.data && response.data.header && response.data.header.resultCode == '0000') {
+                    if (this.editedIndex > -1) {
+                        Object.assign(this.rules[this.editedIndex], this.editedItem)
+                    } else {
+                        this.rules.push(this.editedItem)
+                    }
+                    this.$msg.showSnackbar('룰셋이 성공적으로 저장되었습니다.');
+                } else {
+                    this.$msg.showSnackbar(`룰셋 저장에 실패하였습니다. 관리자에게 문의해주세요. ${response?.data?.header?.resultMessag}`, 'error', 3000);
+                }
+            } catch (error) {
+                console.error('룰셋 저장 중 오류가 발생했습니다:', error);
+            } finally {
+                this.$loading.hide();
             }
+
+            console.log('저장된 룰셋 : ', this.rules);
             this.close()
         }
     },

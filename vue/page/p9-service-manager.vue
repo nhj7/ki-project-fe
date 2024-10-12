@@ -342,7 +342,7 @@ module.exports = {
     //this.$msg.showSnackbar('서비스가 성공적으로 조회되었습니다.');
     console.log(this.services.length, this.services[0].id);
     if (this.services.length > 0) {
-      this.openedItems = [this.services[0]];
+      this.openedItems = [this.services[0], this.services[2], this.services[3]];
     }
   }
 };
