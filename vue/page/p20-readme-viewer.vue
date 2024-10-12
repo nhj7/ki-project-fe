@@ -14,6 +14,15 @@ const data = {
     readmeContent: '',
 };
 
+const renderer = new marked.Renderer();
+renderer.link = function(link) {    
+    return `<a href="${link.href}" title="${link.text}" target="_blank">${link.text}</a>`;
+};
+// marked 옵션에 렌더러 적용
+marked.setOptions({
+    renderer: renderer,
+});
+
 const comp = module.exports = {
     name: 'ReadmeViewer',
     data() {
@@ -43,38 +52,38 @@ const comp = module.exports = {
 </script>
 <style scoped>
 /* 마크다운 스타일링 */
-:deep(h1) {
+h1 {
     font-size: 1.7em;
     margin-bottom: 0.5em;
 }
 
-:deep(h2) {
+h2 {
     font-size: 1.5em;
     margin-top: 1em;
     margin-bottom: 0.5em;
 }
 
-:deep(p) {
-    margin-bottom: 1em;
+p {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
 }
 
-:deep(ul),
-:deep(ol) {
+ul, ol {
     margin-bottom: 1em;
     padding-left: 2em;
 }
 
-:deep(li) {
-    margin-bottom: 0.5em;
+li {
+    margin-bottom: 0.25em;
 }
 
-:deep(code) {
+code {
     background-color: #f0f0f0;
     padding: 0.2em 0.4em;
     border-radius: 3px;
 }
 
-:deep(pre) {
+pre {
     background-color: #f0f0f0;
     padding: 1em;
     border-radius: 5px;

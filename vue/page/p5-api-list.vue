@@ -693,6 +693,10 @@ const comp = module.exports = {
         };
     },
     computed: {
+        /**
+         * curl 예제 계산
+         * @returns {string} curl 예제
+         */
         computedCurlExample() {
             console.log('computedCurlExample', this.paramValues);
             if (!this.selectedApiDetails) return '';
@@ -759,6 +763,10 @@ const comp = module.exports = {
             this.$set(this.paramValues, paramName, value);
             this.curlExample = this.dynamicCurlExample();
         },
+        /**
+         * curl 예제 계산
+         * @returns {string} curl 예제
+         */
         dynamicCurlExample() {
             //console.log('dynamicCurlExample', this.selectedApiDetails, this.paramValues);
             if (!this.selectedApiDetails) return '';
