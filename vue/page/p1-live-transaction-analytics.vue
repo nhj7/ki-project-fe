@@ -502,9 +502,9 @@ const comp = module.exports = {
          */
         formatNumber: function (num) {
             if (num >= 1000000) {
-                return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'm';
+                return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
             } else if (num >= 1000) {
-                return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+                return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
             } else {
                 return num.toString();
             }
@@ -600,11 +600,11 @@ const comp = module.exports = {
                         serviceName: service.svcNm,
                         normal: service.todayCnt,
                         errorRate: service.errPer,
-                        tps: service.tps, // 하루 평균 TPS 계산
-                        transactionsPerHour: service.currentCnt,
-                        todayTransactions: service.todayCnt,
-                        yesterdayTransactions: service.previousDayCnt,
-                        lastWeekTransactions: service.previousWeekCnt,
+                        tps: service.tps ? parseFloat(service.tps).toFixed(2) : 0, // TPS를 소수점 두 자리까지 표시
+                        transactionsPerHour: this.$util.numberWithComma(service.currentCnt),
+                        todayTransactions: this.formatNumber(service.todayCnt),
+                        yesterdayTransactions: this.$util.numberWithComma(service.previousDayCnt),
+                        lastWeekTransactions: this.$util.numberWithComma(service.previousWeekCnt),
                         compareTrend: service.errDiffPer >= 0 ? 'up' : 'down',
                         compareValue: `${service.errDiffPer >= 0 ? '+' : ''}${service.errDiffPer}%`
                     }));
