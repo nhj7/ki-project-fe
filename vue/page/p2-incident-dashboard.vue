@@ -445,16 +445,43 @@ const comp = module.exports = {
         getIcon(filterType) {
             return this.$util.getIcon(this.isAllSelected(filterType));
         },
-        showDetails(item) {
+        async showDetails(item) {
+
+            await this.fetchDetailTransactions(item.guid);
+
             console.log('showDetails : ', item);
-            this.selectedIncident = item;
-            this.fetchDetailTransactions(item.guid);
+            this.selectedIncident = item;            
             this.detailDialog = true;
         },
         async fetchDetailTransactions(incidentGuid) {
             // 실제로는 API를 호출하여 데이터를 가져와야 합니다.
             // 여기서는 예시 데이터를 사용합니다.
 
+            try {
+                this.$loading.show('거래 목록을 불러오는 중입니다...');
+
+                const response = await axios.post('/getGuidData', { guid : incidentGuid });
+
+                if (response.data) {
+                    this.detailTransactions = response.data.map(transaction => ({
+                        txId : transaction.tx_id,
+                        programId: transaction.if_id,
+                        programNm: transaction.prg_nm,
+                        transactionTime: transaction.req_dttm,
+                        processTime: transaction.elapsed,
+                        status: transaction.status
+                    }));
+                } else {
+                    console.error('API 응답 형식이 올바르지 않습니다:', response.data, error);
+                    this.detailTransactions = [];
+                }
+                console.log('fetchDetailTransactions 응답 : ', response);
+            } catch (error) {
+                
+            } finally {
+                this.$loading.hide();
+            }
+            /*
             this.detailTransactions = [
                 { guid: 'tx001', txId: 'tx001', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:30:15', processTime: '15', status: '성공' },
                 { guid: 'tx002', txId: 'tx002', programId: 'PROG002', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:31:20', processTime: '20', status: '실패' },
@@ -466,7 +493,7 @@ const comp = module.exports = {
                 { guid: 'tx008', txId: 'tx008', programId: 'PROG001', programNm: 'NICE 신용조회', transactionTime: '2023-05-01 10:32:30', processTime: '30', status: '성공' },
                 // ... 더 많은 거래 데이터 ...
             ];
-
+            */
         },
 
     },
@@ -477,7 +504,7 @@ const comp = module.exports = {
 
         this.filters.startTime = this.$util.getTime(-5, 0, '').slice(0, 2);
         this.filters.startTimeMinute = this.$util.getTime(-5, 0, '').slice(2, 4);
-        this.filters.endTime = this.filters.startTime;
+        this.filters.endTime = this.$util.getTime(0, 0, '').slice(0, 2);
         this.filters.endTimeMinute = this.$util.getTime(0, 0, '').slice(2, 4);
     },
     async mounted() {
