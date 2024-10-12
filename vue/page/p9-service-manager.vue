@@ -5,8 +5,8 @@
         <v-card>
 
           <v-card-text>
-            <v-treeview :items="treeItems" activatable="true" item-value="id" item-key="id" return-object
-              class="elevation-1" dense>
+            <v-treeview :items="treeItems" activatable="true" item-key="id" return-object
+              class="elevation-1" dense :open.sync="openedItems">
               <template v-slot:prepend="{ item, open }">
                 <v-icon v-if="item.children && item.children.length > 0">
                   {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
@@ -86,6 +86,7 @@ module.exports = {
         transactions: [] // 트랜잭션 데이터 추가
       },
       activeNodes: [],
+      openedItems: [1],
       headers: [
         { text: '서비스 ID', value: 'serviceID' },
         { text: '서비스명', value: 'serviceName' },
@@ -227,7 +228,7 @@ module.exports = {
         },
 
 
-        
+
         {
           id: 4,
           serviceID: 'SV004',
@@ -339,6 +340,10 @@ module.exports = {
   },
   mounted() {
     //this.$msg.showSnackbar('서비스가 성공적으로 조회되었습니다.');
+    console.log(this.services.length, this.services[0].id);
+    if (this.services.length > 0) {
+      this.openedItems = [this.services[0]];
+    }
   }
 };
 </script>

@@ -131,7 +131,7 @@ const comp = (module.exports = {
             type: "scatter",
             smooth: true,
             data: [],
-            symbolSize: 5,
+            symbolSize: 4,
             symbol: "circle",
             itemStyle: {
               color: "dodgerblue",
@@ -142,7 +142,7 @@ const comp = (module.exports = {
             type: "scatter",
             smooth: true,
             data: [],
-            symbolSize: 5,
+            symbolSize: 4,
             symbol: "circle",
             itemStyle: {
               color: "red",
@@ -326,13 +326,10 @@ const comp = (module.exports = {
         .transition()
         .duration(transaction.speed)
         .ease(d3.easeLinear)
-        .attrTween("transform", function () {
-          //const interpolateX = d3.interpolate(100 , fadeStartX); // 시작과 끝 좌표 사이의 보간
+        .attrTween("transform", function () {          
           const interpolateX = d3.interpolate(100, fadeStartX); // 시작과 끝 좌표 사이의 보간
-          //console.log('interpolateX', interpolateX);
           return function (t) {
-            const x = parseInt(interpolateX(t));
-            //console.log('t', t, x);
+            const x = parseInt(interpolateX(t));            
             return `translate(${x},0)`; // translate로 x 좌표 변경
           };
         })
@@ -658,7 +655,7 @@ const comp = (module.exports = {
       try {
         const response = await this.$axios.get("/incident/getMetric");
 
-        console.log("getMetric response", response);
+        //console.log("getMetric response", response);
 
         if (response.data && response.data) {
           this.serviceTransactions = response.data.map((service) => ({

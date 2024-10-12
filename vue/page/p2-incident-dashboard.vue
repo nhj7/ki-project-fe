@@ -55,7 +55,7 @@
                                 </v-select>
                             </v-col>
                             -->
-                            <v-col cols="12" sm="8" md="6">
+                            <v-col cols="12" sm="4" md="3">
                                 <v-combobox v-model="filters.severities" :items="severities"
                                     label="심각도" multiple dense></v-combobox>
                                 <!--v-select v-model="filters.severities" :items="severities" label="심각도" dense
@@ -82,7 +82,7 @@
 
                             </v-col>
                             <v-col cols="12" sm="12" md="6" class="d-flex justify-end align-center">
-                                
+
                             </v-col>
                             <v-col cols="12" sm="12" md="6" class="d-flex justify-end align-center">
                                 <v-btn :color="$config.color_btn" @click="search" small dense>조회</v-btn>
@@ -191,9 +191,9 @@
 
 
 const systems = ['소비자여신시스템', '일반여신시스템', '모바일앱', '통합웹'];
-const severities = ['심각', '경고', '정보'];
+const severities = ['오류', '정상'];
 const severities_color = ['red', 'orange', 'blue'];
-const status = ['조치중', '모니터링중', '완료'];
+const status = ['확인전','조치중', '모니터링중', '완료'];
 
 const comp = module.exports = {
     data() {
@@ -206,7 +206,7 @@ const comp = module.exports = {
             status: status,
             filters: {
                 systems: systems,
-                severities: severities.slice(0, 2),
+                severities: severities.slice(0, 1),
                 status: status,
                 startDate: '',
                 endDate: '',
@@ -246,7 +246,7 @@ const comp = module.exports = {
         summaryItems() {
             return [
                 { label: '전체 건수', value: this.totalIncidents, color: '' },
-                { label: '심각', value: this.criticalIncidents, color: 'red--text' },
+                { label: '오류', value: this.criticalIncidents, color: 'red--text' },
                 { label: '경고', value: this.warningIncidents, color: 'orange--text' },
                 { label: '정보', value: this.infoIncidents, color: 'blue--text' },
             ];
@@ -325,23 +325,23 @@ const comp = module.exports = {
                 // 여기서는 예시 데이터를 사용합니다.
 
                 this.incidents = [
-                    { timestamp: '2023-05-01 10:30:00', system: '소비자금융시스템', severity: '심각', description: '여신 한도조회', status: '조치중' },
-                    { timestamp: '2023-05-01 10:25:00', system: '소비자금융시스템', severity: '심각', description: '여신 한도조회', status: '완료' },
-                    { timestamp: '2023-05-01 10:27:00', system: '소비자금융시스템', severity: '심각', description: '여신 한도조회', status: '완료' },
-                    { timestamp: '2023-05-02 14:15:00', system: '일반여신시스템', severity: '경고', description: '여신 한도조회', status: '모니터링중' },
+                    { timestamp: '2023-05-01 10:30:00', system: '소비자금융시스템', severity: '오류', description: '여신 한도조회', status: '조치중' },
+                    { timestamp: '2023-05-01 10:25:00', system: '소비자금융시스템', severity: '오류', description: '여신 한도조회', status: '완료' },
+                    { timestamp: '2023-05-01 10:27:00', system: '소비자금융시스템', severity: '오류', description: '여신 한도조회', status: '완료' },
+                    { timestamp: '2023-05-02 14:15:00', system: '일반여신시스템', severity: '오류', description: '여신 한도조회', status: '모니터링중' },
 
-                    { timestamp: '2023-05-03 09:00:00', system: '모바일앱', severity: '경고', description: '모바일 비대면 대출', status: '완료' },
-                    { timestamp: '2023-05-03 07:33:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 07:23:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 07:13:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 07:03:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 06:53:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 06:43:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 06:33:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 06:23:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 06:13:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 06:03:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
-                    { timestamp: '2023-05-03 05:53:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 09:00:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '완료' },
+                    { timestamp: '2023-05-03 07:33:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 07:23:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 07:13:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 07:03:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 06:53:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 06:43:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 06:33:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 06:23:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 06:13:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 06:03:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 05:53:00', system: '모바일앱', severity: '오류', description: '모바일 비대면 대출', status: '조치중' },
                 ];
 
 
@@ -356,7 +356,7 @@ const comp = module.exports = {
         },
         updateIncidentSummary() {
             this.totalIncidents = this.incidents.length;
-            this.criticalIncidents = this.incidents.filter(i => i.severity === '심각').length;
+            this.criticalIncidents = this.incidents.filter(i => i.severity === '오류').length;
             this.warningIncidents = this.incidents.filter(i => i.severity === '경고').length;
             this.infoIncidents = this.incidents.filter(i => i.severity === '정보').length;
         },
