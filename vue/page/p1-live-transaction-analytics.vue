@@ -587,9 +587,7 @@ const comp = module.exports = {
                 };
             });
             */
-
-        // getMetric API를 사용하여 데이터 가져오기
-            
+           
             try {
                 const response = await this.$axios.get('/incident/getMetric');
 
