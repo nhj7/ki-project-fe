@@ -223,37 +223,31 @@ module.exports = {
         {
           id : 4,
           serviceID: 'SV004',
-          serviceName: '햇살론 대출실행',
-          description: '여신 햇살론 상품 대출실행 서비스입니다.',
+          serviceName: '여신 가상계좌 원리금 수납',
+          description: '여신 상품 가상계좌 원리금 수납 서비스입니다.',
           transactions: [
             {
-              id : 31,
-              txID: 'IF031',
-              txName: 'NICE 실시간대출조회',
+              id : 41,
+              txID: 'IF041',
+              txName: 'KIBNET 가상계좌 입금',
               status: '성공',              
             },
             {
-              id : 32,
-              txID: 'IF032',
-              txName: '서민금융진흥원 보증실행',
+              id : 42,
+              txID: 'IF042',
+              txName: 'FSB(중앙회) 원리금 수납',
               status: '성공'
             },
             {
-              id : 33,
-              txID: 'IF033',
-              txName: 'FSB(중앙회) 대출실행',
+              id : 43,
+              txID: 'IF043',
+              txName: 'FSB(중앙회) 원리금 수납',
               status: '성공',              
-            },
+            },            
             {
-              id : 34,
-              txID: 'IF034',
-              txName: '서민금융진흥원 대출통지',
-              status: '성공'
-            },
-            {
-              id : 35,
-              txID: 'IF035',
-              txName: '대출실행 회계 전표 처리',
+              id : 45,
+              txID: 'IF045',
+              txName: '회계 전표 처리',
               status: '성공',
             },
           ]

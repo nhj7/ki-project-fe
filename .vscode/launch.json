@@ -4,13 +4,19 @@
     // 자세한 내용을 보려면 https://go.microsoft.com/fwlink/?linkid=830387을(를) 방문하세요.
     "version": "0.2.0",
     "configurations": [
-
+        {
+            "type": "java",
+            "name": "여신한도조회",
+            "request": "launch",
+            "mainClass": "java.여신한도조회",
+            "projectName": "ki-project-fe_bc350536"
+        },
         {
             "type": "chrome",
             "request": "launch",
             "name": "localhost에 대해 Chrome 시작",
             "url": "http://localhost:8080",
-            "webRoot": "${workspaceFolder}",            
+            "webRoot": "${workspaceFolder}"
         }
     ],
     "compilerOptions": {

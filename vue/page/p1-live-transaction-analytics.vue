@@ -16,9 +16,10 @@
                 <v-data-table
                   :headers="serviceHeaders"
                   :items="serviceTransactions"
-                  :items-per-page="5"
+                  :items-per-page="4"
+                  :hide-default-footer="true"
                   :footer-props="{
-                    'items-per-page-options': [5, 10, 15],
+                    'items-per-page-options': [4, 5, 10, 15],
                   }"
                   class="elevation-1"
                 >
