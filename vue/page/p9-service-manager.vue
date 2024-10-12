@@ -121,22 +121,21 @@ module.exports = {
           transactions: [
             {
               id : 11,
-              txID: 'IF001',
+              txID: 'IF011',
               txName: 'NICE 신용조회',
               status: '성공',              
             },
             {
               id : 12,
-              txID: 'IF002',
+              txID: 'IF012',
               txName: 'KCB 신용조회',
               status: '성공'
             },
             {
               id : 13,
-              txID: 'IF003',
+              txID: 'IF013',
               txName: 'CSS 한도/금리 조회',
-              status: '성공',
-              serviceID : 'SV010'
+              status: '성공',              
             },
           ]
         },
@@ -149,31 +148,31 @@ module.exports = {
           transactions: [
             {
               id : 20,
-              txID: 'IF003',
+              txID: 'IF020',
               txName: '앱버전 체크(안드로이드/아이폰)',
               status: '성공'
             },
             {
               id : 21,
-              txID: 'IF003',
+              txID: 'IF021',
               txName: 'FSB(중앙회) Open API 거래',
               status: '성공'
             },
             {
               id : 22,
-              txID: 'IF004',
+              txID: 'IF022',
               txName: 'FDS 체크',
               status: '성공'
             },
             {
               id : 23,
-              txID: 'IF005',
+              txID: 'IF023',
               txName: '계정계 로그인 조회',
               status: '성공'
             },
             {
               id : 24,
-              txID: 'IF006',
+              txID: 'IF024',
               txName: '계정계2 로그인 조회',
               status: '성공'
             },            
@@ -188,31 +187,31 @@ module.exports = {
           transactions: [
             {
               id : 31,
-              txID: 'IF001',
+              txID: 'IF031',
               txName: 'NICE 실시간대출조회',
               status: '성공',              
             },
             {
               id : 32,
-              txID: 'IF002',
+              txID: 'IF032',
               txName: '서민금융진흥원 보증실행',
               status: '성공'
             },
             {
               id : 33,
-              txID: 'IF003',
+              txID: 'IF033',
               txName: 'FSB(중앙회) 대출실행',
               status: '성공',              
             },
             {
               id : 34,
-              txID: 'IF002',
+              txID: 'IF034',
               txName: '서민금융진흥원 대출통지',
               status: '성공'
             },
             {
               id : 35,
-              txID: 'IF003',
+              txID: 'IF035',
               txName: '대출실행 회계 전표 처리',
               status: '성공',
             },
