@@ -601,7 +601,7 @@ const comp = module.exports = {
                         normal: service.todayCnt,
                         errorRate: service.errPer,
                         tps: service.tps, // 하루 평균 TPS 계산
-                        //transactionsPerHour: service.todayCnt / 24, // 시간당 평균 거래량 계산
+                        transactionsPerHour: service.currentCnt,
                         todayTransactions: service.todayCnt,
                         yesterdayTransactions: service.previousDayCnt,
                         lastWeekTransactions: service.previousWeekCnt,

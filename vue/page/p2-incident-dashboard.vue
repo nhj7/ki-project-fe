@@ -95,7 +95,7 @@
                 <!-- 장애 현황 요약 -->
                 <!--v-card outlined class="mb-2 pa-0">
                     <v-card-text class="pb-0 pt-3"-->
-                <v-row dense class="mb-2">
+                <!--v-row dense class="mb-2">
                     <v-col v-for="(item, index) in summaryItems" :key="index" cols="12" sm="6" md="3">
                         <v-card>
                             <v-card-text class="pa-2">
@@ -109,7 +109,7 @@
                             </v-card-text>
                         </v-card>
                     </v-col>
-                </v-row>
+                </v-row-->
                 <!--/v-card-text>
                 </v-card-->
 
@@ -186,7 +186,7 @@
 <script>
 
 
-const systems = ['소비자금융시스템', '일반여신시스템', '모바일앱', '통합웹'];
+const systems = ['소비자여신시스템', '일반여신시스템', '모바일앱', '통합웹'];
 const severities = ['심각', '경고', '정보'];
 const severities_color = ['red', 'orange', 'blue'];
 const status = ['조치중', '모니터링중', '완료'];
