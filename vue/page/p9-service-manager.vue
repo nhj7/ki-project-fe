@@ -156,7 +156,7 @@ module.exports = {
             {
               id : 21,
               txID: 'IF003',
-              txName: 'FSB Open API 거래',
+              txName: 'FSB(중앙회) Open API 거래',
               status: '성공'
             },
             {
@@ -201,7 +201,7 @@ module.exports = {
             {
               id : 33,
               txID: 'IF003',
-              txName: 'FSB 대출실행',
+              txName: 'FSB(중앙회) 대출실행',
               status: '성공',              
             },
             {
