@@ -262,7 +262,7 @@ const LoadingPlugin = {
         isLoading: false,
         loadingText: '로딩 중...',
         elapsedTime: 0,
-        timerInterval: null,        
+        timerInterval: null,
       },
       methods: {
         show(text = '로딩 중...') {
@@ -398,14 +398,15 @@ const comp = (module.exports = {
     toggleDarkTheme() {
       data.isDark = !data.isDark;
       this.$vuetify.theme.dark = data.isDark;
-      console.log(this.$vuetify.theme.dark);
+      console.log('toggleDarkTheme', this.$vuetify.theme.dark);
       localStorage.setItem("darkTheme", this.isDark);
 
-      if( data.isDark ) {
-        document.body.style.backgroundColor = '#000';
+      if (data.isDark) {
+        document.body.style.backgroundColor = '#1e1e1e';
       } else {
         document.body.style.backgroundColor = '#fff';
       }
+      this.updateScrollbarColor(data.isDark);
     },
     findRouteByPath(path) {
       return this.$router.options.routes.find((route) => route.path === path);
@@ -444,6 +445,38 @@ const comp = (module.exports = {
       ];
       this.alarmCount = this.alarms.length;
     },
+    updateScrollbarColor(isDark) {
+      const style = document.createElement('style');
+      const color = isDark ? 'grey' : 'darkgray';
+      const hoverColor = isDark ? 'darkgray' : 'grey';
+
+      style.textContent = `
+          html ::-webkit-scrollbar {
+            width: 14px; /* 스크롤바 전체 너비 */
+          }
+          html ::-webkit-scrollbar-track {
+            background: transparent; /* 트랙 배경을 투명하게 */
+          }
+          html ::-webkit-scrollbar-thumb {
+            background-color: ${color};
+            border-radius: 8px;
+            border: 4px solid transparent;
+            background-clip: content-box;
+          }
+          html ::-webkit-scrollbar-thumb:hover {
+            background-color: ${hoverColor};
+          }
+      `;
+
+      // 기존 스타일 제거
+      const existingStyle = document.getElementById('scrollbar-style');
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+      // 새 스타일 추가
+      style.id = 'scrollbar-style';
+      document.head.appendChild(style);
+    }
   },
   async mounted() {
     //console.log("App.vue mounted", Object.keys(this.$options.components));
@@ -473,12 +506,9 @@ const comp = (module.exports = {
     { // ===== 테마 설정 =====
       const savedTheme = localStorage.getItem("darkTheme");
       if (savedTheme !== null) {
-        this.isDark = JSON.parse(savedTheme);
-        this.$vuetify.theme.dark = this.isDark;
-        if( this.isDark ) {
-          document.body.style.backgroundColor = '#000';
-        } else {
-          document.body.style.backgroundColor = '#fff';
+        const parsedTheme = JSON.parse(savedTheme);
+        if (this.isDark !== parsedTheme) {
+          this.toggleDarkTheme();
         }
       }
     } // end 테마 설정
@@ -522,25 +552,25 @@ const globalMethods = {
     const today = new Date();
     const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
     return {
-      endDate: this.formatDate(today),
-      startDate: this.formatDate(lastWeek),
+      endDate: this.formatDate(today, '-'),
+      startDate: this.formatDate(lastWeek, '-'),
     };
   },
-  formatDate(date) {
+  formatDate(date, sep = '') {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+    return `${year}${sep}${month}${sep}${day}`;
   },
   /**
    * 날짜를 가져오는 함수
    * @param {number} days 날짜 차이
    * @returns {string} 날짜
    */
-  getDate(days = 0) {
+  getDate(days = 0, sep = '') {
     const date = new Date();
     date.setDate(date.getDate() + days);
-    return this.formatDate(date);
+    return this.formatDate(date, sep);
   },
   getTime(min = 0, sec = 0, sep = '') {
     const now = new Date();
@@ -907,7 +937,4 @@ Vue.prototype.$session = {
 .theme--dark .fixed-table .value-column {
   background-color: #333333;
 }
-
-
-
 </style>

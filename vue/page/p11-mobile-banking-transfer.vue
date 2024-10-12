@@ -53,7 +53,7 @@ const comp = module.exports = {
         sender: '김남구',
         receiver: '이민호',
         amount: '100000000',
-        date: this.$util.formatDate(new Date()),
+        date: this.$util.formatDate(new Date(), '-'),
         txSecond: '2',
         txStatus: '처리완료'
       },

@@ -17,13 +17,12 @@
                                         @input="startDateMenu = false"></v-date-picker>
                                 </v-menu>
                             </v-col>
-                            <v-col cols="6" md="1" sm="3" xs="4">
+                            <v-col cols="6" md="1" sm="2" xs="4">
                                 <!--v-text-field v-model="filters.startTimeFormatted" label="시작 시간" persistent-hint
                                     @input="formatTimeInput($event, 'startTime')" hide-details dense></v-text-field-->
                                 <v-select v-model="filters.startTime"
                                     :items="Array.from({length: 24}, (_, i) => i.toString().padStart(2, '0'))"
-                                    label="시작 시간" dense hide-details
-                                    ></v-select>
+                                    label="시작 시간" dense hide-details></v-select>
                             </v-col>
 
                             <v-col cols="6" md="2" sm="3" xs="4">
@@ -37,7 +36,7 @@
                                         @input="endDateMenu = false"></v-date-picker>
                                 </v-menu>
                             </v-col>
-                            <v-col cols="6" md="1" sm="3" xs="4">
+                            <v-col cols="6" md="1" sm="2" xs="4">
                                 <v-select v-model="filters.endTime"
                                     :items="Array.from({length: 24}, (_, i) => i.toString().padStart(2, '0'))"
                                     label="종료 시간" dense hide-details></v-select>
@@ -185,7 +184,7 @@
                         </template>
                     </v-simple-table>
                     <v-divider></v-divider>
-                    <v-card-subtitle>
+                    <v-card-subtitle class="text-subtitle-1">
                         <v-icon>mdi-list-box</v-icon>
                         &nbsp;&nbsp; 서비스 상세 거래 목록
                     </v-card-subtitle>
@@ -465,5 +464,5 @@ const comp = module.exports = {
 </script>
 
 <style scoped>
-    
+
 </style>

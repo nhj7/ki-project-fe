@@ -131,7 +131,7 @@ const comp = module.exports = {
             curlExample: '',
             paramValues: {},
             isFormValid: true,
-            selectedApi: 'getMetric',
+            selectedApi: 'getIncidents',
             apiList: [
                 { text: '서비스 지표 목록', value: 'getMetric' },                
                 { text: '룰셋 저장(미완)', value: 'saveRule' },                
@@ -157,9 +157,9 @@ const comp = module.exports = {
                     method: 'POST',
                     description: '인시던트 목록을 조회합니다.',
                     parameters: [
-                        { name: 'startDate', type: 'String', required: true, default: this.$util.getDate(-7), description: '조회 시작 날짜 (YYYY-MM-DD 형식)' },
-                        { name: 'endDate', type: 'String', required: true, default: this.$util.getDate(), description: '조회 종료 날짜 (YYYY-MM-DD 형식)' },
-                        { name: 'status', type: 'String', required: false, default: '', description: '인시던트 상태 (예: "open", "closed")' }
+                        { name: 'startDttm', type: 'String', required: true, default: this.$util.getDate()+ this.$util.getTime(60, 0 ), description: '조회 시작 날짜 (YYYY-MM-DD 형식)' },
+                        { name: 'endDttm', type: 'String', required: true, default: this.$util.getDate()+ this.$util.getTime(0, 0 ), description: '조회 종료 날짜 (YYYY-MM-DD 형식)' },
+                        { name: 'status', type: 'String', required: false, default: '', description: '인시던트 상태 (예: "오류,정상")' }
                     ],
                     responseSampleHtml: '',
                     responseSample: {
