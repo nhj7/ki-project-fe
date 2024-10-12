@@ -1,12 +1,12 @@
 <template>
-    <v-container fluid>
+    <v-container fluid v-bar>
         <v-row>
             <v-col>
                 <!-- 조회 조건 -->
                 <v-card class="mb-4 pb-0">
                     <v-card-text dense>
                         <v-row dense>
-                            <v-col cols="12" sm="6" md="3">
+                            <v-col cols="6" md="2" sm="3" xs="4">
                                 <v-menu v-model="startDateMenu" :close-on-content-click="false"
                                     transition="scale-transition" offset-y max-width="290px" min-width="290px">
                                     <template v-slot:activator="{ on, attrs }">
@@ -17,7 +17,16 @@
                                         @input="startDateMenu = false"></v-date-picker>
                                 </v-menu>
                             </v-col>
-                            <v-col cols="12" sm="6" md="3">
+                            <v-col cols="6" md="1" sm="3" xs="4">
+                                <!--v-text-field v-model="filters.startTimeFormatted" label="시작 시간" persistent-hint
+                                    @input="formatTimeInput($event, 'startTime')" hide-details dense></v-text-field-->
+                                <v-select v-model="filters.startTime"
+                                    :items="Array.from({length: 24}, (_, i) => i.toString().padStart(2, '0'))"
+                                    label="시작 시간" dense hide-details
+                                    ></v-select>
+                            </v-col>
+
+                            <v-col cols="6" md="2" sm="3" xs="4">
                                 <v-menu v-model="endDateMenu" :close-on-content-click="false"
                                     transition="scale-transition" offset-y max-width="290px" min-width="290px">
                                     <template v-slot:activator="{ on, attrs }">
@@ -27,6 +36,13 @@
                                     <v-date-picker v-model="filters.endDate" no-title
                                         @input="endDateMenu = false"></v-date-picker>
                                 </v-menu>
+                            </v-col>
+                            <v-col cols="6" md="1" sm="3" xs="4">
+                                <v-select v-model="filters.endTime"
+                                    :items="Array.from({length: 24}, (_, i) => i.toString().padStart(2, '0'))"
+                                    label="종료 시간" dense hide-details></v-select>
+                                <!--v-text-field v-model="filters.endTimeFormatted" label="종료 시간" persistent-hint
+                                    @input="formatTimeInput($event, 'endTime')" hide-details dense></v-text-field-->
                             </v-col>
 
                             <!-- 
@@ -215,6 +231,10 @@ const comp = module.exports = {
                 status: status,
                 startDate: '',
                 endDate: '',
+                startTime: '',
+                startTimeFormatted: '',
+                endTime: '',
+                endTimeFormatted: '',
             },
             headers: [
                 { text: '발생시간', align: 'start', sortable: true, value: 'timestamp' },
@@ -237,7 +257,6 @@ const comp = module.exports = {
                 { text: '거래 시간', value: 'transactionTime' },
                 { text: '거래 유형', value: 'transactionType' },
                 { text: '사용자 ID', value: 'userId' },
-                { text: '금액', value: 'amount' },
                 { text: '상태', value: 'status' },
             ],
             detailTransactions: [],
@@ -274,6 +293,16 @@ const comp = module.exports = {
         }
     },
     methods: {
+        formatTimeInput(value, dataId) {
+            //console.log('replaceNumber', value, dataId)
+            // 숫자만 입력 가능하도록 처리
+            try {
+                this.filters[dataId] = value.replace(/[^0-9]/g, '').slice(0, 6);
+                this.filters[dataId + 'Formatted'] = value.replace(/(\d{2})(?=\d)/g, '$1:');
+            } catch (error) {
+                console.error('replaceNumber 중 오류 발생:', error)
+            }
+        },
         getHeaderText(key) {
             const header = this.headers.find(h => h.value === key);
             return header ? header.text : key;
@@ -424,6 +453,9 @@ const comp = module.exports = {
         const dates = this.$util.setLastWeekDates();
         this.filters.startDate = dates.startDate;
         this.filters.endDate = dates.endDate;
+
+        this.filters.startTime = this.$util.getTime(-60, 0, '').slice(0, 2);
+        this.filters.endTime = this.filters.startTime;
     },
     async mounted() {
         await this.search();
@@ -432,25 +464,6 @@ const comp = module.exports = {
 }
 </script>
 
-<<style scoped>
-@media (max-width: 600px) {
-    .v-data-table .v-data-table__wrapper {
-        overflow-x: auto;
-    }
-}
-
-.dialog-card {
-    border: 2px solid #3a3737;
-    /* 어두운 회색 테두리 */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    /* 그림자 효과 추가 */
-}
-
-/* 다크 모드일 때 테두리 색상 변경 (선택사항) */
-.theme--dark .dialog-card {
-    border: 2px solid #757575 !important;
-    }
-
-
+<style scoped>
     
 </style>
