@@ -6,6 +6,30 @@
                 <v-card class="mb-4 pb-0">
                     <v-card-text dense>
                         <v-row dense>
+                            <v-col cols="12" sm="6" md="3">
+                                <v-menu v-model="startDateMenu" :close-on-content-click="false"
+                                    transition="scale-transition" offset-y max-width="290px" min-width="290px">
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-text-field v-model="filters.startDate" label="시작 날짜" readonly v-bind="attrs"
+                                            v-on="on" dense></v-text-field>
+                                    </template>
+                                    <v-date-picker v-model="filters.startDate" no-title
+                                        @input="startDateMenu = false"></v-date-picker>
+                                </v-menu>
+                            </v-col>
+                            <v-col cols="12" sm="6" md="3">
+                                <v-menu v-model="endDateMenu" :close-on-content-click="false"
+                                    transition="scale-transition" offset-y max-width="290px" min-width="290px">
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-text-field v-model="filters.endDate" label="종료 날짜" readonly v-bind="attrs"
+                                            v-on="on" dense hide-details></v-text-field>
+                                    </template>
+                                    <v-date-picker v-model="filters.endDate" no-title
+                                        @input="endDateMenu = false"></v-date-picker>
+                                </v-menu>
+                            </v-col>
+
+                            <!-- 
                             <v-col cols="12" sm="8" md="6">
                                 <v-select v-model="filters.systems" :items="systems" label="시스템" multiple chips
                                     dense hide-details>
@@ -24,17 +48,17 @@
                                         <v-divider class="mt-2"></v-divider>
                                     </template>
                                     <template
-                                        v-slot:selection="{ item, index }"><!-- eslint-disable-line vue/no-unused-vars -->
-                                        <!--v-chip color="primary lighten-2">
-                                            {{ item }}
-                                        </v-chip-->
+                                        v-slot:selection="{ item, index }">
                                         <span class="primary--text" v-if="index === 0">{{ filters.systems.join(', ')
                                             }}</span>
                                     </template>
                                 </v-select>
                             </v-col>
+                            -->
                             <v-col cols="12" sm="8" md="6">
-                                <v-select v-model="filters.severities" :items="severities" label="심각도" dense
+                                <v-combobox v-model="filters.severities" :items="severities"
+                                    label="심각도" multiple dense></v-combobox>
+                                <!--v-select v-model="filters.severities" :items="severities" label="심각도" dense
                                     multiple chips hide-details>
                                     <template v-slot:prepend-item>
                                         <v-list-item ripple @mousedown.prevent @click="toggleAll('severities')">
@@ -50,42 +74,22 @@
                                         <v-divider class="mt-2"></v-divider>
                                     </template>
                                     <template
-                                        v-slot:selection="{ item, index }"><!-- eslint-disable-line vue/no-unused-vars -->
-                                        <!--v-chip :color="getSeverityColor(item)">
-                                            {{ item }}
-                                        </v-chip-->
+                                        v-slot:selection="{ item, index }">
                                         <span class="primary--text" v-if="index === 0">{{ filters.severities.join(', ')
                                             }}</span>
                                     </template>
-                                </v-select>
+                                </v-select-->
+
                             </v-col>
-                        </v-row>
-                        <v-row dense class="mt-6">
-                            <v-col cols="12" sm="6" md="3">
-                                <v-menu v-model="startDateMenu" :close-on-content-click="false"
-                                    transition="scale-transition" offset-y max-width="290px" min-width="290px">
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <v-text-field v-model="filters.startDate" label="시작 날짜" readonly v-bind="attrs"
-                                            v-on="on" dense hide-details></v-text-field>
-                                    </template>
-                                    <v-date-picker v-model="filters.startDate" no-title
-                                        @input="startDateMenu = false"></v-date-picker>
-                                </v-menu>
-                            </v-col>
-                            <v-col cols="12" sm="6" md="3">
-                                <v-menu v-model="endDateMenu" :close-on-content-click="false"
-                                    transition="scale-transition" offset-y max-width="290px" min-width="290px">
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <v-text-field v-model="filters.endDate" label="종료 날짜" readonly v-bind="attrs"
-                                            v-on="on" dense hide-details></v-text-field>
-                                    </template>
-                                    <v-date-picker v-model="filters.endDate" no-title
-                                        @input="endDateMenu = false"></v-date-picker>
-                                </v-menu>
+                            <v-col cols="12" sm="12" md="6" class="d-flex justify-end align-center">
+                                
                             </v-col>
                             <v-col cols="12" sm="12" md="6" class="d-flex justify-end align-center">
                                 <v-btn :color="$config.color_btn" @click="search" small dense>조회</v-btn>
                             </v-col>
+
+
+
                         </v-row>
 
                     </v-card-text>
@@ -127,7 +131,7 @@
                         </v-chip>
                     </template>
                     <template v-slot:[`item.actions`]="{ item }">
-                        <v-btn small  @click="showDetails(item)">상세</v-btn>
+                        <v-btn small @click="showDetails(item)">상세</v-btn>
                     </template>
                 </v-data-table>
             </v-col>
@@ -319,27 +323,27 @@ const comp = module.exports = {
                 */
                 // 실제로는 API 호출을 통해 데이터를 가져와야 합니다.
                 // 여기서는 예시 데이터를 사용합니다.
-                
-                this.incidents = [
-                    { timestamp: '2023-05-01 10:30:00', system: '소비자금융시스템', severity: '심각', description: '대출 한도조회 오류', status: '조치중' },
-                    { timestamp: '2023-05-01 10:25:00', system: '소비자금융시스템', severity: '심각', description: '1원 송금 오류', status: '완료' },
-                    { timestamp: '2023-05-01 10:27:00', system: '소비자금융시스템', severity: '심각', description: '네이버페이 한도조회 오류', status: '완료' },
-                    { timestamp: '2023-05-02 14:15:00', system: '일반여신시스템', severity: '경고', description: '스크래핑 오류', status: '모니터링중' },
 
-                    { timestamp: '2023-05-03 09:00:00', system: '모바일앱', severity: '경고', description: '일반 점검', status: '완료' },
-                    { timestamp: '2023-05-03 07:33:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
-                    { timestamp: '2023-05-03 07:23:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
-                    { timestamp: '2023-05-03 07:13:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
-                    { timestamp: '2023-05-03 07:03:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
-                    { timestamp: '2023-05-03 06:53:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
-                    { timestamp: '2023-05-03 06:43:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
-                    { timestamp: '2023-05-03 06:33:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
-                    { timestamp: '2023-05-03 06:23:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
-                    { timestamp: '2023-05-03 06:13:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
-                    { timestamp: '2023-05-03 06:03:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
-                    { timestamp: '2023-05-03 05:53:00', system: '모바일앱', severity: '심각', description: '중앙회 API 오류', status: '조치중' },
-                ];  
-                
+                this.incidents = [
+                    { timestamp: '2023-05-01 10:30:00', system: '소비자금융시스템', severity: '심각', description: '여신 한도조회', status: '조치중' },
+                    { timestamp: '2023-05-01 10:25:00', system: '소비자금융시스템', severity: '심각', description: '여신 한도조회', status: '완료' },
+                    { timestamp: '2023-05-01 10:27:00', system: '소비자금융시스템', severity: '심각', description: '여신 한도조회', status: '완료' },
+                    { timestamp: '2023-05-02 14:15:00', system: '일반여신시스템', severity: '경고', description: '여신 한도조회', status: '모니터링중' },
+
+                    { timestamp: '2023-05-03 09:00:00', system: '모바일앱', severity: '경고', description: '모바일 비대면 대출', status: '완료' },
+                    { timestamp: '2023-05-03 07:33:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 07:23:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 07:13:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 07:03:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 06:53:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 06:43:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 06:33:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 06:23:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 06:13:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 06:03:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
+                    { timestamp: '2023-05-03 05:53:00', system: '모바일앱', severity: '심각', description: '모바일 비대면 대출', status: '조치중' },
+                ];
+
 
                 console.log('조회 응답 : ', this.incidents);
 
@@ -389,9 +393,9 @@ const comp = module.exports = {
         },
         fetchDetailTransactions(incidentGuid) {
             // 실제로는 API를 호출하여 데이터를 가져와야 합니다.
-            
+
             // 여기서는 예시 데이터를 사용합니다.
-            
+
             this.detailTransactions = [
                 { guid: 'tx001', programId: 'PROG001', transactionTime: '2023-05-01 10:30:15', transactionType: '입금', userId: 'user123', amount: 50000, status: '성공' },
                 { guid: 'tx002', programId: 'PROG002', transactionTime: '2023-05-01 10:31:20', transactionType: '출금', userId: 'user456', amount: 30000, status: '실패' },
@@ -406,7 +410,7 @@ const comp = module.exports = {
                 { guid: 'tx003', programId: 'PROG001', transactionTime: '2023-05-01 10:32:30', transactionType: '조회', userId: 'user789', amount: 0, status: '성공' },
                 // ... 더 많은 거래 데이터 ...
             ];
-            
+
         },
 
     },
@@ -427,9 +431,4 @@ const comp = module.exports = {
         overflow-x: auto;
     }
 }
-
-
-
-
-    
 </style>

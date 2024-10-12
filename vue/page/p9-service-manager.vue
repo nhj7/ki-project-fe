@@ -3,21 +3,17 @@
     <v-row>
       <v-col cols="12">
         <v-card>
-          <v-card-title>
-            서비스 관리
-            <v-spacer></v-spacer>
-            <!--v-btn color="primary" small @click="openDialog">
-              <v-icon left>mdi-plus-circle</v-icon> 서비스 등록
-            </v-btn-->
-          </v-card-title>
+          
           <v-card-text>
             <v-treeview
               :items="treeItems"
-              activatable
-              open-all
-              item-key="serviceID"
+              activatable="true"
+              item-value="id"
+              item-key="id"
+              open-all              
               return-object
               class="elevation-1"
+              dense              
             >
               <template v-slot:prepend="{ item, open }">
                 <v-icon v-if="item.children && item.children.length > 0">
@@ -108,6 +104,7 @@ module.exports = {
         description: '',
         transactions: [] // 트랜잭션 데이터 추가
       },
+      activeNodes: [],
       headers: [
         { text: '서비스 ID', value: 'serviceID' },
         { text: '서비스명', value: 'serviceName' },
@@ -117,64 +114,111 @@ module.exports = {
       services: [
         // 초기 서비스 데이터 예시
         {
+          id : 1,
           serviceID: 'SV001',
           serviceName: '여신 한도조회',
           description: '사용자의 여신 한도를 조회하는 서비스입니다.',
           transactions: [
             {
+              id : 11,
               txID: 'IF001',
               txName: 'NICE 신용조회',
-              status: '성공'
+              status: '성공',              
             },
             {
+              id : 12,
               txID: 'IF002',
               txName: 'KCB 신용조회',
               status: '성공'
             },
             {
+              id : 13,
               txID: 'IF003',
               txName: 'CSS 한도/금리 조회',
-              status: '성공'
+              status: '성공',
+              serviceID : 'SV010'
             },
           ]
         },
+        
         {
+          id : 2,
           serviceID: 'SV002',
-          serviceName: '모바일 비대면 대출',
-          description: '모바일을 통한 비대면 대출 신청 서비스입니다.',
+          serviceName: '모바일 뱅킹 로그인',
+          description: '모바일 뱅킹 로그인 서비스입니다.',
           transactions: [
             {
+              id : 20,
+              txID: 'IF003',
+              txName: '앱버전 체크(안드로이드/아이폰)',
+              status: '성공'
+            },
+            {
+              id : 21,
               txID: 'IF003',
               txName: 'FSB Open API 거래',
               status: '성공'
             },
             {
+              id : 22,
               txID: 'IF004',
-              txName: '건강보험/국세청 스크래핑',
+              txName: 'FDS 체크',
               status: '성공'
             },
             {
+              id : 23,
               txID: 'IF005',
-              txName: '계정계 한도조회',
+              txName: '계정계 로그인 조회',
               status: '성공'
             },
             {
+              id : 24,
               txID: 'IF006',
-              txName: '전자약정 솔루션 처리',
+              txName: '계정계2 로그인 조회',
+              status: '성공'
+            },            
+          ]
+        },
+
+        {
+          id : 3,
+          serviceID: 'SV003',
+          serviceName: '햇살론 대출실행',
+          description: '여신 햇살론 상품 대출실행 서비스입니다.',
+          transactions: [
+            {
+              id : 31,
+              txID: 'IF001',
+              txName: 'NICE 실시간대출조회',
+              status: '성공',              
+            },
+            {
+              id : 32,
+              txID: 'IF002',
+              txName: '서민금융진흥원 보증실행',
               status: '성공'
             },
             {
-              txID: 'IF007',
-              txName: '신분증 본인인증',
+              id : 33,
+              txID: 'IF003',
+              txName: 'FSB 대출실행',
+              status: '성공',              
+            },
+            {
+              id : 34,
+              txID: 'IF002',
+              txName: '서민금융진흥원 대출통지',
               status: '성공'
             },
             {
-              txID: 'IF008',
-              txName: '대출금 계좌송금',
-              status: '성공'
+              id : 35,
+              txID: 'IF003',
+              txName: '대출실행 회계 전표 처리',
+              status: '성공',
             },
           ]
-        }
+        },
+
       ]
     };
   },
@@ -224,11 +268,11 @@ module.exports = {
       // 중복된 서비스 ID 확인
       const exists = this.services.find(service => service.serviceID === this.form.serviceID);
       if (exists) {
-        this.$emit('show-snackbar', '이미 존재하는 서비스 ID입니다.');
+        this.$msg.showSnackbar('이미 존재하는 서비스 ID입니다.');
         return;
       }
       this.services.push({ ...this.form, transactions: [] });
-      this.$emit('show-snackbar', '서비스가 성공적으로 등록되었습니다.');
+      this.$msg.showSnackbar('서비스가 성공적으로 등록되었습니다.');
     },
     editService(item) {
       this.dialog = true;
@@ -239,16 +283,19 @@ module.exports = {
       const index = this.services.findIndex(service => service.serviceID === this.form.serviceID);
       if (index !== -1) {
         this.$set(this.services, index, { ...this.form });
-        this.$emit('show-snackbar', '서비스가 성공적으로 수정되었습니다.');
+        this.$msg.showSnackbar('서비스가 성공적으로 수정되었습니다.');
       }
     },
     deleteService(item) {
       const index = this.services.indexOf(item);
       if (index !== -1) {
         this.services.splice(index, 1);
-        this.$emit('show-snackbar', '서비스가 성공적으로 삭제되었습니다.');
+        this.$msg.showSnackbar('서비스가 성공적으로 삭제되었습니다.');
       }
     }
+  },
+  mounted() {
+    //this.$msg.showSnackbar('서비스가 성공적으로 조회되었습니다.');
   }
 };
 </script>

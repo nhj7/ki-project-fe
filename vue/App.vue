@@ -136,9 +136,9 @@
         <!--component :is="currentView"></component-->
         <div class="router-view-container flex-grow-1">
           <router-view></router-view>
-          <v-snackbar v-model="snackbar" :color="snackbarColor">
-            {{ snackbarText }}
-            <v-btn color="white" text @click="snackbar = false">닫기</v-btn>
+          <v-snackbar v-model="$msg.snackbar" :color="$msg.snackbarColor" :timeout="$msg.snackbarTimeout">
+            {{ $msg.snackbarText }}
+            <v-btn color="white" text @click="$msg.snackbar = false">닫기</v-btn>
           </v-snackbar>
           <v-overlay :value="$loading.isLoading" :opacity="0.05" absolute class="d-flex align-center justify-center">
             <v-card class="loading-card pa-4 d-flex flex-column align-center" elevation="0" color="transparent">
@@ -317,7 +317,11 @@ const MessagePlugin = {
         messageContent: "메시지 내용",
         errorDetails: "오류 상세",
         isError: false,
-        showErrorDetails: false,        
+        showErrorDetails: false,
+        snackbar: false,
+        snackbarColor: 'success',
+        snackbarText: '',
+        snackbarTimeout: 1000,
       },
       methods: {
         show(options = {}) {
@@ -330,6 +334,12 @@ const MessagePlugin = {
         },
         toggleErrorDetails() {
           this.showErrorDetails = !this.showErrorDetails;
+        },
+        showSnackbar(text, color = 'success', timeout = 1000) {
+          this.snackbarText = text;
+          this.snackbarColor = color;
+          this.snackbar = true;
+          this.snackbarTimeout = timeout;
         }
       }
     });
@@ -461,12 +471,6 @@ const comp = (module.exports = {
         this.$vuetify.theme.dark = this.isDark;
       }
     } // end 테마 설정
-
-    this.$root.$on('show-snackbar', (message, color = 'success') => {
-      this.snackbarText = message;
-      this.snackbarColor = color;
-      this.snackbar = true;
-    });
 
     if (false) { // ===== 로그인 상태 확인 =====
       let nextRoute = "/login";
