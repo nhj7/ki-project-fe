@@ -56,8 +56,8 @@
             </template>
 
             <v-list-item v-for="subItem in route.subRoutes" :key="subItem.path" :to="subItem.path" link
-              class="lnb-subItem rounded-lg pl-4" >
-              <v-list-item-action dense >
+              class="lnb-subItem rounded-lg pl-4">
+              <v-list-item-action dense>
                 <v-icon>{{ findRouteByPath(subItem.path).meta.icon }}</v-icon>
               </v-list-item-action>
               <v-list-item-content dense>
@@ -68,7 +68,7 @@
             </v-list-item>
           </v-list-group>
 
-          <v-list-item v-else :key="route.path" :to="route.path" class="lnb-item rounded-lg" dense >
+          <v-list-item v-else :key="route.path" :to="route.path" class="lnb-item rounded-lg" dense>
             <v-list-item-action>
               <v-icon>{{ route.meta.icon }}</v-icon>
             </v-list-item-action>
@@ -93,7 +93,7 @@
       <v-menu offset-y v-if="$session.userName">
         <template v-slot:activator="{ on, attrs }">
           <v-btn text v-bind="attrs" v-on="on">
-            <v-icon >mdi-account-circle</v-icon>
+            <v-icon>mdi-account-circle</v-icon>
             {{ $session.userName + "님" || "" }}
           </v-btn>
         </template>
@@ -115,7 +115,7 @@
       </v-btn>
       <v-btn icon @click="showAlarmPopup">
         <v-badge :content="alarmCount" :value="alarmCount > 0" color="error" overlap>
-          <v-icon >mdi-bell</v-icon>
+          <v-icon>mdi-bell</v-icon>
         </v-badge>
       </v-btn>
       <v-btn icon @click="toggleDarkTheme">
@@ -136,6 +136,10 @@
         <!--component :is="currentView"></component-->
         <div class="router-view-container flex-grow-1">
           <router-view></router-view>
+          <v-snackbar v-model="snackbar" :color="snackbarColor">
+            {{ snackbarText }}
+            <v-btn color="white" text @click="snackbar = false">닫기</v-btn>
+          </v-snackbar>
           <v-overlay :value="$loading.isLoading" :opacity="0.05" absolute class="d-flex align-center justify-center">
             <v-card class="loading-card pa-4 d-flex flex-column align-center" elevation="0" color="transparent">
               <v-progress-circular :size="70" :width="7" color="primary" indeterminate>
@@ -234,11 +238,11 @@
     </v-navigation-drawer>
 
     <v-footer absolute fixed inset padless>
-      <v-spacer ></v-spacer>
+      <v-spacer></v-spacer>
       <span class="text-center">
-        &copy; {{ new Date().getFullYear() }} 한국투자 {{ title }}.  All rights reserved.
+        &copy; {{ new Date().getFullYear() }} 한국투자 {{ title }}. All rights reserved.
       </span>
-      <v-spacer ></v-spacer>
+      <v-spacer></v-spacer>
     </v-footer>
 
     <v-snackbar>
@@ -258,7 +262,7 @@ const LoadingPlugin = {
         isLoading: false,
         loadingText: '로딩 중...',
         elapsedTime: 0,
-        timerInterval: null
+        timerInterval: null,        
       },
       methods: {
         show(text = '로딩 중...') {
@@ -313,7 +317,7 @@ const MessagePlugin = {
         messageContent: "메시지 내용",
         errorDetails: "오류 상세",
         isError: false,
-        showErrorDetails: false,
+        showErrorDetails: false,        
       },
       methods: {
         show(options = {}) {
@@ -348,12 +352,14 @@ const data = {
   title: "KI-SQM",
   groupStates: [true, true],
   alarmCount: 3,
-
   alarms: [],
   userName: "나형주",
   alarmPopupVisible: false,
   accountSettingsVisible: false,
   groupOpened: true,
+  snackbar: false,
+  snackbarColor: 'success',
+  snackbarText: '',
 };
 
 const comp = (module.exports = {
@@ -433,7 +439,7 @@ const comp = (module.exports = {
     "account-settings": loadVue("/component/AccountSettings"),
   },
   beforeCreate() {
-    //console.log("App.vue beforeCreate");
+
     this.$router.options.routes.forEach(route => {
       if (route.subRoutes && route.subRoutes.some(subRoute => subRoute.path === this.$router.currentRoute.path)) {
         if (route.meta) {
@@ -456,8 +462,13 @@ const comp = (module.exports = {
       }
     } // end 테마 설정
 
-    if(false)
-    { // ===== 로그인 상태 확인 =====
+    this.$root.$on('show-snackbar', (message, color = 'success') => {
+      this.snackbarText = message;
+      this.snackbarColor = color;
+      this.snackbar = true;
+    });
+
+    if (false) { // ===== 로그인 상태 확인 =====
       let nextRoute = "/login";
 
       // 로그인 상태 체크
@@ -516,7 +527,7 @@ const globalMethods = {
     date.setDate(date.getDate() + days);
     return this.formatDate(date);
   },
-  getTime(min = 0 , sec = 0, sep = '') {
+  getTime(min = 0, sec = 0, sep = '') {
     const now = new Date();
     now.setMinutes(now.getMinutes() + min);
     now.setSeconds(now.getSeconds() + sec);
@@ -540,7 +551,7 @@ const globalMethods = {
    * @param {Date} date 날짜
    * @returns {string} 날짜
    */
-  getDateTime(date) {    
+  getDateTime(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');

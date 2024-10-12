@@ -290,6 +290,14 @@
                     }
                 }
                 , {
+                    path: '/service-manager', name: 'service-manager', component: loadVue('./page/p9-service-manager'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-clipboard-check",
+                        iconColor: "info",
+                        title: "서비스 관리",
+                    }
+                }
+                , {
                     path: '/readme-viewer', name: 'readme-viewer', component: loadVue('./page/p20-readme-viewer'), meta: {
                         showInMenu: true,
                         icon: "mdi-file-document-outline",
@@ -297,6 +305,7 @@
                         title: "README 뷰어",
                     }
                 }
+                
                 , {
                     path: '#1', name: 'test', meta: {
                         showInMenu: true,
