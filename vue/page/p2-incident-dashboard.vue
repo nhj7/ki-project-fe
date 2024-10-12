@@ -56,8 +56,8 @@
                             </v-col>
                             -->
                             <v-col cols="12" sm="4" md="3">
-                                <v-combobox v-model="filters.severities" :items="severities"
-                                    label="심각도" multiple dense></v-combobox>
+                                <v-combobox v-model="filters.severities" :items="severities" label="심각도" multiple
+                                    dense></v-combobox>
                                 <!--v-select v-model="filters.severities" :items="severities" label="심각도" dense
                                     multiple chips hide-details>
                                     <template v-slot:prepend-item>
@@ -139,10 +139,15 @@
 
         <!-- 상세 정보 팝업 -->
         <v-dialog v-model="detailDialog" max-width="80%">
-            <v-card>
-                <v-card-title>
-                    <v-icon>mdi-information-outline</v-icon>
-                    &nbsp;&nbsp; 서비스 상세 정보
+            <v-card class="dialog-card">
+                <v-card-title class="d-flex justify-space-between align-center">
+                    <div>
+                        <v-icon>mdi-information-outline</v-icon>
+                        &nbsp;&nbsp; 서비스 상세 정보
+                    </div>
+                    <v-btn icon @click="detailDialog = false">
+                        <v-icon>mdi-close</v-icon>
+                    </v-btn>
                 </v-card-title>
                 <v-divider></v-divider>
                 <v-card-text>
@@ -193,7 +198,7 @@
 const systems = ['소비자여신시스템', '일반여신시스템', '모바일앱', '통합웹'];
 const severities = ['오류', '정상'];
 const severities_color = ['red', 'orange', 'blue'];
-const status = ['확인전','조치중', '모니터링중', '완료'];
+const status = ['확인전', '조치중', '모니터링중', '완료'];
 
 const comp = module.exports = {
     data() {
@@ -275,7 +280,7 @@ const comp = module.exports = {
         },
         async search() {
             // 실제 검색 로직 구현
-            this.fetchIncidents();
+            await this.fetchIncidents();
         },
         async fetchIncidents() {
 
@@ -387,11 +392,12 @@ const comp = module.exports = {
             return this.$util.getIcon(this.isAllSelected(filterType));
         },
         showDetails(item) {
+            console.log('showDetails : ', item);
             this.selectedIncident = item;
             this.fetchDetailTransactions(item.guid);
             this.detailDialog = true;
         },
-        fetchDetailTransactions(incidentGuid) {
+        async fetchDetailTransactions(incidentGuid) {
             // 실제로는 API를 호출하여 데이터를 가져와야 합니다.
 
             // 여기서는 예시 데이터를 사용합니다.
@@ -419,8 +425,9 @@ const comp = module.exports = {
         this.filters.startDate = dates.startDate;
         this.filters.endDate = dates.endDate;
     },
-    mounted() {
-        this.search();
+    async mounted() {
+        await this.search();
+        await this.showDetails(this.incidents[0]);
     }
 }
 </script>
@@ -431,4 +438,19 @@ const comp = module.exports = {
         overflow-x: auto;
     }
 }
+
+.dialog-card {
+    border: 2px solid #3a3737;
+    /* 어두운 회색 테두리 */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    /* 그림자 효과 추가 */
+}
+
+/* 다크 모드일 때 테두리 색상 변경 (선택사항) */
+.theme--dark .dialog-card {
+    border: 2px solid #757575 !important;
+    }
+
+
+    
 </style>

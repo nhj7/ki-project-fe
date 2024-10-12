@@ -835,37 +835,7 @@ Vue.prototype.$session = {
   margin-bottom: 0;
 }
 
-.fixed-table {
-  table-layout: fixed;
-  width: 100%;
-}
 
-.fixed-table .label-column {
-  width: 70px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  background-color: var(--v-primary-lighten5);
-  color: var(--v-primary-darken1);
-}
-
-.fixed-table .value-column {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  background-color: #f5f5f5;
-  border-radius: 4px;
-}
-
-/* 다크 모드 대응 */
-.theme--dark .fixed-table .label-column {
-  background-color: var(--v-primary-darken4);
-  color: var(--v-primary-lighten4);
-}
-
-.theme--dark .fixed-table .value-column {
-  background-color: #333333;
-}
 
 /* 새로운 스타일 추가 */
 .theme--dark .custom-nav-drawer {
@@ -902,4 +872,40 @@ Vue.prototype.$session = {
 .v-select .v-select__selections {
   color: var(--v-primary-base) !important;
 }
+
+
+
+.fixed-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.fixed-table .label-column {
+  width: 70px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background-color: var(--v-grey-lighten1);
+  color: var(--v-primary-darken1);
+}
+
+.fixed-table .value-column {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+
+/* 다크 모드 대응 */
+.theme--dark .fixed-table .label-column {
+  background-color: var(--v-grey-darken4);
+  color: var(--v-grey-lighten4);
+}
+
+.theme--dark .fixed-table .value-column {
+  background-color: #333333;
+}
+
 </style>
