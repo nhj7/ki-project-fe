@@ -479,7 +479,7 @@ const comp = (module.exports = {
           .map((tx) => ({
             id: tx.id,
             guid: tx.guid,
-            timestamp: tx.req_dttm,
+            timestamp: this.$util.formatDttm(tx.req_dttm, '-', ':'),
             transactionId: tx.tx_id,
             type: tx.tx_biz_id,            
             status: tx.tx_status === "타임아웃" ? "오류" : "의심",
