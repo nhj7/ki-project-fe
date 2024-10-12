@@ -365,7 +365,7 @@ const comp = module.exports = {
                             guid : incident.guid,
                             timestamp: incident.req_dttm,
                             system: incident.system_cd,
-                            severity: incident.svc_status == 'Succ' ? '정상' : '오류', // API 응답에 심각도 정보가 없어 임의로 설정
+                            severity: incident.res_cd == 'Succ' ? '정상' : '오류', // API 응답에 심각도 정보가 없어 임의로 설정
                             description: incident.svc_nm,
                             /* status: incident.status */
                         }));
@@ -463,13 +463,14 @@ const comp = module.exports = {
                 const response = await axios.post('/getGuidData', { guid : incidentGuid });
 
                 if (response.data) {
+                    response.data.sort((a, b) => a.if_id.localeCompare(b.if_id));
                     this.detailTransactions = response.data.map(transaction => ({
                         txId : transaction.tx_id,
                         programId: transaction.if_id,
                         programNm: transaction.prg_nm,
                         transactionTime: transaction.req_dttm,
                         processTime: transaction.elapsed,
-                        status: transaction.status
+                        status: transaction.tx_status
                     }));
                 } else {
                     console.error('API 응답 형식이 올바르지 않습니다:', response.data, error);
