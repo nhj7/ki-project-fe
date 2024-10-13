@@ -8,7 +8,7 @@
                 </v-btn>
             </v-card-title>
             <v-card-text>
-                <v-data-table :headers="headers" :items="rules" :items-per-page="10" class="elevation-1">
+                <v-data-table :headers="headers" :items="rules" :items-per-page="10" class="elevation-1" @click:row="editRule">
                     <template v-slot:[`item.actions`]="{ item }">
                         <v-icon small class="mr-2" @click="editRule(item)">
                             mdi-pencil
@@ -27,6 +27,7 @@
         <v-dialog v-model="dialog" max-width="680px">
             <v-card>
                 <v-card-title>
+                    <v-icon :color="$route.meta.iconColor || 'primary'" class="mr-2">{{ $route.meta.icon }}</v-icon>
                     <span class="headline">{{ formTitle }}</span>
                 </v-card-title>
                 <v-card-text>
@@ -52,16 +53,16 @@
                             </v-col>
 
                             <v-col cols="12" sm="6" md="4"
-                                v-if="['거래량', '오류율','응답시간','반복수행'].includes(editedItem.condition.type)">
+                                >
                                 <v-text-field v-model="editedItem.condition.duration" label="기간"
                                     type="number"></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="4"
-                                v-if="['거래량', '오류율','응답시간','반복수행'].includes(editedItem.condition.type)">
+                                >
                                 <v-select v-model="editedItem.condition.unit" :items="units" label="단위"></v-select>
                             </v-col>
 
-                            <v-col cols="4" v-if="['거래량','오류율','응답시간','반복수행'].includes(editedItem.condition.type)">
+                            <v-col cols="4" >
                                 <v-text-field v-model="editedItem.condition.threshold" label="임계값 (%)"
                                     type="number"></v-text-field>
                             </v-col>

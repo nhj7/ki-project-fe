@@ -1,6 +1,6 @@
 <template>
     <v-container fluid>
-        <v-card>            
+        <v-card>
             <v-card-text>
                 <v-select v-model="selectedApi" :items="apiList" label="API 선택" @change="showApiDetails"></v-select>
 
@@ -14,7 +14,8 @@
                                         <td>엔드포인트</td>
                                         <td>
                                             <!--code>{{ selectedApiDetails.endpoint }}</code-->
-                                            <v-text-field v-model="selectedApiDetails.endpoint" dense hide-details="auto"></v-text-field>
+                                            <v-text-field v-model="selectedApiDetails.endpoint" dense
+                                                hide-details="auto"></v-text-field>
                                         </td>
                                     </tr>
                                     <tr>
@@ -131,16 +132,16 @@ const comp = module.exports = {
             curlExample: '',
             paramValues: {},
             isFormValid: true,
-            selectedApi: 'saveRule',
+            selectedApi: 'getRuleDetections',
             apiList: [
-                { text: '서비스 거래 목록 조회(미완)', value: 'getIncidents' },
-                { text: '서비스 지표 목록', value: 'getGuidData' },
-                { text: '서비스 지표 목록', value: 'getMetric' },                
-                { text: '룰셋 저장(미완)', value: 'saveRule' },                
+                { text: '감지 목록 조회(예정)', value: 'getRuleDetections' },
+                { text: '서비스 지표 목록(완료)', value: 'getMetric' },
+                { text: '서비스 거래 목록 조회(완료)', value: 'getIncidents' },
+                { text: '서비스 내역 조회(완료)', value: 'getGuidData' },
+                { text: '룰셋 저장(완료)', value: 'saveRule' },
                 { text: '간편 이체(미완-1)', value: 'transfer' },
                 { text: '대출 신청(미완-2)', value: 'applyLoan' },
                 { text: '한도 조회(미완-3)', value: 'checkLoanLimit' },
-                
                 { text: '알람 목록 조회(미완)', value: 'getAlarms' },
                 // { text: '실시간 서비스 분석(미완)', value: 'getLiveTransactions' },
 
@@ -159,8 +160,8 @@ const comp = module.exports = {
                     method: 'POST',
                     description: '서비스 거래 목록을 조회합니다.',
                     parameters: [
-                        { name: 'startDttm', type: 'String', required: true, default: this.$util.getDate()+ this.$util.getTime(-1, 0 ), description: '조회 시작 날짜 (yyyymmddhh24miss 형식)' },
-                        { name: 'endDttm', type: 'String', required: true, default: this.$util.getDate()+ this.$util.getTime(0, 0 ), description: '조회 종료 날짜 (yyyymmddhh24miss 형식)' },
+                        { name: 'startDttm', type: 'String', required: true, default: this.$util.getDate() + this.$util.getTime(-1, 0), description: '조회 시작 날짜 (yyyymmddhh24miss 형식)' },
+                        { name: 'endDttm', type: 'String', required: true, default: this.$util.getDate() + this.$util.getTime(0, 0), description: '조회 종료 날짜 (yyyymmddhh24miss 형식)' },
                         { name: 'status', type: 'String', required: false, default: '', description: '인시던트 상태 (예: "오류,정상")' }
                     ],
                     responseSampleHtml: '',
@@ -684,6 +685,145 @@ const comp = module.exports = {
                         { name: 'todayCnt', type: 'Number', required: true, description: '금일 거래량' },
                         { name: 'previousDayCnt', type: 'Number', required: true, description: '전일 거래량' },
                         { name: 'previousWeekCnt', type: 'Number', required: true, description: '전주 거래량' }
+                    ],
+                },
+                getGuidData: {
+                    name: '서비스 내역 조회',
+                    endpoint: '/getGuidData',
+                    method: 'POST',
+                    description: '특정 서비스에 대한 상세 거래 데이터를 조회합니다.',
+                    parameters: [
+                        { name: 'guid', type: 'String', required: true, description: '조회할 GUID', default: 'OQshG_gPNnZO' },
+                    ],
+                    responseSampleHtml: '',
+                    responseSample: [
+                        {
+                            "id": 2874592,
+                            "guid": "OQshG_gPNnZO",
+                            "tx_id": "FxwqC2AwL0rL",
+                            "if_id": "IF041",
+                            "prg_nm": "KIBNET 가상계좌 입금",
+                            "system_cd": "모바일",
+                            "tx_status": "정상",
+                            "req_dt": "20241013",
+                            "req_tm": "234657",
+                            "req_dttm": "20241013234657",
+                            "res_dttm": "20241013234704",
+                            "res_cd": "200",
+                            "res_msg": "200",
+                            "tx_biz_id": "KIBNET 가상계좌 입금",
+                            "req_json": "{\"req_dttm\":\"20241013234657\",\"IF_ID\":\"IF041\",\"res_dttm\":null,\"prg_nm\":\"KIBNET 가상계좌 입금\"}",
+                            "res_json": "{\"tx_status\":\"정상\",\"res_cd\":\"200\"}",
+                            "elapsed": 6827
+                        },
+                        {
+                            "id": 2874620,
+                            "guid": "OQshG_gPNnZO",
+                            "tx_id": "sPkJQsgaDw91",
+                            "if_id": "IF042",
+                            "prg_nm": "FSB(중앙회) 원리금 수납",
+                            "system_cd": "모바일",
+                            "tx_status": "정상",
+                            "req_dt": "20241013",
+                            "req_tm": "234704",
+                            "req_dttm": "20241013234704",
+                            "res_dttm": "20241013234712",
+                            "res_cd": "200",
+                            "res_msg": "200",
+                            "tx_biz_id": "FSB(중앙회) 원리금 수납",
+                            "req_json": "{\"req_dttm\":\"20241013234704\",\"IF_ID\":\"IF042\",\"res_dttm\":null,\"prg_nm\":\"FSB(중앙회) 원리금 수납\"}",
+                            "res_json": "{\"tx_status\":\"정상\",\"res_cd\":\"200\"}",
+                            "elapsed": 7904
+                        }
+                    ],
+                    responseFormat: [
+                        { name: 'id', type: 'Number', required: true, description: '거래 ID' },
+                        { name: 'guid', type: 'String', required: true, description: 'GUID' },
+                        { name: 'tx_id', type: 'String', required: true, description: '거래 ID' },
+                        { name: 'if_id', type: 'String', required: true, description: '인터페이스 ID' },
+                        { name: 'prg_nm', type: 'String', required: true, description: '프로그램 이름' },
+                        { name: 'system_cd', type: 'String', required: true, description: '시스템 코드' },
+                        { name: 'tx_status', type: 'String', required: true, description: '거래 상태' },
+                        { name: 'req_dt', type: 'String', required: true, description: '요청 날짜' },
+                        { name: 'req_tm', type: 'String', required: true, description: '요청 시간' },
+                        { name: 'req_dttm', type: 'String', required: true, description: '요청 일시' },
+                        { name: 'res_dttm', type: 'String', required: true, description: '응답 일시' },
+                        { name: 'res_cd', type: 'String', required: true, description: '응답 코드' },
+                        { name: 'res_msg', type: 'String', required: true, description: '응답 메시지' },
+                        { name: 'tx_biz_id', type: 'String', required: true, description: '거래 업무 ID' },
+                        { name: 'req_json', type: 'String', required: true, description: '요청 JSON' },
+                        { name: 'res_json', type: 'String', required: true, description: '응답 JSON' },
+                        { name: 'elapsed', type: 'Number', required: true, description: '소요 시간 (밀리초)' }
+                    ],
+                },
+                getRuleDetections: {
+                    name: '규칙 감지 목록 조회',
+                    endpoint: '/api/rule-detections',
+                    method: 'POST',
+                    description: '규칙 감지 목록을 조회합니다.',
+                    parameters: [
+                        { name: 'startDate', type: 'String', required: true, default: this.$util.getDate(-7), description: '조회 시작 날짜 (YYYY-MM-DD 형식)' },
+                        { name: 'endDate', type: 'String', required: true, default: this.$util.getDate(), description: '조회 종료 날짜 (YYYY-MM-DD 형식)' },
+                        { name: 'ruleId', type: 'String', required: false, default: 'RULE-001', description: '규칙 ID (전체 또는 특정 규칙 ID)' }
+                    ],
+                    responseSampleHtml: '',
+                    responseSample: [
+                        {
+                            "id": 1,
+                            "rule_id": "RULE001",
+                            "rule_nm": "거래량 급증 감지",
+                            "svc_id": "SVC001",
+                            "svc_nm": "계좌이체 서비스",
+                            "svc_cnt": 1000,
+                            "bf_svc_cnt": 800,
+                            "bf_err_cnt": 10,
+                            "af_svc_cnt": 1200,
+                            "af_err_cnt": 15,
+                            "tx_zero_yn": "N",
+                            "tx_ratio": 150.00,
+                            "tx_err_ratio": 1.25,
+                            "tx_ratio_yn": "Y",
+                            "tx_err_ratio_yn": "N",
+                            "bf_startDttm": "20230501000000",
+                            "af_startDttm": "20230501010000",
+                            "type": "거래량",
+                            "duration": "1시간",
+                            "direction": "증가",
+                            "threshold": 30,
+                            "unit": "%",
+                            "action": "알림 발송",
+                            "enabled": "Y",
+                            "reg_dt": "20230501",
+                            "reg_dttm": "20230501010000"
+                        }
+                    ],
+                    responseFormat: [
+                        { name: 'id', type: 'Number', required: true, description: '규칙 감지 ID' },
+                        { name: 'rule_id', type: 'String', required: true, description: '규칙 ID' },
+                        { name: 'rule_nm', type: 'String', required: true, description: '규칙명' },
+                        { name: 'svc_id', type: 'String', required: true, description: '서비스 ID' },
+                        { name: 'svc_nm', type: 'String', required: true, description: '서비스명' },
+                        { name: 'svc_cnt', type: 'Number', required: false, description: '서비스 건수' },
+                        { name: 'bf_svc_cnt', type: 'Number', required: false, description: '이전 서비스 건수' },
+                        { name: 'bf_err_cnt', type: 'Number', required: false, description: '이전 오류 건수' },
+                        { name: 'af_svc_cnt', type: 'Number', required: false, description: '이후 서비스 건수' },
+                        { name: 'af_err_cnt', type: 'Number', required: false, description: '이후 오류 건수' },
+                        { name: 'tx_zero_yn', type: 'String', required: false, description: '거래량 제로 여부' },
+                        { name: 'tx_ratio', type: 'Number', required: false, description: '거래량 비율' },
+                        { name: 'tx_err_ratio', type: 'Number', required: false, description: '오류율' },
+                        { name: 'tx_ratio_yn', type: 'String', required: false, description: '거래량 비율 여부' },
+                        { name: 'tx_err_ratio_yn', type: 'String', required: false, description: '오류율 여부' },
+                        { name: 'bf_startDttm', type: 'String', required: false, description: '이전 시작 일시' },
+                        { name: 'af_startDttm', type: 'String', required: false, description: '이후 시작 일시' },
+                        { name: 'type', type: 'String', required: false, description: '규칙 유형' },
+                        { name: 'duration', type: 'String', required: false, description: '기간' },
+                        { name: 'direction', type: 'String', required: false, description: '방향' },
+                        { name: 'threshold', type: 'Number', required: false, description: '임계값' },
+                        { name: 'unit', type: 'String', required: false, description: '단위' },
+                        { name: 'action', type: 'String', required: false, description: '액션' },
+                        { name: 'enabled', type: 'String', required: false, description: '활성화 여부' },
+                        { name: 'reg_dt', type: 'String', required: false, description: '등록 일자' },
+                        { name: 'reg_dttm', type: 'String', required: false, description: '등록 일시' }
                     ],
                 },
             }

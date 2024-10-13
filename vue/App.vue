@@ -208,7 +208,7 @@
             <v-divider color="grey"></v-divider>
             <v-card-title class="d-flex justify-space-between align-center">
               <div>
-                <v-icon>mdi-information-outline</v-icon>
+                <v-icon :color="$route.meta.iconColor || 'primary'" class="mr-2">{{ $route.meta.icon }}</v-icon>
                 &nbsp;&nbsp; 서비스 상세 정보
               </div>
               <v-btn icon @click="$vo.svcDetailDialog = false">
@@ -263,7 +263,7 @@
             <v-divider color="grey"></v-divider>
             <v-card-title class="d-flex justify-space-between align-center">
               <div>
-                <v-icon>mdi-code-json</v-icon>
+                <v-icon :color="$route.meta.iconColor || 'primary'" class="mr-2">{{ $route.meta.icon }}</v-icon>
                 &nbsp;&nbsp; 전문 상세 정보
               </div>
               <v-btn icon @click="$vo.tx.detailDialog = false">

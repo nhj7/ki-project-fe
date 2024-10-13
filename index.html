@@ -222,6 +222,22 @@
                     }
                 }
                 , {
+                    path: '/rule-detected-list', name: 'rule-detected-list', component: loadVue('./page/p8-rule-detected-list'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-shield-sync-outline",
+                        iconColor: "green",
+                        title: "서비스 감지 목록",
+                    }
+                }
+                , {
+                    path: '/rule-configuration', name: 'rule-configuration', component: loadVue('./page/p3-rule-configuration'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-shield-star-outline",
+                        iconColor: "green",
+                        title: "이상 징후 감지 정책 설정",
+                    }
+                }
+                , {
                     path: '/incident-dashboard', name: 'incident-dashboard', component: loadVue('./page/p2-incident-dashboard'), meta: {
                         showInMenu: true,
                         icon: "mdi-lan-check",
@@ -237,14 +253,7 @@
                         title: "서비스 상세 내역 조회",
                     }
                 }
-                , {
-                    path: '/rule-configuration', name: 'rule-configuration', component: loadVue('./page/p3-rule-configuration'), meta: {
-                        showInMenu: true,
-                        icon: "mdi-shield-alert-outline",
-                        iconColor: "green",
-                        title: "감지 정책 설정",
-                    }
-                }
+                
 
                 , {
                     path: '/rule-condition-builder', name: 'rule-condition-builder', component: loadVue('./page/p4-rule-condition-builder'), meta: {
