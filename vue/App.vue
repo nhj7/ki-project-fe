@@ -30,7 +30,7 @@
       </v-list-item>
       <v-divider></v-divider>
       <v-list expand dense>
-        <v-list-item>
+        <!--v-list-item>
           <v-btn icon @click.stop="miniVariant = !miniVariant">
             <v-icon>mdi-{{ `chevron-${miniVariant ? "right" : "left"}` }}</v-icon>
           </v-btn>
@@ -40,7 +40,7 @@
           <v-btn icon @click.stop="fixed = !fixed">
             <v-icon>mdi-minus</v-icon>
           </v-btn>
-        </v-list-item>
+        </v-list-item-->
 
         <v-divider></v-divider>
 
