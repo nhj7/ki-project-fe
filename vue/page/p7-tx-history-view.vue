@@ -66,7 +66,7 @@
           </v-row>
         </v-expand-transition>
         <v-data-table :headers="headers" :items="transactions" :search="search" :items-per-page="10"
-          class="elevation-1 small-font-table" >          
+          class="elevation-1 small-font-table" @click:row="$vo.openTxDetailDialog">          
           <template v-slot:[`item.req_dttm`]="{ item }">
             {{ formatDateTime(item.req_dttm) }}
           </template>

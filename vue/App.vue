@@ -205,6 +205,7 @@
         <!-- 상세 정보 팝업 -->
         <v-dialog v-model="$vo.svcDetailDialog" max-width="80%" transition="" :retain-focus="false">
           <v-card class="dialog-card">
+            <v-divider color="grey"></v-divider>
             <v-card-title class="d-flex justify-space-between align-center">
               <div>
                 <v-icon>mdi-information-outline</v-icon>
@@ -239,7 +240,7 @@
                 &nbsp;&nbsp; 서비스 상세 거래 목록
               </v-card-subtitle>
               <v-data-table :headers="$vo.detailTransactionHeaders" :items="$vo.detailTransactions" :items-per-page="5"
-                class="elevation-1" dense :height="200" fixed-header>
+                class="elevation-1" dense :height="230" fixed-header @click:row="$vo.openTxDetailDialog">
                 <template v-slot:[`item.status`]="{ item }">
                   <v-chip :color="$vo.getStatusColor(item.status)" small>
                     {{ item.status }}
@@ -251,8 +252,110 @@
               <v-spacer></v-spacer>
               <v-btn :color="$config.color_btn" @click="$vo.svcDetailDialog = false" small>닫기</v-btn>
             </v-card-actions>
+            <v-divider color="grey"></v-divider>
           </v-card>
         </v-dialog><!-- detailDialog -->
+
+
+        <!-- 전문 상세 정보 다이얼로그 -->
+        <v-dialog v-model="$vo.tx.detailDialog" max-width="90%" transition="" :retain-focus="false">
+          <v-card class="dialog-card">
+            <v-divider color="grey"></v-divider>
+            <v-card-title class="d-flex justify-space-between align-center">
+              <div>
+                <v-icon>mdi-code-json</v-icon>
+                &nbsp;&nbsp; 전문 상세 정보
+              </div>
+              <v-btn icon @click="$vo.tx.detailDialog = false">
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+            </v-card-title>
+            <v-divider></v-divider>
+            <v-card-text>
+              <!-- 상단 정보 테이블 -->
+              <v-simple-table class="fixed-table mb-4" dense>
+                <template v-slot:default>
+                  <tbody>
+                    <tr>
+                      <td class="label-column">트랜잭션 ID</td>
+                      <td class="value-column">{{ $vo.tx.selectedTx.tx_id }}</td>
+                      <td class="label-column">인터페이스 ID</td>
+                      <td class="value-column">{{ $vo.tx.selectedTx.if_id }}</td>
+                      <td class="label-column">프로그램명</td>
+                      <td class="value-column">{{ $vo.tx.selectedTx.prg_nm }}</td>
+                    </tr>
+                    <tr>
+                      
+                      <td class="label-column">시스템 코드</td>
+                      <td class="value-column">{{ $vo.tx.selectedTx.system_cd }}</td>
+                      <td class="label-column">상태</td>
+                      <td class="value-column">
+                        <v-chip :color="$vo.getStatusColor($vo.tx.selectedTx.status)" small>
+                          {{ $vo.tx.selectedTx.status }}
+                        </v-chip>
+                      </td>
+                      <td class="label-column">경과 시간</td>
+                      <td class="value-column">{{ $vo.tx.selectedTx.elapsed }}</td>
+                    </tr>
+                    <tr>
+                      
+                      <td class="label-column">요청일시</td>
+                      <td class="value-column">{{ $util.formatDttm($vo.tx.selectedTx.req_dttm, '-', ':') }}</td>
+                      <td class="label-column">응답일시</td>
+                      <td class="value-column">{{ $util.formatDttm($vo.tx.selectedTx.res_dttm, '-', ':') }}</td>
+                      
+                    </tr>                    
+                    <tr>
+                      <td class="label-column">응답코드</td>
+                      <td class="value-column">{{ $vo.tx.selectedTx.res_cd }}</td>
+                      <td class="label-column">응답메시지</td>
+                      <td class="value-column" colspan="3">{{ $vo.tx.selectedTx.res_msg }}</td>
+                      
+                    </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+
+              <!-- 요청부와 응답부 테이블 -->
+              <v-row>
+                <v-col cols="6" class="message-column">
+                  <v-card-subtitle class="text-subtitle-1 pb-0">
+                    
+                    &nbsp;&nbsp; 요청 전문
+                    <v-icon>mdi-arrow-right-bold</v-icon>
+                  </v-card-subtitle>
+                  <v-data-table :headers="$vo.keyValueHeaders" :items="$vo.tx.requestItems" :items-per-page="-1"
+                    hide-default-footer dense class="elevation-1">
+                    <template v-slot:[`item.value`]="{ item }">
+                      <pre>{{ item.value }}</pre>
+                    </template>
+                  </v-data-table>
+                </v-col>
+                <v-divider vertical></v-divider>
+                <v-col cols="6" class="message-column">
+                  <v-card-subtitle class="text-subtitle-1 pb-0">
+                    <v-icon>mdi-arrow-left-bold</v-icon>
+                    &nbsp;&nbsp; 응답 전문
+                  </v-card-subtitle>
+                  <v-data-table :headers="$vo.keyValueHeaders" :items="$vo.tx.responseItems" :items-per-page="-1"
+                    hide-default-footer dense class="elevation-1">
+                    <template v-slot:[`item.value`]="{ item }">
+                      <pre>{{ item.value }}</pre>
+                    </template>
+                  </v-data-table>
+                </v-col>
+              </v-row>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn :color="$config.color_btn" @click="$vo.tx.detailDialog = false" small>닫기</v-btn>
+            </v-card-actions>
+            <v-divider color="grey"></v-divider>
+          </v-card>
+        </v-dialog>
+
+
+
 
 
       </v-container>
@@ -424,18 +527,56 @@ const VoPlugin = {
 
         },
         detailTransactionHeaders: [
-          { text: '거래ID', value: 'txId' },
+          { text: '거래ID', value: 'tx_id' },
           { text: '프로그램 ID', value: 'programId' },
-          { text: '프로그램 명', value: 'programNm' },
+          { text: '프로그램 명', value: 'prg_nm' },
           { text: '거래 시간', value: 'transactionTime' },
-          { text: '처리 시간(초)', value: 'processTime' },
+          { text: '처리 시간(초)', value: 'elapsed' },
           { text: '상태', value: 'status' },
         ],
-        detailTransactions: [],
+        detailTransactions: [],        
+        tx : {
+          detailDialog: false,
+          selectedTx : {
+            transactionId: '',
+            interfaceId: '',
+            programName: '',
+            systemCode: '',
+            status: '',
+            requestDateTime: '',
+            responseDateTime: '',
+            responseCode: '',
+            responseMessage: '',
+            elapsedTime: '',
+            requestItems: [],
+            responseItems: []
+          },
+          requestItems: [],
+          responseItems: []
+        },
+        keyValueHeaders: [
+          { text: 'Key', value: 'key' },
+          { text: 'Value', value: 'value' }
+        ],        
       },
       methods: {
         set(options = {}) {
           Object.assign(this.$data, options);
+        },
+        async openTxDetailDialog(tx) {
+          console.log('openTxDetailDialog', tx);
+          this.tx.selectedTx = tx;
+          this.setKeyValueItems(tx.req_json, 'requestItems');
+          this.setKeyValueItems(tx.res_json, 'responseItems');
+          this.tx.detailDialog = true;
+        },
+        setKeyValueItems(_json, items) {
+          const json = _json ? JSON.parse(_json) : {};
+          console.log('setKeyValueItems', json, items, this.tx[items]);
+          this.tx[items]?.splice(0, this.tx[items].length);
+          Object.entries(json).forEach(([key, value]) => {
+            this.tx[items].push({ key, value });
+          });
         },
         async openSvcDetailDialog(incident) {
           this.selectedIncident = incident;
@@ -467,7 +608,7 @@ const VoPlugin = {
         getStatusColor(status) {
           if (!status) return 'grey';
           switch (status) {
-            case '정상': return 'green';
+            case '정상': return 'grey';
             default: return 'orange';
           }
         },
@@ -481,12 +622,10 @@ const VoPlugin = {
             if (response.data) {
               response.data.sort((a, b) => a.if_id.localeCompare(b.if_id));
               this.detailTransactions = response.data.map(transaction => ({
-                txId: transaction.tx_id,
-                programId: transaction.if_id,
-                programNm: transaction.prg_nm,
+                ...transaction,
                 transactionTime: this.$util.formatDttm(transaction.req_dttm, '-', ':'),
-                processTime: (transaction.elapsed / 1000).toFixed(2),
-                status: transaction.tx_status
+                elapsed: transaction.elapsed ? (transaction.elapsed / 1000).toFixed(2) : '',
+                status: transaction.tx_status,                
               }));
             } else {
               console.error('API 응답 형식이 올바르지 않습니다:', response.data, error);
@@ -1132,4 +1271,6 @@ Vue.prototype.$session = {
 .theme--dark .fixed-table .value-column {
   background-color: #333333;
 }
+
+
 </style>

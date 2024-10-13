@@ -52,16 +52,16 @@
                             </v-col>
 
                             <v-col cols="12" sm="6" md="4"
-                                v-if="['거래량', '오류율','반복수행'].includes(editedItem.condition.type)">
+                                v-if="['거래량', '오류율','응답시간','반복수행'].includes(editedItem.condition.type)">
                                 <v-text-field v-model="editedItem.condition.duration" label="기간"
                                     type="number"></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="4"
-                                v-if="['거래량', '오류율','반복수행'].includes(editedItem.condition.type)">
+                                v-if="['거래량', '오류율','응답시간','반복수행'].includes(editedItem.condition.type)">
                                 <v-select v-model="editedItem.condition.unit" :items="units" label="단위"></v-select>
                             </v-col>
 
-                            <v-col cols="4" v-if="['오류율','응답시간','반복수행'].includes(editedItem.condition.type)">
+                            <v-col cols="4" v-if="['거래량','오류율','응답시간','반복수행'].includes(editedItem.condition.type)">
                                 <v-text-field v-model="editedItem.condition.threshold" label="임계값 (%)"
                                     type="number"></v-text-field>
                             </v-col>
