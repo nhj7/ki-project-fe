@@ -134,6 +134,7 @@ const comp = module.exports = {
             isFormValid: true,
             selectedApi: 'getRuleDetections',
             apiList: [
+                { text: '서비스 목록 조회(예정)', value: 'getServices' },
                 { text: '감지 목록 조회(예정)', value: 'getRuleDetections' },
                 { text: '서비스 지표 목록(완료)', value: 'getMetric' },
                 { text: '서비스 거래 목록 조회(완료)', value: 'getIncidents' },
@@ -825,7 +826,50 @@ const comp = module.exports = {
                         { name: 'reg_dt', type: 'String', required: false, description: '등록 일자' },
                         { name: 'reg_dttm', type: 'String', required: false, description: '등록 일시' }
                     ],
+                }, 
+            getServices: {
+                name: '서비스 목록 조회',
+                endpoint: '/api/services',
+                method: 'GET',
+                description: '서비스 목록을 조회합니다.',
+                parameters: [],
+                responseSampleHtml: '',
+                responseSample: {
+                    services: [
+                        {
+                            id: 1,
+                            parent_id: null,
+                            service_code: 'SV001',
+                            service_name: '여신 상품 신규',
+                            description: '여신 상품 신규 서비스입니다.',
+                            is_active: true,
+                            is_mandatory: false,
+                            sort_order: 1
+                        },
+                        {
+                            id: 2,
+                            parent_id: 1,
+                            service_code: 'SV002',
+                            service_name: '대출 신청',
+                            description: '대출 신청 서비스입니다.',
+                            is_active: true,
+                            is_mandatory: true,
+                            sort_order: 1
+                        }
+                    ]
                 },
+                responseFormat: [
+                    { name: 'services', type: 'Array', required: true, description: '서비스 목록' },
+                    { name: 'services[].id', type: 'Number', required: true, description: '서비스 ID' },
+                    { name: 'services[].parent_id', type: 'Number', required: false, description: '상위 서비스 ID' },
+                    { name: 'services[].service_code', type: 'String', required: true, description: '서비스 코드' },
+                    { name: 'services[].service_name', type: 'String', required: true, description: '서비스 이름' },
+                    { name: 'services[].description', type: 'String', required: false, description: '서비스 설명' },
+                    { name: 'services[].is_active', type: 'Boolean', required: true, description: '활성화 여부' },
+                    { name: 'services[].is_mandatory', type: 'Boolean', required: true, description: '필수 여부' },
+                    { name: 'services[].sort_order', type: 'Number', required: true, description: '정렬 순서' }
+                ]
+            },
             }
 
         };

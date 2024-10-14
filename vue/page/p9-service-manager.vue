@@ -5,8 +5,8 @@
         <v-card>
 
           <v-card-text>
-            <v-treeview :items="treeItems" activatable="true" item-key="id" return-object
-              class="elevation-1" dense :open.sync="openedItems">
+            <v-treeview :items="treeItems" activatable="true" item-key="id" return-object class="elevation-1" dense
+              :open.sync="openedItems">
               <template v-slot:prepend="{ item, open }">
                 <v-icon v-if="item.children && item.children.length > 0">
                   {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
@@ -338,12 +338,46 @@ module.exports = {
       }
     }
   },
-  mounted() {
+  async mounted() {
     //this.$msg.showSnackbar('서비스가 성공적으로 조회되었습니다.');
     console.log(this.services.length, this.services[0].id);
     if (this.services.length > 0) {
       this.openedItems = [this.services[0], this.services[2], this.services[3]];
     }
+
+    try {
+      const response = await this.$axios.get('/api/getServices');
+      const services = response.data;
+
+      // 최상위 서비스 찾기
+      const rootServices = services.filter(service => !service.parent_id);
+
+      // 자식 서비스 찾아 트리 구조 만들기
+      const buildTree = (service) => {
+        const children = services.filter(child => child.parent_id === service.id);
+        if (children.length) {
+          service.children = children.map(buildTree);
+        }
+        return {
+          id: service.id,
+          serviceID: service.service_code,
+          serviceName: service.service_name,
+          description: service.description,
+          children: service.children || []
+        };
+      };
+
+      this.treeItems = rootServices.map(buildTree);
+
+      this.$msg.showSnackbar('서비스가 성공적으로 조회되었습니다.');
+    } catch (error) {
+      console.error('서비스 데이터를 불러오는 중 오류가 발생했습니다:', error);
+      this.$msg.showSnackbar('서비스 데이터를 불러오는 데 실패했습니다.');
+    }
+
+  },
+  async created() {
+
   }
 };
 </script>
