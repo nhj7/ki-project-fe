@@ -289,7 +289,7 @@ const comp = (module.exports = {
       if (params.componentType === 'series' && params.seriesType === 'scatter') {
         const clickedData = params.data;
         console.log('클릭된 데이터:', clickedData);
-        this.$vo.openSvcDetailDialog({ guid: clickedData[5] });
+        this.$vo.openSvcDetailDialog({ guid: clickedData[5], timestamp: clickedData[0], system: clickedData[4], description: clickedData[3] });
       }
     },
     // 오류율에 따른 색상 반환
