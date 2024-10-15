@@ -58,7 +58,7 @@
             <v-list-item v-for="subItem in route.subRoutes" :key="subItem.path" :to="subItem.path" link
               class="lnb-subItem rounded-lg pl-4">
               <v-list-item-action dense>
-                <v-icon>{{ findRouteByPath(subItem.path).meta.icon }}</v-icon>
+                <v-icon >{{ findRouteByPath(subItem.path).meta.icon }}</v-icon>
               </v-list-item-action>
               <v-list-item-content dense>
                 <v-list-item-title>{{
@@ -129,14 +129,14 @@
 
     <v-main>
       <v-container fluid>
-        <div class="d-flex align-center justify-space-between">
-          <h2 class="text-subtitle-2 mb-2 d-flex align-center cursor-pointer" @click.stop="drawer = !drawer">
+        <div class="d-flex align-center">
+          <h2 class="text-subtitle-2 mb-1 d-flex align-center cursor-pointer flex-grow-1" @click.stop="drawer = !drawer">
             <v-icon size="24" :color="this.$route.meta.iconColor || 'primary'" class="mr-2">
               {{ this.$route.meta.icon }}
             </v-icon>
             {{ this.$route.meta.title }}
           </h2>
-          <div>
+          <div class="d-flex flex-nowrap">
             <v-btn icon @click="$router.go(-1)">
               <v-icon>mdi-arrow-left</v-icon>
             </v-btn>

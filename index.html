@@ -210,6 +210,7 @@
                     path: '/live-transaction-analytics', name: 'live-transaction-analytics', component: loadVue('./page/p1-live-transaction-analytics'), meta: {
                         showInMenu: true,
                         icon: "mdi-chart-timeline-variant-shimmer",
+                        iconColor: "green",
                         title: "실시간 서비스 모니터링",
                         description: '실시간으로 서비스 트랜잭션을 모니터링하고 분석합니다. 거래량, 오류율, 처리 시간 등을 한눈에 확인할 수 있습니다.'
                     }
@@ -219,7 +220,7 @@
                         showInMenu: true,
                         icon: "mdi-shield-sync-outline",
                         iconColor: "green",
-                        title: "서비스 감지 목록",
+                        title: "서비스 이상 감지 목록",
                         description: '설정된 규칙에 따라 감지된 서비스 이상 징후 목록을 확인할 수 있습니다. 거래량 비율, 오류율 등을 모니터링합니다.'
                     }
                 }
@@ -265,7 +266,7 @@
                     path: '/service-manager', name: 'service-manager', component: loadVue('./page/p9-service-manager'), meta: {
                         showInMenu: true,
                         icon: "mdi-clipboard-check",
-                        iconColor: "info",
+                        iconColor: "orange",
                         title: "서비스 관리",
                         description: '관리되고 있는 서비스들을 확인 할 수 있습니다. 서비스 이름, 설명, 세부 내역을 확인할 수 있습니다.'
                     }
@@ -276,7 +277,7 @@
                     path: '/user-management', name: 'user-management', component: loadVue('./page/p6-user-management'), meta: {
                         showInMenu: true,
                         icon: "mdi-account-multiple",
-                        iconColor: "green",
+                        iconColor: "purple",
                         title: "사용자 관리",
                         description: '사용자 관리를 위한 설정을 할 수 있습니다. 사용자 이름, 설명, 상태 등을 관리할 수 있습니다.'
                     }
@@ -286,7 +287,7 @@
                     path: '/api-list', name: 'api-list', component: loadVue('./page/p5-api-list'), meta: {
                         showInMenu: true,
                         icon: "mdi-dev-to",
-                        iconColor: "green",
+                        iconColor: "purple",
                         title: "API 명세",
                         description: '시스템에서 제공하는 API 목록과 상세 명세를 확인할 수 있습니다. API 테스트도 가능합니다.'
                     }
@@ -331,7 +332,7 @@
                     path: '/readme-viewer', name: 'readme-viewer', component: loadVue('./page/p20-readme-viewer'), meta: {
                         showInMenu: true,
                         icon: "mdi-file-document-outline",
-                        iconColor: "info",
+                        iconColor: "purple",
                         title: "프로젝트 소개(README)",
                         description: '프로젝트 개요, 주요 기능, 기술스택, 구조, 팀 소개 등을 확인할 수 있습니다.'
                     }
@@ -343,6 +344,7 @@
                         hideInWelcom:true,
                         title: "Welcome KI-SQM",
                         icon: "mdi-home",
+                        iconColor: "purple",
                         description: '웰컴페이지.'
                     }
                 }
@@ -451,7 +453,7 @@
                     path: '/mobile-banking-transfer', name: 'mobile-banking-transfer', component: loadVue('./page/p11-mobile-banking-transfer'), meta: {
                         showInMenu: false,
                         icon: "mdi-bank-transfer",
-                        iconColor: "green",
+                        iconColor: "red",
                         title: "모바일뱅킹 간편이체",
                     }
                 }
@@ -459,7 +461,7 @@
                     path: '/mobile-banking-loan', name: 'mobile-banking-loan', component: loadVue('./page/p12-mobile-banking-loan'), meta: {
                         showInMenu: false,
                         icon: "mdi-checkbook",
-                        iconColor: "green",
+                        iconColor: "red",
                         title: "모바일뱅킹 대출신청",
                     }
                 }

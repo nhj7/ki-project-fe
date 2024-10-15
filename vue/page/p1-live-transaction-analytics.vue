@@ -123,7 +123,7 @@ const comp = (module.exports = {
             },
           },
           {
-            name: "이상 거래",
+            name: "오류 거래",
             type: "scatter",
             smooth: true,
             data: [],
@@ -289,7 +289,7 @@ const comp = (module.exports = {
       if (params.componentType === 'series' && params.seriesType === 'scatter') {
         const clickedData = params.data;
         console.log('클릭된 데이터:', clickedData);
-        this.$vo.openSvcDetailDialog( {guid : clickedData[5]});
+        this.$vo.openSvcDetailDialog({ guid: clickedData[5] });
       }
     },
     // 오류율에 따른 색상 반환
@@ -399,6 +399,36 @@ const comp = (module.exports = {
       return transaction;
     },
 
+    updateAnomalyTransactions(transactions) {
+      // 이상 거래 목록 업데이트
+      // 새로운 비정상 거래 필터링 및 매핑
+      const newAnomalies = transactions
+        .filter((tx) => tx.tx_status !== "정상")
+        .filter(
+          (tx) =>
+            !this.anomalyTransactions.some(
+              (existingItem) => existingItem.id === tx.id
+            )
+        )
+        .map((tx) => ({
+          id: tx.id,
+          guid: tx.guid,
+          timestamp: this.$util.formatDttm(tx.req_dttm, '-', ':'),
+          transactionId: tx.tx_id,
+          type: tx.tx_biz_id,
+          status: tx.tx_status,
+        }));
+
+      // 기존 anomalyTransactions와 새로운 비정상 거래를 합치고 정렬
+      this.anomalyTransactions = [
+        ...this.anomalyTransactions,
+        ...newAnomalies,
+      ]
+        .sort((a, b) => new Date(b.id) - new Date(a.id))
+        .slice(0, 10); // 최근 10개만 유지
+
+    },
+
     /**
      * 초기 데이터를 가져오는 함수
      * @returns 초기 데이터
@@ -488,32 +518,7 @@ const comp = (module.exports = {
 
         this.updateChartData(transactions);
 
-        // 이상 거래 목록 업데이트
-        // 새로운 비정상 거래 필터링 및 매핑
-        const newAnomalies = transactions
-          .filter((tx) => tx.tx_status !== "정상")
-          .filter(
-            (tx) =>
-              !this.anomalyTransactions.some(
-                (existingItem) => existingItem.id === tx.id
-              )
-          )
-          .map((tx) => ({
-            id: tx.id,
-            guid: tx.guid,
-            timestamp: this.$util.formatDttm(tx.req_dttm, '-', ':'),
-            transactionId: tx.tx_id,
-            type: tx.tx_biz_id,
-            status: tx.tx_status === "타임아웃" ? "오류" : "의심",
-          }));
-
-        // 기존 anomalyTransactions와 새로운 비정상 거래를 합치고 정렬
-        this.anomalyTransactions = [
-          ...this.anomalyTransactions,
-          ...newAnomalies,
-        ]
-          .sort((a, b) => new Date(b.id) - new Date(a.id))
-          .slice(0, 10); // 최근 10개만 유지
+        this.updateAnomalyTransactions(transactions);
 
         transactions.sort((a, b) => b.id - a.id);
         transactions.forEach((tx, idx) =>
@@ -662,7 +667,7 @@ const comp = (module.exports = {
             normal: service.todayCnt,
             errorRate: service.errPer,
             tps: service.tps ? parseFloat(service.tps).toFixed(2) : 0, // TPS를 소수점 두 자리까지 표시
-            transactionsPerHour: this.$util.numberWithComma(service.currentCnt),
+            transactionsPerHour: this.formatNumber(service.currentCnt),
             todayTransactions: this.formatNumber(service.todayCnt),
             yesterdayTransactions: this.formatNumber(
               service.previousDayCnt
@@ -701,6 +706,7 @@ const comp = (module.exports = {
   async created() {
     const initialData = await this.generateInitialData();
     this.updateChartData(initialData);
+    this.updateAnomalyTransactions(initialData);
     this.fetchServiceData(); // 초기 데이터 로드 (가상 데이터 사용)
     ///this.updateSummaryItems(initialData);
   },

@@ -50,7 +50,7 @@ const comp = module.exports = {
     return {
       valid: false,
       transferData: {
-        sender: '김남구',
+        sender: '김엄상',
         receiver: '이민호',
         amount: '100000000',
         date: this.$util.formatDate(new Date(), '-'),
