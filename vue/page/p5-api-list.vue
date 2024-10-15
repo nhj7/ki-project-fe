@@ -765,7 +765,9 @@ const comp = module.exports = {
                     parameters: [
                         { name: 'startDate', type: 'String', required: true, default: this.$util.getDate(-7), description: '조회 시작 날짜 (YYYY-MM-DD 형식)' },
                         { name: 'endDate', type: 'String', required: true, default: this.$util.getDate(), description: '조회 종료 날짜 (YYYY-MM-DD 형식)' },
-                        { name: 'ruleId', type: 'String', required: false, default: 'RULE-001', description: '규칙 ID (전체 또는 특정 규칙 ID)' }
+                        { name: 'ruleId', type: 'String', required: false, default: 'RULE-001', description: '규칙 ID (전체 또는 특정 규칙 ID)' },
+                        { name: 'lastMinutes', type: 'Number', required: false, default: '', description: '최근 몇 분 동안의 데이터를 조회할지 지정 (예: 5)' },
+                        { name: 'detectStatus', type: 'String', required: false, default: '', description: '감지 상태 (확인전, 확인중, 조치중, 모니터링중, 완료)' }
                     ],
                     responseSampleHtml: '',
                     responseSample: [
@@ -773,6 +775,7 @@ const comp = module.exports = {
                             "id": 1,
                             "rule_id": "RULE001",
                             "rule_nm": "거래량 급증 감지",
+                            "detect_status": "확인전",
                             "svc_id": "SVC001",
                             "svc_nm": "계좌이체 서비스",
                             "svc_cnt": 1000,
@@ -802,6 +805,7 @@ const comp = module.exports = {
                         { name: 'id', type: 'Number', required: true, description: '규칙 감지 ID' },
                         { name: 'rule_id', type: 'String', required: true, description: '규칙 ID' },
                         { name: 'rule_nm', type: 'String', required: true, description: '규칙명' },
+                        { name: 'detect_status', type: 'String', required: true, description: '감지 상태' },
                         { name: 'svc_id', type: 'String', required: true, description: '서비스 ID' },
                         { name: 'svc_nm', type: 'String', required: true, description: '서비스명' },
                         { name: 'svc_cnt', type: 'Number', required: false, description: '서비스 건수' },

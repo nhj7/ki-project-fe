@@ -361,7 +361,7 @@ module.exports = {
 
       this.services = rootServices.map(buildTree);
 
-      this.$msg.showSnackbar('서비스가 성공적으로 조회되었습니다.');
+      //this.$msg.showSnackbar('서비스가 성공적으로 조회되었습니다.');
     } catch (error) {
       console.error('서비스 데이터를 불러오는 중 오류가 발생했습니다:', error);
       this.$msg.showSnackbar('서비스 데이터를 불러오는 데 실패했습니다.');

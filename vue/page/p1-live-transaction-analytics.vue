@@ -28,7 +28,7 @@
                     </v-tooltip>
                   </template>
                   <template v-slot:[`item.errorRate`]="{ item }">
-                    <v-chip :color="getRateColor(item.errorRate)" small>
+                    <v-chip :color="getRateColor(item.errorRate)" small outlined>
                       {{ item.errorRate }}%
                     </v-chip>
                   </template>
@@ -66,17 +66,9 @@
               <v-col cols="12">
                 <v-data-table :headers="anomalyHeaders" :items="anomalyTransactions" :items-per-page="3" :footer-props="{
                     'items-per-page-options': itemsPerPageOptions,
-                  }" class="elevation-1" @click:row="$vo.openSvcDetailDialog">
-                  <template v-slot:[`item.timestamp`]="{ item }">
-                    {{
-                    item.timestamp.replace(
-                    /(.{4})(.{2})(.{2})(.{2})(.{2})(.{2})/,
-                    "$1-$2-$3$4:$5:$6"
-                    )
-                    }}
-                  </template>
+                  }" class="elevation-1" @click:row="$vo.openSvcDetailDialog">                  
                   <template v-slot:[`item.status`]="{ item }">
-                    <v-chip :color="getStatusColor(item.status)" small>
+                    <v-chip :color="getStatusColor(item.status)" small outlined>
                       {{ item.status }}
                     </v-chip>
                   </template>

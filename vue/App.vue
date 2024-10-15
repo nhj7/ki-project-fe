@@ -126,7 +126,7 @@
     <alarm-popup v-model="alarmPopupVisible" :alarms="alarms"></alarm-popup>
 
     <v-main>
-      <v-container lass="fill-height pa-0" fluid>
+      <v-container fluid>
         <div class="d-flex align-center justify-space-between">
           <h2 class="text-subtitle-2 mb-2 d-flex align-center cursor-pointer" @click.stop="drawer = !drawer">
             <v-icon size="24" :color="this.$route.meta.iconColor || 'primary'" class="mr-2">
@@ -138,7 +138,7 @@
             <v-btn icon @click="$router.go(-1)">
               <v-icon>mdi-arrow-left</v-icon>
             </v-btn>
-            <v-btn icon @click="$router.go(1)" >
+            <v-btn icon @click="$router.go(1)">
               <v-icon>mdi-arrow-right</v-icon>
             </v-btn>
           </div>
@@ -251,9 +251,10 @@
                 &nbsp;&nbsp; 서비스 상세 거래 목록
               </v-card-subtitle>
               <v-data-table :headers="$vo.detailTransactionHeaders" :items="$vo.detailTransactions" :items-per-page="5"
-                class="elevation-1" dense :height="230" fixed-header @click:row="$vo.openTxDetailDialog">
+                class="elevation-1" dense :height="230" fixed-header @click:row="$vo.openTxDetailDialog"
+                :item-class="rowClasses">
                 <template v-slot:[`item.status`]="{ item }">
-                  <v-chip :color="$vo.getStatusColor(item.status)" small>
+                  <v-chip small :text-color="$vo.getStatusColor(item.status)" outlined>
                     {{ item.status }}
                   </v-chip>
                 </template>
@@ -301,7 +302,7 @@
                       <td class="value-column">{{ $vo.tx.selectedTx.system_cd }}</td>
                       <td class="label-column">상태</td>
                       <td class="value-column">
-                        <v-chip :color="$vo.getStatusColor($vo.tx.selectedTx.status)" small>
+                        <v-chip :color="$vo.getStatusColor($vo.tx.selectedTx.status)" small outlined>
                           {{ $vo.tx.selectedTx.status }}
                         </v-chip>
                       </td>
@@ -529,9 +530,6 @@ const VoPlugin = {
           { text: '시스템', value: 'system' },
           { text: '심각도', value: 'severity' },
           { text: '서비스내용', value: 'description' },
-          { text: '처리상태', value: 'status' },
-          { text: '정책ID', value: 'ruleId' },
-          { text: '정책명', value: 'ruleNm' },
           { text: '상세', value: 'actions', sortable: false },
         ],
         incidents: {
@@ -620,7 +618,7 @@ const VoPlugin = {
           if (!status) return 'grey';
           switch (status) {
             case '정상': return 'grey';
-            default: return 'orange';
+            default: return 'red';
           }
         },
         async fetchDetailTransactions(incidentGuid) {
@@ -708,6 +706,9 @@ const comp = (module.exports = {
 
   },
   methods: {
+    rowClasses(item) {
+      return item.status !== '정상' ? 'error-row' : '';
+    },
     goToAccountSettings() {
 
       this.accountSettingsVisible = true;
@@ -720,7 +721,7 @@ const comp = (module.exports = {
     toggleDarkTheme() {
       data.isDark = !data.isDark;
       this.$vuetify.theme.dark = data.isDark;
-      console.log('toggleDarkTheme', this.$vuetify.theme.dark);
+      //console.log('toggleDarkTheme', this.$vuetify.theme.dark);
       localStorage.setItem("darkTheme", this.isDark);
 
       if (data.isDark) {
@@ -1281,5 +1282,11 @@ Vue.prototype.$session = {
 
 .theme--dark .fixed-table .value-column {
   background-color: #333333;
+}
+
+.error-row {
+  color: var(--v-error-base) !important;
+  /* 연한 빨간색 */
+  font-weight: bold;
 }
 </style>

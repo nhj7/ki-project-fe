@@ -146,12 +146,12 @@
                 <v-data-table :headers="$vo.incidentHeaders" :items="incidents" :items-per-page="10"
                     class="elevation-1 custom-table" :mobile-breakpoint="0" @click:row="showDetails">
                     <template v-slot:[`item.severity`]="{ item }">
-                        <v-chip :color="getSeverityColor(item.severity)" dark small>
+                        <v-chip :text-color="getSeverityColor(item.severity)" outlined small >
                             {{ item.severity }}
                         </v-chip>
                     </template>
                     <template v-slot:[`item.status`]="{ item }">
-                        <v-chip :color="getStatusColor(item.status)" dark small>
+                        <v-chip :text-color="getStatusColor(item.status)" outlined small >
                             {{ item.status }}
                         </v-chip>
                     </template>

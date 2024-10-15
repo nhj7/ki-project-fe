@@ -75,15 +75,15 @@ const comp = module.exports = {
       ruleIds: [],
       ruleDetections: [],
       headers: [
-        { text: '규칙 ID', value: 'rule_id' },
-        { text: '규칙명', value: 'rule_nm' },
-        { text: '서비스 ID', value: 'svc_id' },
-        { text: '서비스명', value: 'svc_nm' },
-        { text: '거래량 비율', value: 'tx_ratio' },
-        { text: '거래량 비율 여부', value: 'tx_ratio_yn' },
-        { text: '오류율', value: 'tx_err_ratio' },
-        { text: '오류율 여부', value: 'tx_err_ratio_yn' },
-        { text: '감지 시작 시간', value: 'af_startDttm' },
+        { text: '규칙 ID', value: 'ruleId' },
+        { text: '규칙명', value: 'ruleNm' },
+        { text: '서비스 ID', value: 'svcId' },
+        { text: '서비스명', value: 'svcNm' },
+        { text: '거래량 비율', value: 'txRatio' },
+        { text: '거래량 비율 여부', value: 'txRatioYn' },
+        { text: '오류율', value: 'txErrRatio' },
+        { text: '오류율 여부', value: 'txErrRatioYn' },
+        { text: '감지 시작 시간', value: 'afStartdttm', format: (value) => this.$util.formatDttm(value) },
         { text: '액션', value: 'actions', sortable: false },
       ],
     };
@@ -99,7 +99,7 @@ const comp = module.exports = {
           ...(this.filters.ruleId !== '전체' ? { ruleId: this.filters.ruleId } : {}),
         });
         console.log('규칙 감지 목록 : ', response);
-        this.ruleDetections = response.data.body.rules;
+        this.ruleDetections = response.data;
         
       } catch (error) {
         console.error('규칙 감지 목록을 불러오는 중 오류가 발생했습니다:', error);

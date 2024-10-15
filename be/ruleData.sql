@@ -2,6 +2,7 @@ CREATE TABLE ruledata (
   `id` bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `rule_id` varchar(255) NOT NULL,
   `rule_nm` varchar(255) NOT NULL,
+  `detect_status` varchar(10) NOT NULL,
   `svc_id` varchar(255) NOT NULL,
   `svc_nm` varchar(255) NOT NULL,
   `svc_cnt` bigint(20) DEFAULT NULL,
