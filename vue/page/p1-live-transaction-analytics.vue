@@ -58,7 +58,8 @@
             <!-- 거래 흐름 차트 -->
             <v-row>
               <v-col cols="12" md="12">
-                <v-chart class="chart" :option="chartOption" :autoresize="true" :key="isDarkMode" />
+                <v-chart class="chart" :option="chartOption" :autoresize="true" :key="isDarkMode"
+                  @click="handleChartClick" />
               </v-col>
             </v-row>
 
@@ -66,7 +67,7 @@
               <v-col cols="12">
                 <v-data-table :headers="anomalyHeaders" :items="anomalyTransactions" :items-per-page="3" :footer-props="{
                     'items-per-page-options': itemsPerPageOptions,
-                  }" class="elevation-1" @click:row="$vo.openSvcDetailDialog">                  
+                  }" class="elevation-1" @click:row="$vo.openSvcDetailDialog">
                   <template v-slot:[`item.status`]="{ item }">
                     <v-chip :color="getStatusColor(item.status)" small outlined>
                       {{ item.status }}
@@ -93,6 +94,7 @@ const comp = (module.exports = {
       transactionFlowOption: {
         legend: {
           data: ["정상 거래", "이상 거래"],
+          show: false, // 범례를 숨깁니다.
         },
         xAxis: {
           type: "time",
@@ -225,6 +227,17 @@ const comp = (module.exports = {
         },
         tooltip: {
           trigger: "item",
+          formatter: function (params) {
+            //console.log('params', params);
+            const date = new Date(params.value[0]);
+            const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
+            const elapsedTime = (params.value[1] / 1000).toFixed(3); // 밀리초를 초로 변환하고 소수점 3자리까지 표시
+            return `<strong>${params.value[2]}-${params.value[3]}-${params.value[4]}</strong><br/>
+                    <strong>${params.seriesName}</strong><br/>
+                    <strong>${params.seriesName}</strong><br/>
+                    시간: ${formattedDate}<br/>
+                    처리시간: ${elapsedTime} 초`;
+          },
           axisPointer: {
             type: "shadow",
             label: {
@@ -272,6 +285,13 @@ const comp = (module.exports = {
     },
   },
   methods: {
+    handleChartClick(params) {
+      if (params.componentType === 'series' && params.seriesType === 'scatter') {
+        const clickedData = params.data;
+        console.log('클릭된 데이터:', clickedData);
+        this.$vo.openSvcDetailDialog( {guid : clickedData[5]});
+      }
+    },
     // 오류율에 따른 색상 반환
     getRateColor(rate) {
       if (rate < 5) return "green";
@@ -426,9 +446,9 @@ const comp = (module.exports = {
         ).getTime();
         if (time >= threeMinutesAgo) {
           if (tx.tx_status === "정상") {
-            this.transactionFlowOption.series[0].data.push([time, tx.elapsed]);
+            this.transactionFlowOption.series[0].data.push([time, tx.elapsed, tx.if_id, tx.prg_nm, tx.system_cd, tx.guid]);
           } else {
-            this.transactionFlowOption.series[1].data.push([time, tx.elapsed]);
+            this.transactionFlowOption.series[1].data.push([time, tx.elapsed, tx.if_id, tx.prg_nm, tx.system_cd, tx.guid]);
           }
         }
       });

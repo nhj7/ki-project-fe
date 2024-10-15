@@ -1,8 +1,10 @@
-CREATE TABLE ruledata (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+-- kisb.ruledata definition
+
+CREATE TABLE `ruledata` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `rule_id` varchar(255) NOT NULL,
   `rule_nm` varchar(255) NOT NULL,
-  `detect_status` varchar(10) NOT NULL,
+  `detect_status` varchar(10) DEFAULT NULL COMMENT '탐지상태(확인전, 확인중, 조치중, 모니터링중, 완료)',
   `svc_id` varchar(255) NOT NULL,
   `svc_nm` varchar(255) NOT NULL,
   `svc_cnt` bigint(20) DEFAULT NULL,
@@ -24,6 +26,11 @@ CREATE TABLE ruledata (
   `unit` varchar(255) DEFAULT NULL,
   `action` text DEFAULT NULL,
   `enabled` char(1) DEFAULT NULL,
-  `reg_dt` varchar(8) DEFAULT CURRENT_DATE,
-  `reg_dttm` varchar(14) DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+  `reg_dt` date DEFAULT curdate(),
+  `reg_time` time DEFAULT curtime(),
+  `reg_dttm` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ruledata_reg_dt_IDX` (`reg_dt`) USING BTREE,
+  KEY `ruledata_reg_time_IDX` (`reg_time`) USING BTREE,
+  KEY `ruledata_reg_dttm_IDX` (`reg_dttm`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=564 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
