@@ -42,6 +42,10 @@
 - Vuetify 2: UI 컴포넌트 라이브러리
 - D3.js: 데이터 시각화
 - ECharts: 고급 차트 및 그래프 생성
+ #Backend
+- Spring Cloud Gateway
+- Spring Security
+- Spring Data JPA
 
 ## 성능 최적화
 
