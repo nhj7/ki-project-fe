@@ -766,7 +766,7 @@ const comp = module.exports = {
                         { name: 'startDate', type: 'String', required: true, default: this.$util.getDate(-7), description: '조회 시작 날짜 (YYYY-MM-DD 형식)' },
                         { name: 'endDate', type: 'String', required: true, default: this.$util.getDate(), description: '조회 종료 날짜 (YYYY-MM-DD 형식)' },
                         { name: 'ruleId', type: 'String', required: false, default: 'RULE-001', description: '규칙 ID (전체 또는 특정 규칙 ID)' },
-                        { name: 'lastMinutes', type: 'Number', required: false, default: '', description: '최근 몇 분 동안의 데이터를 조회할지 지정 (예: 5)' },
+                        { name: 'lastMinutes', type: 'number', required: false, default: '', description: '최근 몇 분 동안의 데이터를 조회할지 지정 (예: 5)' },
                         { name: 'detectStatus', type: 'String', required: false, default: '', description: '감지 상태 (확인전, 확인중, 조치중, 모니터링중, 완료)' }
                     ],
                     responseSampleHtml: '',

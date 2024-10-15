@@ -85,7 +85,9 @@
     <v-app-bar :clipped-left="clipped" fixed app flat class="app-bar-with-border">
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <!--v-img src="/assets/ci4.jpg" :width="150" @click.stop="drawer = !drawer" /-->
-      <v-toolbar-title class="text-h6 cursor-pointer" @click.stop="drawer = !drawer">한국투자</v-toolbar-title>
+      <router-link to="/" class="text-decoration-none">
+        <v-toolbar-title class="text-h6 cursor-pointer">한국투자</v-toolbar-title>
+      </router-link>
       <v-spacer></v-spacer>
       <!--v-btn icon @click.stop="rightDrawer = !rightDrawer">
                         <v-icon>mdi-cog</v-icon>
@@ -250,9 +252,9 @@
                 <v-icon>mdi-list-box</v-icon>
                 &nbsp;&nbsp; 서비스 상세 거래 목록
               </v-card-subtitle>
-              <v-data-table :headers="$vo.detailTransactionHeaders" :items="$vo.detailTransactions" :items-per-page="5"
+              <v-data-table :headers="$vo.detailTransactionHeaders" :items="$vo.detailTransactions" :items-per-page="7"
                 class="elevation-1" dense :height="230" fixed-header @click:row="$vo.openTxDetailDialog"
-                :item-class="rowClasses">
+                :item-class="rowClasses" hide-default-footer>
                 <template v-slot:[`item.status`]="{ item }">
                   <v-chip small :text-color="$vo.getStatusColor(item.status)" outlined>
                     {{ item.status }}
@@ -537,7 +539,7 @@ const VoPlugin = {
         },
         detailTransactionHeaders: [
           { text: '거래ID', value: 'tx_id' },
-          { text: '프로그램 ID', value: 'programId' },
+          { text: '프로그램 ID', value: 'if_id' },
           { text: '프로그램 명', value: 'prg_nm' },
           { text: '거래 시간', value: 'transactionTime' },
           { text: '처리 시간(초)', value: 'elapsed' },
@@ -1288,5 +1290,10 @@ Vue.prototype.$session = {
   color: var(--v-error-base) !important;
   /* 연한 빨간색 */
   font-weight: bold;
+}
+
+.text-decoration-none {
+  text-decoration: none;
+  color: inherit;
 }
 </style>
