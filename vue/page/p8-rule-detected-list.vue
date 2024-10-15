@@ -29,8 +29,8 @@
                 </v-menu>
               </v-col>
               <v-col cols="12" sm="4" md="3">
-                <v-select v-model="filters.ruleId" :items="ruleIds" label="규칙 ID"
-                  dense hide-details></v-select>
+                <v-select v-model="filters.ruleId" :items="ruleIds" item-text="text" item-value="value"
+                  label="규칙 ID" dense hide-details></v-select>
               </v-col>
               <v-col cols="12" sm="12" md="12" class="d-flex justify-end align-center">
                 <v-btn :color="$config.color_btn" @click="search" small dense>조회</v-btn>
@@ -93,8 +93,14 @@ const comp = module.exports = {
       try {
         this.$loading.show('규칙 감지 목록을 불러오는 중입니다...');
         // API 호출 로직 구현
-        const response = await this.$axios.post('/api/rule-detections', this.filters);
-        this.ruleDetections = response.data;
+        const response = await this.$axios.post('/api/rule-detections', {
+          startDate: this.filters.startDate.replace(/-/g, ''),
+          endDate: this.filters.endDate.replace(/-/g, ''),
+          ...(this.filters.ruleId !== '전체' ? { ruleId: this.filters.ruleId } : {}),
+        });
+        console.log('규칙 감지 목록 : ', response);
+        this.ruleDetections = response.data.body.rules;
+        
       } catch (error) {
         console.error('규칙 감지 목록을 불러오는 중 오류가 발생했습니다:', error);
         this.ruleDetections = [];
@@ -113,7 +119,12 @@ const comp = module.exports = {
       try {
         const response = await this.$axios.post('/api/rule-list');
         console.log('규칙 ID 목록 조회 응답 : ', response);
-        this.ruleIds = ['전체', ...response.data.body.rules.map(rule => rule.id + ' - ' + rule.name)];
+        this.ruleIds = ['전체', ...response.data.body.rules.map(rule => {
+          return {
+            text: rule.id + ' - ' + rule.name,
+            value: rule.id
+          }
+        })];
       } catch (error) {
         console.error('규칙 ID 목록을 불러오는 중 오류가 발생했습니다:', error);
         this.ruleIds = [];
@@ -124,6 +135,8 @@ const comp = module.exports = {
     const dates = this.$util.setLastWeekDates();
     this.filters.startDate = dates.startDate;
     this.filters.endDate = dates.endDate;
+
+    //console.log("app.vue created", this.$router);
   },
   async mounted() {
     await this.fetchRuleIds();

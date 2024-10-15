@@ -200,25 +200,18 @@
             warning: '#f57c00', // 오렌지색 계열
         }
 
-        const Home = { template: '<div>Home</div>' }
+        const Home = { component: loadVue('./page/p10-welcome-page') }
 
 
         const router = new VueRouter({
             mode: 'hash',
             routes: [
                 {
-                    path: '/', name: 'Home', component: Home, meta: {
-                        showInMenu: false,
-                        title: "홈",
-                        icon: "mdi-home",
-                    }
-                }
-
-                , {
                     path: '/live-transaction-analytics', name: 'live-transaction-analytics', component: loadVue('./page/p1-live-transaction-analytics'), meta: {
                         showInMenu: true,
                         icon: "mdi-chart-timeline-variant-shimmer",
                         title: "실시간 서비스 모니터링",
+                        description: '실시간으로 서비스 트랜잭션을 모니터링하고 분석합니다. 거래량, 오류율, 처리 시간 등을 한눈에 확인할 수 있습니다.'
                     }
                 }
                 , {
@@ -227,6 +220,7 @@
                         icon: "mdi-shield-sync-outline",
                         iconColor: "green",
                         title: "서비스 감지 목록",
+                        description: '설정된 규칙에 따라 감지된 서비스 이상 징후 목록을 확인할 수 있습니다. 거래량 비율, 오류율 등을 모니터링합니다.'
                     }
                 }
                 , {
@@ -235,6 +229,7 @@
                         icon: "mdi-shield-star-outline",
                         iconColor: "green",
                         title: "이상 징후 감지 정책 설정",
+                        description: '서비스 모니터링을 위한 이상 징후 감지 정책을 설정합니다. 다양한 조건으로 규칙을 생성하고 관리할 수 있습니다.'
                     }
                 }
                 , {
@@ -243,6 +238,7 @@
                         icon: "mdi-lan-check",
                         iconColor: "orange",
                         title: "서비스 거래 이력 조회",
+                        description: '서비스 거래 이력을 조회할 수 있습니다. 거래량, 오류율, 처리 시간 등을 한눈에 확인할 수 있습니다.'
                     }
                 }
                 , {
@@ -251,6 +247,7 @@
                         icon: "mdi-database-search",
                         iconColor: "orange",
                         title: "서비스 상세 내역 조회",
+                        description: '개별 서비스 거래의 상세 내역을 조회합니다. 요청/응답 데이터, 처리 시간 등 상세 정보를 확인할 수 있습니다.'
                     }
                 }
                 
@@ -270,6 +267,7 @@
                         icon: "mdi-clipboard-check",
                         iconColor: "info",
                         title: "서비스 관리",
+                        description: '관리되고 있는 서비스들을 확인 할 수 있습니다. 서비스 이름, 설명, 세부 내역을 확인할 수 있습니다.'
                     }
                 }
                 
@@ -280,6 +278,7 @@
                         icon: "mdi-account-multiple",
                         iconColor: "green",
                         title: "사용자 관리",
+                        description: '사용자 관리를 위한 설정을 할 수 있습니다. 사용자 이름, 설명, 상태 등을 관리할 수 있습니다.'
                     }
                 }
 
@@ -289,6 +288,7 @@
                         icon: "mdi-dev-to",
                         iconColor: "green",
                         title: "API 명세",
+                        description: '시스템에서 제공하는 API 목록과 상세 명세를 확인할 수 있습니다. API 테스트도 가능합니다.'
                     }
                 }
 
@@ -333,8 +333,21 @@
                         icon: "mdi-file-document-outline",
                         iconColor: "info",
                         title: "프로젝트 소개(README)",
+                        description: '프로젝트 개요, 주요 기능, 기술스택, 구조, 팀 소개 등을 확인할 수 있습니다.'
+                    }
+                },
+
+                {
+                    path: '/', name: 'Home', component: loadVue('./page/p10-welcome-page'), meta: {
+                        showInMenu: true,
+                        hideInWelcom:true,
+                        title: "Welcome KI-SQM",
+                        icon: "mdi-home",
+                        description: '웰컴페이지.'
                     }
                 }
+
+                
                 
                 , {
                     path: '#1', name: 'test', meta: {
@@ -342,6 +355,7 @@
                         icon: "mdi-view-dashboard",
                         title: "서비스 품질 테스트 센터",
                         isGroupOpen: false,
+                        hideInWelcom:true,
                     }, subRoutes: [                        
                         {
                             path: '/mobile-banking-transfer'

@@ -127,11 +127,22 @@
 
     <v-main>
       <v-container lass="fill-height pa-0" fluid>
-        <h2 class="text-subtitle-2 mb-2 d-flex align-center cursor-pointer" @click.stop="drawer = !drawer">
-          <v-icon size="24" :color="this.$route.meta.iconColor || 'primary'" class="mr-2">{{ this.$route.meta.icon
-            }}</v-icon>
-          {{ this.$route.meta.title }}
-        </h2>
+        <div class="d-flex align-center justify-space-between">
+          <h2 class="text-subtitle-2 mb-2 d-flex align-center cursor-pointer" @click.stop="drawer = !drawer">
+            <v-icon size="24" :color="this.$route.meta.iconColor || 'primary'" class="mr-2">
+              {{ this.$route.meta.icon }}
+            </v-icon>
+            {{ this.$route.meta.title }}
+          </h2>
+          <div>
+            <v-btn icon @click="$router.go(-1)">
+              <v-icon>mdi-arrow-left</v-icon>
+            </v-btn>
+            <v-btn icon @click="$router.go(1)" >
+              <v-icon>mdi-arrow-right</v-icon>
+            </v-btn>
+          </div>
+        </div>
         <v-divider class=""></v-divider>
         <!--component :is="currentView"></component-->
         <div class="router-view-container flex-grow-1">
@@ -285,7 +296,7 @@
                       <td class="value-column">{{ $vo.tx.selectedTx.prg_nm }}</td>
                     </tr>
                     <tr>
-                      
+
                       <td class="label-column">시스템 코드</td>
                       <td class="value-column">{{ $vo.tx.selectedTx.system_cd }}</td>
                       <td class="label-column">상태</td>
@@ -298,19 +309,19 @@
                       <td class="value-column">{{ $vo.tx.selectedTx.elapsed }}</td>
                     </tr>
                     <tr>
-                      
+
                       <td class="label-column">요청일시</td>
                       <td class="value-column">{{ $util.formatDttm($vo.tx.selectedTx.req_dttm, '-', ':') }}</td>
                       <td class="label-column">응답일시</td>
                       <td class="value-column">{{ $util.formatDttm($vo.tx.selectedTx.res_dttm, '-', ':') }}</td>
-                      
-                    </tr>                    
+
+                    </tr>
                     <tr>
                       <td class="label-column">응답코드</td>
                       <td class="value-column">{{ $vo.tx.selectedTx.res_cd }}</td>
                       <td class="label-column">응답메시지</td>
                       <td class="value-column" colspan="3">{{ $vo.tx.selectedTx.res_msg }}</td>
-                      
+
                     </tr>
                   </tbody>
                 </template>
@@ -320,7 +331,7 @@
               <v-row>
                 <v-col cols="6" class="message-column">
                   <v-card-subtitle class="text-subtitle-1 pb-0">
-                    
+
                     &nbsp;&nbsp; 요청 전문
                     <v-icon>mdi-arrow-right-bold</v-icon>
                   </v-card-subtitle>
@@ -534,10 +545,10 @@ const VoPlugin = {
           { text: '처리 시간(초)', value: 'elapsed' },
           { text: '상태', value: 'status' },
         ],
-        detailTransactions: [],        
-        tx : {
+        detailTransactions: [],
+        tx: {
           detailDialog: false,
-          selectedTx : {
+          selectedTx: {
             transactionId: '',
             interfaceId: '',
             programName: '',
@@ -557,7 +568,7 @@ const VoPlugin = {
         keyValueHeaders: [
           { text: 'Key', value: 'key' },
           { text: 'Value', value: 'value' }
-        ],        
+        ],
       },
       methods: {
         set(options = {}) {
@@ -625,7 +636,7 @@ const VoPlugin = {
                 ...transaction,
                 transactionTime: this.$util.formatDttm(transaction.req_dttm, '-', ':'),
                 elapsed: transaction.elapsed ? (transaction.elapsed / 1000).toFixed(2) : '',
-                status: transaction.tx_status,                
+                status: transaction.tx_status,
               }));
             } else {
               console.error('API 응답 형식이 올바르지 않습니다:', response.data, error);
@@ -811,7 +822,7 @@ const comp = (module.exports = {
     });
   },
   async created() {
-    //console.log("app.vue created", this, this.$options.components);
+    //console.log("app.vue created", this.$router);
     //this.$router.addRoutes(router);
 
     { // ===== 테마 설정 =====
@@ -1271,6 +1282,4 @@ Vue.prototype.$session = {
 .theme--dark .fixed-table .value-column {
   background-color: #333333;
 }
-
-
 </style>

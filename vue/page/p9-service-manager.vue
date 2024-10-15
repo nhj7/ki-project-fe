@@ -5,7 +5,7 @@
         <v-card>
 
           <v-card-text>
-            <v-treeview :items="treeItems" activatable="true" item-key="id" return-object class="elevation-1" dense
+            <v-treeview :items="services" activatable="true" item-key="id" return-object class="elevation-1" dense
               :open.sync="openedItems">
               <template v-slot:prepend="{ item, open }">
                 <v-icon v-if="item.children && item.children.length > 0">
@@ -35,8 +35,8 @@
                 </div>
               </template>
               <template v-slot:append="{ item }">
-                <v-chip v-if="item.transactions" color="green" small>
-                  {{ item.transactions.length }} 거래
+                <v-chip v-if="item?.children?.length > 0" color="green" small>
+                  {{ item.children.length }} 거래
                 </v-chip>
               </template>
             </v-treeview>
@@ -95,13 +95,13 @@ module.exports = {
       ],
       services: [
         // 초기 서비스 데이터 예시
-
+        
         {
           id: 1,
           serviceID: 'SV001',
           serviceName: '여신 한도조회',
           description: '사용자의 여신 한도를 조회하는 서비스입니다.',
-          transactions: [
+          children: [
             {
               id: 11,
               txID: 'IF011',
@@ -127,7 +127,7 @@ module.exports = {
           serviceID: 'SV005',
           serviceName: '토스 비교금리조회',
           description: '토스 비교금리를 조회하는 서비스입니다.',
-          transactions: [
+          children: [
             {
               id: 11,
               txID: 'IF011',
@@ -154,7 +154,7 @@ module.exports = {
           serviceID: 'SV002',
           serviceName: '모바일 뱅킹 로그인',
           description: '모바일 뱅킹 로그인 서비스입니다.',
-          transactions: [
+          children: [
             {
               id: 20,
               txID: 'IF020',
@@ -193,7 +193,7 @@ module.exports = {
           serviceID: 'SV003',
           serviceName: '햇살론 대출실행',
           description: '여신 햇살론 상품 대출실행 서비스입니다.',
-          transactions: [
+          children: [
             {
               id: 31,
               txID: 'IF031',
@@ -234,7 +234,7 @@ module.exports = {
           serviceID: 'SV004',
           serviceName: '여신 가상계좌 원리금 수납',
           description: '여신 상품 가상계좌 원리금 수납 서비스입니다.',
-          transactions: [
+          children: [
             {
               id: 41,
               txID: 'IF041',
@@ -261,21 +261,13 @@ module.exports = {
             },
           ]
         },
-
+        
 
       ]
     };
   },
   computed: {
-    treeItems() {
-      return this.services.map(service => ({
-        ...service,
-        children: service.transactions ? service.transactions.map(tx => ({
-          ...tx,
-          serviceID: service.serviceID
-        })) : []
-      }));
-    }
+    
   },
   methods: {
     openDialog() {
@@ -340,40 +332,46 @@ module.exports = {
   },
   async mounted() {
     //this.$msg.showSnackbar('서비스가 성공적으로 조회되었습니다.');
-    console.log(this.services.length, this.services[0].id);
-    if (this.services.length > 0) {
-      this.openedItems = [this.services[0], this.services[2], this.services[3]];
-    }
+    //console.log(this.services.length, this.services[0].id);
+    
 
     try {
       const response = await this.$axios.get('/api/getServices');
-      const services = response.data;
+      console.log('getServices', response);
+      const services = response.data.services;
 
       // 최상위 서비스 찾기
-      const rootServices = services.filter(service => !service.parent_id);
+      const rootServices = services.filter(service => !service.parentId);
+      console.log('rootServices', rootServices);
 
       // 자식 서비스 찾아 트리 구조 만들기
       const buildTree = (service) => {
-        const children = services.filter(child => child.parent_id === service.id);
+        const children = services.filter(child => child.parentId === service.id);
         if (children.length) {
           service.children = children.map(buildTree);
         }
         return {
           id: service.id,
-          serviceID: service.service_code,
-          serviceName: service.service_name,
+          serviceID: service.serviceCode,
+          serviceName: service.serviceName,
           description: service.description,
           children: service.children || []
         };
       };
 
-      this.treeItems = rootServices.map(buildTree);
+      this.services = rootServices.map(buildTree);
 
       this.$msg.showSnackbar('서비스가 성공적으로 조회되었습니다.');
     } catch (error) {
       console.error('서비스 데이터를 불러오는 중 오류가 발생했습니다:', error);
       this.$msg.showSnackbar('서비스 데이터를 불러오는 데 실패했습니다.');
     }
+
+    if (this.services.length > 0) {
+      this.openedItems = [this.services[0], this.services[2], this.services[3]];
+    }
+
+    console.log(this.services);
 
   },
   async created() {

@@ -17,6 +17,16 @@
                   :hide-default-footer="true" :footer-props="{
                     'items-per-page-options': [4, 5, 10, 15],
                   }" class="elevation-1">
+                  <!-- 새로운 템플릿 추가 -->
+                  <template v-slot:[`header.compare`]="{ header }">
+                    {{ header.text }}
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-icon small v-bind="attrs" v-on="on">mdi-help-circle-outline</v-icon>
+                      </template>
+                      <span>{{ header.tooltip }}</span>
+                    </v-tooltip>
+                  </template>
                   <template v-slot:[`item.errorRate`]="{ item }">
                     <v-chip :color="getRateColor(item.errorRate)" small>
                       {{ item.errorRate }}%
@@ -184,7 +194,7 @@ const comp = (module.exports = {
       serviceHeaders: [
         { text: "서비스명", value: "serviceName" },
         { text: "오류율", value: "errorRate" },
-        { text: "전일대비", value: "compare", sortable: false },
+        { text: "전일대비", value: "compare", sortable: false, html: true, tooltip: "전일 동시간대 대비 오류율 증감" },
         { text: "TPS", value: "tps" },
         { text: "시간당", value: "transactionsPerHour" },
         { text: "금일", value: "todayTransactions" },
@@ -481,7 +491,7 @@ const comp = (module.exports = {
             guid: tx.guid,
             timestamp: this.$util.formatDttm(tx.req_dttm, '-', ':'),
             transactionId: tx.tx_id,
-            type: tx.tx_biz_id,            
+            type: tx.tx_biz_id,
             status: tx.tx_status === "타임아웃" ? "오류" : "의심",
           }));
 
@@ -642,7 +652,7 @@ const comp = (module.exports = {
             tps: service.tps ? parseFloat(service.tps).toFixed(2) : 0, // TPS를 소수점 두 자리까지 표시
             transactionsPerHour: this.$util.numberWithComma(service.currentCnt),
             todayTransactions: this.formatNumber(service.todayCnt),
-            yesterdayTransactions: this.$util.numberWithComma(
+            yesterdayTransactions: this.formatNumber(
               service.previousDayCnt
             ),
             lastWeekTransactions: this.$util.numberWithComma(
