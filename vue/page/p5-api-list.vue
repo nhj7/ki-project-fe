@@ -132,10 +132,11 @@ const comp = module.exports = {
             curlExample: '',
             paramValues: {},
             isFormValid: true,
-            selectedApi: 'getRuleDetections',
+            selectedApi: 'updateRuleDetectData',
             apiList: [
-                { text: '서비스 목록 조회(예정)', value: 'getServices' },
-                { text: '감지 목록 조회(예정)', value: 'getRuleDetections' },
+                { text: '감지 데이터 업데이트(예정)', value: 'updateRuleDetectData' },
+                { text: '서비스 목록 조회(완료)', value: 'getServices' },
+                { text: '감지 목록 조회(완료)', value: 'getRuleDetections' },
                 { text: '서비스 지표 목록(완료)', value: 'getMetric' },
                 { text: '서비스 거래 목록 조회(완료)', value: 'getIncidents' },
                 { text: '서비스 내역 조회(완료)', value: 'getGuidData' },
@@ -143,7 +144,7 @@ const comp = module.exports = {
                 { text: '간편 이체(미완-1)', value: 'transfer' },
                 { text: '대출 신청(미완-2)', value: 'applyLoan' },
                 { text: '한도 조회(미완-3)', value: 'checkLoanLimit' },
-                { text: '알람 목록 조회(미완)', value: 'getAlarms' },
+                { text: '알람 목록 조회(폐기예정)', value: 'getAlarms' },
                 // { text: '실시간 서비스 분석(미완)', value: 'getLiveTransactions' },
 
                 { text: '룰셋 조회(완료)', value: 'getRules' },
@@ -755,6 +756,25 @@ const comp = module.exports = {
                         { name: 'req_json', type: 'String', required: true, description: '요청 JSON' },
                         { name: 'res_json', type: 'String', required: true, description: '응답 JSON' },
                         { name: 'elapsed', type: 'Number', required: true, description: '소요 시간 (밀리초)' }
+                    ],
+                },
+                updateRuleDetectData: {
+                    name: '감지 데이터 업데이트',
+                    endpoint: '/api/rule-detect-update',
+                    method: 'POST',
+                    description: '감지된 데이터를 업데이트합니다.',
+                    parameters: [
+                        { name: 'id', type: 'Number', required: true, default: '15', description: '규칙 감지 ID' },
+                        { name: 'detectStatus', type: 'String', required: true, default: '확인중', description: '감지 상태 (예: 확인전, 확인중, 조치중, 모니터링중, 완료)' }
+                    ],
+                    responseSampleHtml: '',
+                    responseSample: {
+                        "resultCode": "0000",
+                        "resultMessage": "성공적으로 업데이트되었습니다."
+                    },
+                    responseFormat: [
+                        { name: 'resultCode', type: 'String', required: true, description: '결과 코드' },
+                        { name: 'resultMessage', type: 'String', required: true, description: '결과 메시지' }
                     ],
                 },
                 getRuleDetections: {
