@@ -5,8 +5,17 @@
         <v-card>
           <v-card-text>
             <v-row>
-              <v-col cols="12" align="center">
+              <v-col cols="11" align="center">
                 <div id="realtime-transaction-chart"></div>
+              </v-col>
+              <v-col cols="1">
+                <v-btn icon >
+                  <v-switch v-model="simulatorOn" inset :label="`시뮬레이터 ${simulatorOn ? 'ON' : 'OFF'}`" @click="toggleSimulator">
+                    <template v-slot:prepend>
+                      <v-icon>{{ simulatorOn ? 'mdi-power' : 'mdi-power-off' }}</v-icon>
+                    </template>
+                  </v-switch>
+                </v-btn>
               </v-col>
             </v-row>
 
@@ -67,7 +76,7 @@
               <v-col cols="12">
                 <v-data-table :headers="anomalyHeaders" :items="anomalyTransactions" :items-per-page="3" :footer-props="{
                     'items-per-page-options': itemsPerPageOptions,
-                  }" class="elevation-1" @click:row="$vo.openSvcDetailDialog">
+                  }" class="elevation-1" @click:row="$vo.openSvcDetailDialog" hide-default-footer>
                   <template v-slot:[`item.status`]="{ item }">
                     <v-chip :color="getStatusColor(item.status)" small outlined>
                       {{ item.status }}
@@ -91,6 +100,7 @@ const comp = (module.exports = {
   },
   data: function () {
     return {
+      simulatorOn: false,
       transactionFlowOption: {
         legend: {
           data: ["정상 거래", "이상 거래"],
@@ -286,6 +296,23 @@ const comp = (module.exports = {
     },
   },
   methods: {
+    async toggleSimulator(){
+      try{
+        console.log("simulatorOn", this.simulatorOn);
+        let simulatorUrl = "/simulator/on";
+        if( !this.simulatorOn ){
+          simulatorUrl = "/simulator/off";
+        }
+        const response = await this.$axios.get(simulatorUrl);
+        if (response.data.status === "Y") {
+          this.simulatorOn = true;
+        } else {
+          this.simulatorOn = false;
+        }
+      } catch (error) {
+        console.error("시뮬레이터를 켜거나 끄는 중 오류가 발생했습니다:", error);
+      }
+    },
     handleChartClick(params) {
       if (params.componentType === 'series' && params.seriesType === 'scatter') {
         const clickedData = params.data;
@@ -710,6 +737,14 @@ const comp = (module.exports = {
     this.updateAnomalyTransactions(initialData);
     this.fetchServiceData(); // 초기 데이터 로드 (가상 데이터 사용)
     ///this.updateSummaryItems(initialData);
+    const response = await axios.get("/simulator/status");
+    //console.log("response", response);
+    if(response.data.status==="Y"){
+      this.simulatorOn = true;
+    }else if(response.data.status==="N"){
+      this.simulatorOn = false;
+    }
+    //this.simulatorOn = response.data.simulatorOn;
   },
   async mounted() {
     await this.fetchNewData(); // 초기 데이터 로드

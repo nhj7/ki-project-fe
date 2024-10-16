@@ -990,12 +990,12 @@ Vue.prototype.$util = globalMethods;
 }
 
 .v-main {
-  padding-top: 53px !important;
+  padding-top: 64px !important;
   /* 상단 바 높이에 맞춰 조정 */
 }
 
 .v-main>.container {
-  height: calc(100vh - 64px);
+  height: calc(100vh - 47px);
   /* 상단 바 높이를 뺀 전체 높이 */
 }
 
@@ -1026,7 +1026,9 @@ Vue.prototype.$util = globalMethods;
 }
 
 .app-bar-with-border {
+
   border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+  
   /* 라이트 모드 */
 }
 
