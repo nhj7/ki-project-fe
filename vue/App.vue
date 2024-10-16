@@ -127,8 +127,8 @@
 
     <alarm-popup v-model="alarmPopupVisible" :alarms="alarms"></alarm-popup>
 
-    <v-main>
-      <v-container fluid>
+    <v-main >
+      <v-container fluid class="pt-0">
         <div class="d-flex align-center">
           <h2 class="text-subtitle-2 mb-1 d-flex align-center cursor-pointer flex-grow-1" @click.stop="drawer = !drawer">
             <v-icon size="24" :color="this.$route.meta.iconColor || 'primary'" class="mr-2">
@@ -990,7 +990,7 @@ Vue.prototype.$util = globalMethods;
 }
 
 .v-main {
-  padding-top: 64px !important;
+  padding-top: 53px !important;
   /* 상단 바 높이에 맞춰 조정 */
 }
 

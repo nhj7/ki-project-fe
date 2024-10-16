@@ -105,6 +105,7 @@ const comp = (module.exports = {
           name: "거래시간(초)",
         },
         grid: {
+          top: 5,
           left: "3%",
           right: "4%",
           bottom: "3%",
@@ -778,7 +779,7 @@ const comp = (module.exports = {
 
 <style scoped>
 .chart {
-  height: 200px;
+  height: 175px;
 }
 
 .transaction {
