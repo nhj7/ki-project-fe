@@ -13,7 +13,7 @@
             <!-- 서비스 별 거래량 데이터 테이블 추가 -->
             <v-row>
               <v-col cols="12">
-                <v-data-table :headers="serviceHeaders" :items="serviceTransactions" :items-per-page="4"
+                <v-data-table :headers="serviceHeaders" :items="serviceTransactions" :items-per-page="5"
                   :hide-default-footer="true" :footer-props="{
                     'items-per-page-options': [4, 5, 10, 15],
                   }" class="elevation-1">

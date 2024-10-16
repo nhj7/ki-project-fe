@@ -72,7 +72,16 @@ const comp = (module.exports = {
             Object.assign(this.$session, response.data.body);
             localStorage.setItem("accessToken", response.data.body.accessToken);
             localStorage.setItem("refreshToken", response.data.body.refreshToken);
-            this.$router.push("/live-transaction-analytics");
+
+            // 리다이렉트 파라미터 확인
+            const redirect = this.$route.query.redirect;
+            if (redirect) {
+              // 리다이렉트 파라미터가 있으면 해당 경로로 이동
+              this.$router.push(redirect);
+            } else {
+              // 리다이렉트 파라미터가 없으면 기본 경로('/')로 이동
+              this.$router.push("/");
+            }            
           } else {
             // 로그인 실패 시 에러 메시지 표시
             this.$session.clear();

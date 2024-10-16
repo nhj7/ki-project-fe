@@ -838,36 +838,7 @@ const comp = (module.exports = {
       }
     } // end 테마 설정
 
-    if (false) { // ===== 로그인 상태 확인 =====
-      let nextRoute = "/login";
-
-      // 로그인 상태 체크
-      const accessToken = localStorage.getItem("accessToken");
-      const refreshToken = localStorage.getItem("refreshToken");
-      if (accessToken && refreshToken) {
-        try {
-          const response = await request("/api/login-check", "POST", { accessToken, refreshToken });
-          //console.log("response", response);
-
-          if (response?.data?.header?.resultCode === "0000") {
-            // 로그인 성공 처리
-            Object.assign(this.$session, response.data.body);
-            localStorage.setItem("accessToken", response.data.body.accessToken);
-            localStorage.setItem("refreshToken", response.data.body.refreshToken);
-            // 현재 경로가 루트("/") 또는 "/login"인 경우 대시보드로 리다이렉트
-            nextRoute = ["/", "/login"].includes(this.$route.path) ? "/live-transaction-analytics" : this.$route.path;
-
-          }
-        } catch (error) {
-          console.error("Login check failed:", error);
-        }
-      }
-
-      // 현재 경로가 nextRoute와 다른 경우에만 리다이렉션
-      if (this.$route.path !== nextRoute) {
-        this.$router.push(nextRoute);
-      }
-    } // end 로그인 상태 체크
+    
 
   },
 });
@@ -989,30 +960,7 @@ const globalMethods = {
 };
 
 Vue.prototype.$util = globalMethods;
-Vue.prototype.$session = {
-  userId: null,
-  userName: null,
-  userType: null,
-  userStatus: null,
-  loginStatus: null,
-  lastLoginDate: null,
-  expiredDate: null,
-  accessToken: null,
-  refreshToken: null,
-  clear() {
-    this.userId = null;
-    this.userName = null;
-    this.userType = null;
-    this.userStatus = null;
-    this.loginStatus = null;
-    this.lastLoginDate = null;
-    this.expiredDate = null;
-    this.accessToken = null;
-    this.refreshToken = null;
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-  },
-};
+
 
 
 

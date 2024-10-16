@@ -78,6 +78,37 @@
     </div>
     <script>
 
+        Vue.prototype.$config = {
+            endpoint_url: 'https://ki.iinfo.kr:18080',
+            color_btn : 'secondary'
+        }
+        axios.defaults.baseURL = Vue.prototype.$config.endpoint_url;
+        Vue.prototype.$axios = axios;
+        Vue.prototype.$session = {
+            userId: null,
+            userName: null,
+            userType: null,
+            userStatus: null,
+            loginStatus: null,
+            lastLoginDate: null,
+            expiredDate: null,
+            accessToken: null,
+            refreshToken: null,
+            clear() {
+                this.userId = null;
+                this.userName = null;
+                this.userType = null;
+                this.userStatus = null;
+                this.loginStatus = null;
+                this.lastLoginDate = null;
+                this.expiredDate = null;
+                this.accessToken = null;
+                this.refreshToken = null;
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("refreshToken");
+            },
+        };
+
         const loadVue = (vueName) => {
             return httpVueLoader('./vue/' + vueName + '.vue');
         }
@@ -469,76 +500,112 @@
         });
 
 
+        function fnIsLoggedIn() {
+            return Vue.prototype.$session.userId != null;
+            //return true;
+        }
+        
 
-        const app = new Vue({
-            'el': '#app'
-            , vuetify: vuetify
-            , router: router
-            , data: {
-                currentView: ''
-            }
-            , data() {
-                return {
-                    currentView: ''
-                    , message: '@nhj12311'
-                    , data1: 'data22'
+        // 로그인 상태를 체크하는 함수
+        async function checkLoginStatus() {
+
+            console.log('현재 주소:', window.location.href);
+            const currentHash = window.location.hash.substring(1);
+            console.log('현재 해시 주소:', currentHash);
+            const accessToken = localStorage.getItem("accessToken");
+            const refreshToken = localStorage.getItem("refreshToken");
+            if (accessToken && refreshToken) {
+                try {
+                    const response = await axios.post("/api/login-check", { accessToken, refreshToken });
+                    if (response?.data?.header?.resultCode === "0000") {
+                        localStorage.setItem("accessToken", response.data.body.accessToken);
+                        localStorage.setItem("refreshToken", response.data.body.refreshToken);
+                        return {
+                            isLoggedIn: true,
+                            userData: response.data.body,
+                            redirectUrl: currentHash
+                        };
+                    }
+                } catch (error) {
+                    console.error("Login check failed:", error);
                 }
             }
-            , components: {
-                'App': loadVue('App')
-                //, 'page-title': PageTitle
+            return { isLoggedIn: false };
+        }
+
+        // 로그인 상태 체크 후 Vue 인스턴스 생성
+        checkLoginStatus().then(({ isLoggedIn, userData, redirectUrl }) => {
+
+            if(!isLoggedIn){
+                // 전역 네비게이션 가드 추가
+                router.beforeEach((to, from, next) => {
+                    
+                    console.log('beforeEach', to, from, next);
+                    if(to.path == '/login'){
+                        next();
+                    }
+                    // 이 라우트는 인증이 필요하며 로그인 여부를 확인합니다.
+                    else if (!fnIsLoggedIn()) {
+                        // 로그인하지 않은 경우 로그인 페이지로 리다이렉션합니다.
+                        next({
+                            path: '/login',
+                            query: { redirect: to.fullPath }
+                        });
+                    } else {
+                        next();
+                    }            
+                });
             }
-            , methods: {
-                changeTheme(themeName) {
-                    this.$vuetify.theme.themes.light = this.$vuetify.theme.themes[themeName];
-                    this.$vuetify.theme.dark = false;
+
+            const app = new Vue({
+                el: '#app',
+                vuetify,
+                router,
+                data() {
+                    return {
+                        currentView: '',
+                        message: '@nhj12311',
+                        data1: 'data22',
+                        isLoggedIn,
+                        userData
+                    };
                 },
-            }
-            , beforeCreate() {
-                //console.log("beforeCreate", this.$vuetify);
+                components: {
+                    'App': loadVue('App')
+                },
+                methods: {
+                    changeTheme(themeName) {
+                        this.$vuetify.theme.themes.light = this.$vuetify.theme.themes[themeName];
+                        this.$vuetify.theme.dark = false;
+                    },
+                },
+                created() {
+                    if (this.isLoggedIn) {
+                        Object.assign(this.$session, this.userData);
 
-            }
-            , created() {
-                //console.log("created");
-            }
-            , mounted: function () {
-                //console.log("mounted");
-                //steem.api.setOptions({url: 'https://api.steemitstage.com/'});
+                        console.log("this.$route.path", this.$route.path);
+                        // 현재 경로가 루트("/") 또는 "/login"인 경우 대시보드로 리다이렉트
+                        if (["/", "/login"].includes(this.$route.path)) {
+                            this.$router.push("/");
+                        }
 
-                //console.log(this.$route) // outputs 'yay'
-                if (this.$route && this.$route.hash != "") {
-                    //var vueName = this.$route.hash.substring(1);
-                    //this.$data.currentView = vueName;
-                    //$(".nav").find(".active").toggleClass("active");
-                    //$("#" + vueName).toggleClass("active");
-                } else {
-                    //this.$data.currentView = "App";
-                    //data.currentView = "App";
+                        if(redirectUrl){
+                            this.$router.push(redirectUrl);
+                        }
+                    } else if (this.$route.path !== "/login") {
+                        this.$router.push("/login");
+                    }
+                },
+                mounted() {
+                    // ... 기존 mounted 로직 ...
                 }
-            } // end mounted
-
+            });
         });
 
         
-        Vue.prototype.$config = {
-            endpoint_url: 'https://ki.iinfo.kr:18080',
-            color_btn : 'secondary'
-        }
-        axios.defaults.baseURL = Vue.prototype.$config.endpoint_url;
-        Vue.prototype.$axios = axios;
-             
-        async function request(url, method, data) {            
-            try{
-                return await axios.request( {
-                    method : method, 
-                    url : Vue.prototype.$config.endpoint_url + url, 
-                    data : data
-                });
-            } catch(error) {
-                console.log('error', error);
-                return error;
-            }
-        }
+
+        
+        
         //hljs.registerLanguage("curl", window.hljsDefineCurl);
         //hljs.highlightAll();
         
