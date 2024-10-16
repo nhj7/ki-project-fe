@@ -269,7 +269,7 @@ const comp = module.exports = {
                     };                    
                     this.$loading.show('인시던트 목록을 불러오는 중입니다...');
                     
-                    const response = await request( '/api/incidents', 'POST', requestData);
+                    const response = await axios.post('/api/incidents', requestData);
                     console.log('조회 응답 : ', response);
                     if (response.data) {
                         this.incidents = response.data.map(incident => ({

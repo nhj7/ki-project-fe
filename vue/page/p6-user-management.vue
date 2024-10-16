@@ -67,8 +67,8 @@ const comp = module.exports = {
     return {
       dialog: false,
       headers: [
-        { text: '사용자 ID', value: 'userId' },
-        { text: '사용자 이름', value: 'userName' },
+        { text: '사용자 ID', value: 'userName' },
+        { text: '사용자 이름', value: 'userId' },
         { text: '사용자 유형', value: 'userType' },
         { text: '사용자 상태', value: 'userStatus' },
         { text: '로그인 상태', value: 'loginStatus' },

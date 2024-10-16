@@ -132,9 +132,11 @@ const comp = module.exports = {
             curlExample: '',
             paramValues: {},
             isFormValid: true,
-            selectedApi: 'updateRuleDetectData',
+            selectedApi: 'onSimulator',
             apiList: [
-                { text: '감지 데이터 업데이트(예정)', value: 'updateRuleDetectData' },
+                { text: '시뮬레이터 상태 확인', value: 'getSimulatorStatus' },
+                { text: '시뮬레이터 켜기', value: 'onSimulator' },
+                { text: '시뮬레이터 끄기', value: 'offSimulator' },
                 { text: '서비스 목록 조회(완료)', value: 'getServices' },
                 { text: '감지 목록 조회(완료)', value: 'getRuleDetections' },
                 { text: '서비스 지표 목록(완료)', value: 'getMetric' },
@@ -892,6 +894,61 @@ const comp = module.exports = {
                     { name: 'services[].is_active', type: 'Boolean', required: true, description: '활성화 여부' },
                     { name: 'services[].is_mandatory', type: 'Boolean', required: true, description: '필수 여부' },
                     { name: 'services[].sort_order', type: 'Number', required: true, description: '정렬 순서' }
+                ]
+            }, // 서비스 목록 조회, getServices
+            onSimulator: {
+                name: '시뮬레이터 켜기',
+                endpoint: '/simulator/on',
+                method: 'GET',
+                description: '시뮬레이터를 켭니다.',
+                parameters: [],
+                responseSampleHtml: '',
+                responseSample: {
+                    id: "simulator",
+                    status: "Y",
+                    updateDttm: "20241016233851"
+                },
+                responseFormat: [
+                    { name: 'id', type: 'String', required: true, description: '시뮬레이터 ID' },
+                    { name: 'status', type: 'String', required: true, description: '시뮬레이터 상태 (Y: 켜짐)' },
+                    { name: 'updateDttm', type: 'String', required: true, description: '업데이트 일시 (yyyyMMddHHmmss 형식)' }
+                ]
+            },
+            offSimulator: {
+                name: '시뮬레이터 끄기',
+                endpoint: '/simulator/off',
+                method: 'GET',
+                description: '시뮬레이터를 끕니다.',
+                parameters: [],
+                responseSampleHtml: '',
+                responseSample: {
+                    id: "simulator",
+                    status: "N",
+                    updateDttm: "20241016233851"
+                },
+                responseFormat: [
+                    { name: 'id', type: 'String', required: true, description: '시뮬레이터 ID' },
+                    { name: 'status', type: 'String', required: true, description: '시뮬레이터 상태 (N: 꺼짐)' },
+                    { name: 'updateDttm', type: 'String', required: true, description: '업데이트 일시 (yyyyMMddHHmmss 형식)' }
+                ]
+            },
+
+            getSimulatorStatus: {
+                name: '시뮬레이터 상태 확인',
+                endpoint: '/simulator/status',
+                method: 'GET',
+                description: '시뮬레이터의 현재 상태를 확인합니다.',
+                parameters: [],
+                responseSampleHtml: '',
+                responseSample: {
+                    id: "simulator",
+                    status: "Y",
+                    updateDttm: "20241016233851"
+                },
+                responseFormat: [
+                    { name: 'id', type: 'String', required: true, description: '시뮬레이터 ID' },
+                    { name: 'status', type: 'String', required: true, description: '시뮬레이터 상태 (Y: 켜짐, N: 꺼짐)' },
+                    { name: 'updateDttm', type: 'String', required: true, description: '업데이트 일시 (yyyyMMddHHmmss 형식)' }
                 ]
             },
             }

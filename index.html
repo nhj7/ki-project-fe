@@ -588,8 +588,7 @@
                         if (["/", "/login"].includes(this.$route.path)) {
                             this.$router.push("/");
                         }
-
-                        if(redirectUrl){
+                        else if(redirectUrl){
                             this.$router.push(redirectUrl);
                         }
                     } else if (this.$route.path !== "/login") {
