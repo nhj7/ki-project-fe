@@ -39,12 +39,14 @@
 ## 기술 스택
 
 ### Frontend
+
 - Vue.js 2.7.16: 프론트엔드 프레임워크
 - Vuetify 2: UI 컴포넌트 라이브러리
 - D3.js: 데이터 시각화
 - ECharts: 고급 차트 및 그래프 생성
- 
+
 ### Backend
+
 - Spring Cloud Gateway
 - Spring Security
 - Spring Data JPA
@@ -60,22 +62,22 @@
   - Axios를 이용한 HTTP 요청 헬퍼 함수 정의
 - `vue/App.vue`: 애플리케이션의 메인 컴포넌트로, 전체 레이아웃과 네비게이션을 관리합니다. 다크/라이트 테마 전환, 사용자 인증 상태 관리, 알림 시스템 등 애플리케이션 전반의 기능을 제어합니다.
 - `vue/page/`: 주요 페이지 컴포넌트 포함
+
   - `p0-login.vue`: 로그인 페이지
   - `p1-live-transaction-analytics.vue`: 실시간 거래 분석 페이지
   - `p8-rule-detected-list.vue`: 규칙 감지 목록 페이지
   - `p3-rule-configuration.vue`: 규칙 설정 페이지
   - `p2-incident-dashboard.vue`: 서비스 내역 페이지
-  - `p7-tx-history.vue`: 서비스 상세 내역 페이지
-  
+  - `p7-tx-history.vue`: 전문 상세 내역 페이지
   - `p9-service-manager.vue`: 서비스 관리 페이지
   - `p6-user-management.vue`: 사용자 관리 페이지
   - `p5-api-list.vue`: API 목록 및 테스트 페이지
   - `p20-readme-viewer.vue`: 프로젝트 설명 페이지
 - `vue/page/test/`: 서비스 테스트 센터 페이지
+
   - `p11-mobile-banking-transfer.vue`: 모바일 뱅킹 간편이체 페이지
   - `p12-mobile-banking-loan.vue`: 모바일 뱅킹 대출 페이지
   - `p13-toss-loan.vue`: 토스 비교금리 페이지
-  
 
 ## 프론트 엔드 개발 및 배포
 
@@ -91,4 +93,4 @@
 - 화면 기획 및 프론트엔드 개발 : IT개발팀 나형주
 - 서버 개발 및 데이터 모델링 : IT전략기획팀 이민호
 
-이 프로젝트는 현대적인 웹 기술을 활용하여 사용자 친화적이고 효율적인 금융 거래 모니터링 솔루션을 제공합니다. 최근 업데이트를 통해 성능이 개선되었으며, 오프라인 지원 기능이 강화되었습니다.
+이 프로젝트는 트렌드에 맞는 최신 웹 기술을 활용하여 구성되었으며 사용자 친화적이고 효율적인 금융 거래 모니터링 솔루션을 제공합니다.
