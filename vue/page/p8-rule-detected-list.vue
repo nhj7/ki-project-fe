@@ -41,10 +41,16 @@
 
                 <!-- 규칙 감지 목록 -->
                 <v-data-table :headers="headers" :items="ruleDetections" :items-per-page="10"
-                    class="elevation-1 custom-table" :mobile-breakpoint="0" @click:row="showDetails" item-key="id"
+                    class="elevation-1 custom-table" :mobile-breakpoint="0" @click:row="$vo.openDetectedDialog" 
                     >
+                    <template v-slot:[`item.txRatioYn`]="{ item }">
+                        {{ item.txRatioYn == 'Y' ? '예' : '아니오' }}
+                    </template>
+                    <template v-slot:[`item.txErrRatioYn`]="{ item }">
+                        {{ item.txErrRatioYn == 'Y' ? '예' : '아니오' }}
+                    </template>
                     <template v-slot:[`item.actions`]="{ item }">
-                        <v-btn small @click="showDetails(item)">상세</v-btn>
+                        <v-btn small @click="$vo.openDetectedDialog(item)">상세</v-btn>
                     </template>
                     
                 </v-data-table>
@@ -65,17 +71,27 @@ const comp = module.exports = {
                 ruleId: '전체',
             },
             ruleIds: [],
-            ruleDetections: [],
+            ruleDetections: [{
+                ruleId: '1',
+                ruleNm: '규칙1',
+                svcId: '1',
+                svcNm: '서비스1',
+                txRatio: '100',
+                txRatioYn: 'Y',
+                txErrRatio: '100',
+                txErrRatioYn: 'Y',
+            }],
             headers: [
                 { text: '규칙 ID', value: 'ruleId' },
                 { text: '규칙명', value: 'ruleNm' },
                 { text: '서비스 ID', value: 'svcId' },
                 { text: '서비스명', value: 'svcNm' },
                 { text: '거래량 비율', value: 'txRatio' },
-                { text: '거래량 비율 여부', value: 'txRatioYn' },
+                { text: '거래감지', value: 'txRatioYn' },
                 { text: '오류율', value: 'txErrRatio' },
-                { text: '오류율 여부', value: 'txErrRatioYn' },
+                { text: '오류감지', value: 'txErrRatioYn' },
                 { text: '감지 시작 시간', value: 'afStartdttm' },
+                { text: '상태', value: 'detectStatus' },
                 { text: '액션', value: 'actions', sortable: false },
             ],
         };
@@ -93,6 +109,11 @@ const comp = module.exports = {
                 console.log('규칙 감지 목록 : ', response);
                 for (let i = 0; i < response.data.length; i++) {
                     response.data[i].afStartdttm = this.$util.formatDttm(response.data[i].afStartdttm, '-', ':');
+                    response.data[i].bfStartdttm = this.$util.formatDttm(response.data[i].bfStartdttm, '-', ':');
+                    
+                    if(!response.data[i].detectStatus){
+                        response.data[i].detectStatus = '확인전';
+                    }
                 }
                 this.ruleDetections = response.data;
             } catch (error) {

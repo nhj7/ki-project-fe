@@ -685,27 +685,24 @@ const comp = (module.exports = {
             */
 
       try {
-        const response = await this.$axios.get("/incident/getMetric");
-
-        //console.log("getMetric response", response);
-
+        const response = await this.$axios.get("/incident/getMetric"); // 서비스
         if (response.data && response.data) {
           this.serviceTransactions = response.data.map((service) => ({
-            serviceName: service.svcNm,
-            normal: service.todayCnt,
-            errorRate: service.errPer,
+            serviceName: service.svcNm, // 서비스명
+            normal: service.todayCnt, // 당일 거래량
+            errorRate: service.errPer, // 오류율
             tps: service.tps ? parseFloat(service.tps).toFixed(2) : 0, // TPS를 소수점 두 자리까지 표시
-            transactionsPerHour: this.formatNumber(service.currentCnt),
-            todayTransactions: this.formatNumber(service.todayCnt),
+            transactionsPerHour: this.formatNumber(service.currentCnt), // 현재 거래량
+            todayTransactions: this.formatNumber(service.todayCnt), // 당일 거래량
             yesterdayTransactions: this.formatNumber(
               service.previousDayCnt
-            ),
+            ), // 전일 거래량
             lastWeekTransactions: this.$util.numberWithComma(
               service.previousWeekCnt
-            ),
-            compareTrend: service.errDiffPer >= 0 ? "up" : "down",
+            ), // 전주 거래량
+            compareTrend: service.errDiffPer >= 0 ? "up" : "down", // 오류율 증감 추이
             compareValue: `${service.errDiffPer >= 0 ? "+" : ""}${service.errDiffPer
-              }%`,
+              }%`, // 오류율 증감 비율
           }));
         }
       } catch (error) {

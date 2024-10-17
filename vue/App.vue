@@ -369,6 +369,103 @@
         </v-dialog>
 
 
+      <v-dialog v-model="$vo.detected.dialog" max-width="800px" transition="" :retain-focus="false">
+        <v-card>
+          <v-card-title class="headline">
+            <v-row>
+              <v-col cols="10">
+                <v-icon :color="$route.meta.iconColor || 'primary'" class="mr-2">{{ $route.meta.icon }}</v-icon>
+                이상징후 감지 상세
+              </v-col>
+              <v-col cols="2">
+                <v-select v-model="$vo.detected.selectedDetected.detectStatus" :items="['확인전','확인중','조치중', '모니터링중','완료']" dense hide-details @change="$vo.updateDetectedStatus($event)"></v-select>
+              </v-col>
+            </v-row>
+          </v-card-title>
+          <v-card-text>
+            <v-simple-table dense>
+              <template v-slot:default>
+                <tbody>
+                  <tr>
+                    <td>규칙 ID</td>
+                    <td>{{ $vo.detected.selectedDetected.ruleId }}</td>
+                    <td>규칙명</td>
+                    <td>{{ $vo.detected.selectedDetected.ruleNm }}</td>                    
+                  </tr>
+                  <tr>
+                    
+                    <td>서비스 ID</td>
+                    <td>{{ $vo.detected.selectedDetected.svcId }}</td>
+                    <td>서비스명</td>
+                    <td>{{ $vo.detected.selectedDetected.svcNm }}</td>
+                  </tr>
+                  <tr>
+                    
+                    
+                    <td>이전 서비스 건수</td>
+                    <td>{{ $vo.detected.selectedDetected.bfSvcCnt }}</td>
+                    <td>이후 서비스 건수</td>
+                    <td>{{ $vo.detected.selectedDetected.afSvcCnt }}</td>
+                  </tr>
+                  <tr>
+                    
+                    <td>이전 오류 건수</td>
+                    <td>{{ $vo.detected.selectedDetected.bfErrCnt }}</td>
+                    <td>이후 오류 건수</td>
+                    <td>{{ $vo.detected.selectedDetected.afErrCnt }}</td>
+                  </tr>
+                  <tr>
+                    <td>거래량 비율</td>
+                    <td>{{ $vo.detected.selectedDetected.txRatio }}%</td>
+                    <td>거래량 감지 여부</td>
+                    <td>
+                      <v-chip :color=" [$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'red' : 'green'" small outlined>
+                        {{ [$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes("Y") ? "예" : "아니오" }}
+                      </v-chip>                      
+                      {{ $vo.detected.selectedDetected.txZeroYn =="Y"?"(거래량 없음)":"" }}
+                      {{ $vo.detected.selectedDetected.txRatioYn =="Y"?"(거래량 비율 충족)":"" }}
+                    </td>                    
+                  </tr>
+                  <tr>
+                    <td>오류 비율</td>
+                    <td>{{ $vo.detected.selectedDetected.txErrRatio }}%</td>
+                    <td>오류율 감지 여부</td>
+                    <td>
+                      <v-chip :color="$vo.detected.selectedDetected.txErrRatioYn == 'Y' ? 'red' : 'green'" small outlined>
+                        {{ $vo.detected.selectedDetected.txErrRatioYn == 'Y' ? '예' : '아니오' }}
+                      </v-chip>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>이전 감지 일시</td>
+                    <td>{{ $vo.detected.selectedDetected.bfStartdttm }}</td>
+                    <td>이후 감지 일시</td>
+                    <td>{{ $vo.detected.selectedDetected.afStartdttm }}</td>
+                  </tr>
+                  <tr>
+                    <td>유형</td>
+                    <td>{{ $vo.detected.selectedDetected.type }}</td>
+                    <td>기간</td>
+                    <td>{{ $vo.detected.selectedDetected.duration }}분 {{ $vo.detected.selectedDetected.direction }}</td>
+                  </tr>   
+                  <tr>
+                    <td>임계값</td>
+                    <td>{{ $vo.detected.selectedDetected.threshold }}%</td>
+                    <td>등록 일시</td>
+                    <td>{{ $vo.detected.selectedDetected.regDttm }}</td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="$vo.detected.dialog = false">닫기</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+
 
 
 
@@ -565,6 +662,10 @@ const VoPlugin = {
           requestItems: [],
           responseItems: []
         },
+        detected : {
+          dialog: false,
+          selectedDetected: {},
+        },
         keyValueHeaders: [
           { text: 'Key', value: 'key' },
           { text: 'Value', value: 'value' }
@@ -580,6 +681,20 @@ const VoPlugin = {
           this.setKeyValueItems(tx.req_json, 'requestItems');
           this.setKeyValueItems(tx.res_json, 'responseItems');
           this.tx.detailDialog = true;
+        },
+        async openDetectedDialog(detected) {
+          console.log('openDetectedDialog', detected);
+          this.detected.selectedDetected = detected;
+          this.detected.dialog = true;
+        },
+        async updateDetectedStatus(status) {
+          console.log('updateDetectedStatus', status);
+          try {
+            const response = await axios.post('/api/rule-detect-update', { id : this.detected.selectedDetected.id+'', detectStatus: status });
+            console.log('updateDetectedStatus 응답 : ', response);
+          } catch (error) {
+            console.error('updateDetectedStatus 오류 : ', error);
+          }
         },
         setKeyValueItems(_json, items) {
           const json = _json ? JSON.parse(_json) : {};

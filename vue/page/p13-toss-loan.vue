@@ -15,7 +15,7 @@
                                 <v-progress-circular :value="99" color="primary" size="150" width="15">
                                     <div class="text-h4 font-weight-bold">99%</div>
                                 </v-progress-circular>
-                                <div class="mt-2">승인 가능성</div>
+                                <div class="mt-2">대출승인 가능성이 아주 높아요.</div>
                             </v-col>
                             <v-col cols="4">
                                 <div class="text-h4 font-weight-bold">1000점</div>
@@ -145,6 +145,14 @@ const comp = module.exports = {
         navigateTo(route) {
             // 실제 라우팅 로직 구현
             console.log('Navigating to:', route);
+            this.$msg.show({
+                    messageTitle: '토스 비교금리 조회',
+                    messageCode: '0000',
+                    messageContent: `테스트용 페이지입니다. '신용대출 한도 확인하기'로 테스트를 진행해주세요.`,
+                    isError: false,
+                    showErrorDetails: false,
+                    errorDetails: ''
+                });
         },
         async checkLoanLimit() {
             //if (this.$refs.form.validate()) {

@@ -132,13 +132,16 @@ const comp = module.exports = {
             curlExample: '',
             paramValues: {},
             isFormValid: true,
-            selectedApi: 'onSimulator',
+            selectedApi: 'updateRuleDetectData',
             apiList: [
+            
+                { text: '감지 상태 업데이트', value: 'updateRuleDetectData' },
+                { text: '감지 목록 조회(완료)', value: 'getRuleDetections' },
                 { text: '시뮬레이터 상태 확인', value: 'getSimulatorStatus' },
                 { text: '시뮬레이터 켜기', value: 'onSimulator' },
                 { text: '시뮬레이터 끄기', value: 'offSimulator' },
                 { text: '서비스 목록 조회(완료)', value: 'getServices' },
-                { text: '감지 목록 조회(완료)', value: 'getRuleDetections' },
+                
                 { text: '서비스 지표 목록(완료)', value: 'getMetric' },
                 { text: '서비스 거래 목록 조회(완료)', value: 'getIncidents' },
                 { text: '서비스 내역 조회(완료)', value: 'getGuidData' },
@@ -1095,10 +1098,12 @@ const comp = module.exports = {
                     url: this.$config.endpoint_url + apiDetails.endpoint,
                     data: requestData
                 });
-                //console.log('response', response);
+                console.log('response', response);
                 try {
-                    //this.apiResponse = ' ' + JSON.stringify(response.data, null, 2);
+                    
                     this.apiResponse = ' ' + this.beautifyJSON(response.data);
+                    
+                    
                 } catch (error) {
                     console.error('API 호출 중 오류가 발생했습니다:', error, response.data);
                     const data = await response.json();
@@ -1134,6 +1139,7 @@ const comp = module.exports = {
             };
 
             const processLine = (line) => {
+                if(!line) return '';
 
                 const trimmedLine = line.trim();
                 if (trimmedLine.includes('}') || trimmedLine.includes(']')) {
