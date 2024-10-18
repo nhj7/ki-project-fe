@@ -84,6 +84,20 @@ BEGIN
         IF v_unit = '시간' THEN 
             SET v_duration = v_duration * 60;
         END IF;
+
+        -- 현재 시간을 00분 형태로 계산하고 v_duration으로 나눈 나머지 확인
+        SET @current_minutes = MINUTE(NOW());
+        IF @current_minutes % v_duration != 0 THEN
+			INSERT INTO temp (txt) VALUES( CONCAT(
+            	v_duration, '-', @current_minutes ,' : 미동작', '-' , v_type, ' 로그 - v_direction : ', v_direction,', '
+	            , DATE_FORMAT(DATE_SUB(NOW(), INTERVAL v_duration * 2 MINUTE) , '%Y%m%d%H%i%s') 
+	            , ', '
+	            , DATE_FORMAT(DATE_SUB(NOW(), INTERVAL v_duration MINUTE), '%Y%m%d%H%i%s')
+	            , ', '
+	            , DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')
+            ));
+			ITERATE read_loop;
+        END IF;
        
         -- 로직 상태 체크 경우
         IF v_type <> '반복수행' THEN
@@ -209,10 +223,10 @@ BEGIN
     
    
     INSERT INTO kisb.ruledata
-	(rule_id, rule_nm, svc_id, svc_nm, svc_cnt, bf_svc_cnt, bf_err_cnt, af_svc_cnt, af_err_cnt, tx_zero_yn, tx_ratio, tx_err_ratio, tx_ratio_yn, tx_err_ratio_yn, bf_startDttm, af_startDttm, `type`, duration, direction, threshold, detect_status)
+	(rule_id, rule_nm, svc_id, svc_nm, svc_cnt, bf_svc_cnt, bf_err_cnt, af_svc_cnt, af_err_cnt, tx_zero_yn, tx_ratio, tx_err_ratio, tx_ratio_yn, tx_err_ratio_yn, bf_startDttm, bf_endDttm, af_startDttm, af_endDttm, `type`, duration, direction, threshold, detect_status)
     
 	select 
-    	rule_id, rule_nm, svc_id, svc_nm, svc_cnt, bf_svc_cnt, bf_err_cnt, af_svc_cnt, af_err_cnt, tx_zero_yn, tx_ratio, tx_err_ratio, tx_ratio_yn, tx_err_ratio_yn, bf_startDttm, af_startDttm, `type`, duration, direction, threshold , '확인전'
+    	rule_id, rule_nm, svc_id, svc_nm, svc_cnt, bf_svc_cnt, bf_err_cnt, af_svc_cnt, af_err_cnt, tx_zero_yn, tx_ratio, tx_err_ratio, tx_ratio_yn, tx_err_ratio_yn, bf_startDttm, bf_endDttm,af_startDttm, af_endDttm,`type`, duration, direction, threshold , '확인전'
     from temp_rule
     where 1=1
     and 1 = case 

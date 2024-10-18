@@ -2,33 +2,25 @@
     <v-dialog v-model="dialog" max-width="800px">
       <v-card>
         <v-card-title>
-          <span class="headline">알람 목록</span>
+          <span class="headline">
+            <v-icon>mdi-bell</v-icon>
+            &nbsp;&nbsp;알람 목록
+          </span>
         </v-card-title>
         <v-card-text>
-          <v-simple-table>
-            <template v-slot:default>
-              <thead>
-                <tr>
-                  <th>발생시간</th>
-                  <th>시스템</th>
-                  <th>심각도</th>
-                  <th>서비스내용</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="alarm in alarms" :key="alarm.timestamp">
-                  <td>{{ alarm.timestamp }}</td>
-                  <td>{{ alarm.system }}</td>
-                  <td>
-                    <v-chip :color="getSeverityColor(alarm.severity)" small dark>
-                      {{ alarm.severity }}
-                    </v-chip>
-                  </td>
-                  <td>{{ alarm.description }}</td>
-                </tr>
-              </tbody>
+          <v-data-table
+            :headers="headers"
+            :items="alarms"
+            :items-per-page="5"
+            class="elevation-1"
+            @click:row="$vo.openDetectedDialog"
+          >
+            <template v-slot:[`item.severity`]="{ item }">
+              <v-chip :color="getSeverityColor(item.severity)" small dark>
+                {{ item.severity }}
+              </v-chip>
             </template>
-          </v-simple-table>
+          </v-data-table>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -44,6 +36,13 @@
     data() {
       return {
         dialog: this.value,
+        headers: [
+          { text: '발생시간', value: 'afEnddttm' },
+          { text: '규칙ID', value: 'ruleId' },
+          { text: '규칙명', value: 'ruleNm' },
+          { text: '서비스명', value: 'svcNm' },
+          
+        ]
       };
     },
     watch: {

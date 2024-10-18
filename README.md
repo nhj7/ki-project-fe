@@ -40,8 +40,8 @@
 
 ### Frontend
 
-- Vue.js 2.7.16: 프론트엔드 프레임워크
-- Vuetify 2: UI 컴포넌트 라이브러리
+- Vue.js : 프론트엔드 프레임워크
+- Vuetify : UI 컴포넌트 라이브러리
 - D3.js: 데이터 시각화
 - ECharts: 고급 차트 및 그래프 생성
 

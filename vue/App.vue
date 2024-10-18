@@ -273,7 +273,7 @@
 
 
         <!-- 전문 상세 정보 다이얼로그 -->
-        <v-dialog v-model="$vo.tx.detailDialog" max-width="90%" transition="" :retain-focus="false">
+        <v-dialog v-model="$vo.tx.detailDialog" max-width="70%" transition="" :retain-focus="false">
           <v-card class="dialog-card">
             <v-divider color="grey"></v-divider>
             <v-card-title class="d-flex justify-space-between align-center">
@@ -888,8 +888,7 @@ const comp = (module.exports = {
       route.meta.isGroupOpen = !route.meta.isGroupOpen;
       //this.groupStates[0] = value;
     },
-    showAlarmPopup() {
-      this.fetchAlarms();
+    showAlarmPopup() {      
       this.alarmPopupVisible = true;
     },
     fetchAlarms() {
@@ -968,6 +967,10 @@ const comp = (module.exports = {
             response.data[i].detectStatus = '확인전';
           }
         }
+        if( response.data.length > 0) {
+          this.alarmCount = response.data.length;
+          this.alarms = response.data;
+        }
         //this.ruleDetections = response.data;
       } catch (error) {
         console.error('규칙 감지 목록을 불러오는 중 오류가 발생했습니다:', error);
@@ -982,7 +985,7 @@ const comp = (module.exports = {
 
     this.drawer = window.innerWidth >= 1264; // Vuetify의 lg 브레이크포인트
     await this.alarmSearch();
-    this.alarmInterval = setInterval(this.alarmSearch, 10000);
+    this.alarmInterval = setInterval(this.alarmSearch, 60 * 1000);
   },
   components: {
     "alarm-popup": loadVue("/component/AlarmPopup"),

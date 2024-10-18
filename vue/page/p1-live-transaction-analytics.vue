@@ -36,6 +36,25 @@
                       <span>{{ header.tooltip }}</span>
                     </v-tooltip>
                   </template>
+                  <template v-slot:[`header.errorrate`]="{ header }">
+                    {{ header.text }}
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-icon small v-bind="attrs" v-on="on">mdi-help-circle-outline</v-icon>
+                      </template>
+                      <span>{{ header.tooltip }}</span>
+                    </v-tooltip>
+                  </template>
+                  <template v-slot:[`header.tps`]="{ header }">
+                    {{ header.text }}
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-icon small v-bind="attrs" v-on="on">mdi-help-circle-outline</v-icon>
+                      </template>
+                      <span>{{ header.tooltip }}</span>
+                    </v-tooltip>
+                  </template>
+                  
                   <template v-slot:[`item.errorRate`]="{ item }">
                     <v-chip :color="getRateColor(item.errorRate)" small outlined>
                       {{ item.errorRate }}%
@@ -198,9 +217,9 @@ const comp = (module.exports = {
       // 서비스 거래량 데이터 테이블을 위한 헤더 정의
       serviceHeaders: [
         { text: "서비스명", value: "serviceName" },
-        { text: "오류율", value: "errorRate" },
-        { text: "전일대비", value: "compare", sortable: false, html: true, tooltip: "전일 동시간대 대비 오류율 증감" },
-        { text: "TPS", value: "tps" },
+        { text: "오류율", value: "errorrate", html: true, tooltip: "전일자 비교 오류율"},
+        { text: "전일대비", value: "compare", html: true, tooltip: "전일 동시간대 대비 오류율 증감" },
+        { text: "TPS", value: "tps", html: true, tooltip: "초당 거래량"},
         { text: "시간당", value: "transactionsPerHour" },
         { text: "금일", value: "todayTransactions" },
         { text: "전일", value: "yesterdayTransactions" },
