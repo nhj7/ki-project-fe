@@ -43,16 +43,15 @@
                     </v-card-text>
                 </v-card>
 
-                <!-- 규칙 감지 목록 -->
-                <v-data-table :headers="headers" :items="ruleDetections" :items-per-page="10" class="elevation-1 custom-table" :mobile-breakpoint="0" @click:row="$vo.openDetectedDialog">
-                    <template v-slot:[`item.txRatio`]="{ item }">
-                        {{ item.txRatio == 'Y' ? '예' : '아니오' }}
-                    </template>
-                    <template v-slot:[`item.txErrRatioYn`]="{ item }">
-                        {{ item.txErrRatioYn == 'Y' ? '예' : '아니오' }}
-                    </template>
-                    <template v-slot:[`item.detectStatus`]="{ item }">
-                        fffff
+                
+                <v-data-table :headers="headers" :items="ruleDetections" :items-per-page="10" 
+                class="elevation-1 custom-table" :mobile-breakpoint="0" @click:row="$vo.openDetectedDialog">
+                    
+                    
+                    <template v-slot:[`item.detectstatus`]="{ item }">
+                        <v-chip :color="getDetectStatusColor(item.detectStatus)" small outlined>
+                            {{ item.detectStatus }}
+                        </v-chip>
                     </template>
                     <template v-slot:[`item.actions`]="{ item }">
                         <v-btn small @click="$vo.openDetectedDialog(item)">상세</v-btn>
@@ -64,7 +63,7 @@
     </v-container>
 </template>
 
-<script>
+<script >
 const comp = module.exports = {
     data() {
         return {
@@ -98,12 +97,28 @@ const comp = module.exports = {
                 { text: '오류증감율(%)', value: 'txErrRatio' },
                 
                 { text: '감지시간', value: 'afEnddttm' },
-                { text: '상태', value: 'detectStatus', sortable: false },
+                { text: '상태', value: 'detectstatus', sortable: false },
                 { text: '액션', value: 'actions', sortable: false },
             ],
         };
     },
     methods: {
+        getDetectStatusColor(status) {
+            switch (status) {
+                case '확인전':
+                    return 'red';
+                case '확인중':
+                    return 'orange';
+                case '조치중':
+                    return 'blue';
+                case '모니터링중':
+                    return 'green';
+                case '완료':
+                    return 'grey';
+                default:
+                    return 'grey';
+            }
+        },
         async search() {
             try {
                 this.$loading.show('규칙 감지 목록을 불러오는 중입니다...');
@@ -153,13 +168,21 @@ const comp = module.exports = {
             } catch (error) {
                 console.error('규칙 ID 목록을 불러오는 중 오류가 발생했습니다:', error);
                 this.ruleIds = [];
+                this.$msg.show({
+                    messageTitle: this.$route.meta.title,
+                    messageCode: error?.code,
+                    messageContent: '규칙 ID 목록을 불러오는 중 오류가 발생했습니다.',
+                    isError: true,
+                    showErrorDetails: true,
+                    errorDetails: `${error?.name} - ${error?.message} - ${error?.config?.url} - ${error?.config?.method}`
+                });
+                
             }
         },
     },
-    created() {
-        const dates = this.$util.setLastWeekDates();
-        this.filters.startDate = dates.endDate;
-        this.filters.endDate = dates.endDate;
+    created() {        
+        this.filters.startDate = this.$util.getDate(-1, '-');
+        this.filters.endDate = this.$util.getDate(0, '-');
 
         //console.log("app.vue created", this.$router);
     },

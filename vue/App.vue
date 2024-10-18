@@ -58,7 +58,7 @@
             <v-list-item v-for="subItem in route.subRoutes" :key="subItem.path" :to="subItem.path" link
               class="lnb-subItem rounded-lg pl-4">
               <v-list-item-action dense>
-                <v-icon >{{ findRouteByPath(subItem.path).meta.icon }}</v-icon>
+                <v-icon>{{ findRouteByPath(subItem.path).meta.icon }}</v-icon>
               </v-list-item-action>
               <v-list-item-content dense>
                 <v-list-item-title>{{
@@ -127,10 +127,11 @@
 
     <alarm-popup v-model="alarmPopupVisible" :alarms="alarms"></alarm-popup>
 
-    <v-main >
+    <v-main>
       <v-container fluid class="pt-0">
         <div class="d-flex align-center">
-          <h2 class="text-subtitle-2 mb-1 d-flex align-center cursor-pointer flex-grow-1" @click.stop="drawer = !drawer">
+          <h2 class="text-subtitle-2 mb-1 d-flex align-center cursor-pointer flex-grow-1"
+            @click.stop="drawer = !drawer">
             <v-icon size="24" :color="this.$route.meta.iconColor || 'primary'" class="mr-2">
               {{ this.$route.meta.icon }}
             </v-icon>
@@ -171,7 +172,7 @@
           <v-card>
             <v-card-title class="headline d-flex justify-space-between align-center">
               <div>
-                <v-icon left color="primary">{{ $msg.messageIcon }}</v-icon>
+                <v-icon left :color="$msg.isError ? 'error' : 'primary'">{{ $msg.messageIcon }}</v-icon>
                 {{ $msg.messageTitle }} 결과
               </div>
               <v-btn icon large @click="$msg.hide">
@@ -369,101 +370,131 @@
         </v-dialog>
 
 
-      <v-dialog v-model="$vo.detected.dialog" max-width="800px" transition="" :retain-focus="false">
-        <v-card>
-          <v-card-title class="headline">
-            <v-row>
-              <v-col cols="10">
-                <v-icon :color="$route.meta.iconColor || 'primary'" class="mr-2">{{ $route.meta.icon }}</v-icon>
-                이상징후 감지 상세
-              </v-col>
-              <v-col cols="2">
-                <v-select v-model="$vo.detected.selectedDetected.detectStatus" :items="['확인전','확인중','조치중', '모니터링중','완료']" dense hide-details @change="$vo.updateDetectedStatus($event)"></v-select>
-              </v-col>
-            </v-row>
-          </v-card-title>
-          <v-card-text>
-            <v-simple-table dense>
-              <template v-slot:default>
-                <tbody>
-                  <tr>
-                    <td>규칙 ID</td>
-                    <td>{{ $vo.detected.selectedDetected.ruleId }}</td>
-                    <td>규칙명</td>
-                    <td>{{ $vo.detected.selectedDetected.ruleNm }}</td>                    
-                  </tr>
-                  <tr>
-                    
-                    <td>서비스 ID</td>
-                    <td>{{ $vo.detected.selectedDetected.svcId }}</td>
-                    <td>서비스명</td>
-                    <td>{{ $vo.detected.selectedDetected.svcNm }}</td>
-                  </tr>
-                  <tr>
-                    
-                    
-                    <td>이전 서비스 건수</td>
-                    <td>{{ $vo.detected.selectedDetected.bfSvcCnt }}</td>
-                    <td>이후 서비스 건수</td>
-                    <td>{{ $vo.detected.selectedDetected.afSvcCnt }}</td>
-                  </tr>
-                  <tr>
-                    
-                    <td>이전 오류 건수</td>
-                    <td>{{ $vo.detected.selectedDetected.bfErrCnt }}</td>
-                    <td>이후 오류 건수</td>
-                    <td>{{ $vo.detected.selectedDetected.afErrCnt }}</td>
-                  </tr>
-                  <tr >
-                    <td :class="[$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'border-red' : ''">거래량 비율</td>
-                    <td :class="[$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'border-red' : ''">{{ $vo.detected.selectedDetected.txRatio }}%</td>
-                    <td :class="[$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'border-red' : ''">거래량 감지 여부</td>
-                    <td :class="[$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'border-red' : ''">
-                      <v-chip :color=" [$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'red' : 'green'" small outlined>
-                        {{ [$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes("Y") ? "예" : "아니오" }}
-                      </v-chip>                      
-                      {{ $vo.detected.selectedDetected.txZeroYn =="Y"?"(거래량 없음)":"" }}
-                      {{ $vo.detected.selectedDetected.txRatioYn =="Y"?"(거래량 비율 충족)":"" }}
-                    </td>                    
-                  </tr>
-                  <tr>
-                    <td>오류 비율</td>
-                    <td>{{ $vo.detected.selectedDetected.txErrRatio }}%</td>
-                    <td>오류율 감지 여부</td>
-                    <td>
-                      <v-chip :color="$vo.detected.selectedDetected.txErrRatioYn == 'Y' ? 'red' : 'green'" small outlined>
-                        {{ $vo.detected.selectedDetected.txErrRatioYn == 'Y' ? '예' : '아니오' }}
-                      </v-chip>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>이전 감지 일시</td>
-                    <td>{{ $vo.detected.selectedDetected.bfStartdttm }}</td>
-                    <td>이후 감지 일시</td>
-                    <td>{{ $vo.detected.selectedDetected.afStartdttm }}</td>
-                  </tr>
-                  <tr>
-                    <td>유형</td>
-                    <td>{{ $vo.detected.selectedDetected.type }}</td>
-                    <td>기간</td>
-                    <td>{{ $vo.detected.selectedDetected.duration }}분 {{ $vo.detected.selectedDetected.direction }}</td>
-                  </tr>   
-                  <tr>
-                    <td>임계값</td>
-                    <td>{{ $vo.detected.selectedDetected.threshold }}%</td>
-                    <td>등록 일시</td>
-                    <td>{{ $vo.detected.selectedDetected.regDttm }}</td>
-                  </tr>
-                </tbody>
-              </template>
-            </v-simple-table>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="$vo.detected.dialog = false">닫기</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+        <v-dialog v-model="$vo.detected.dialog" max-width="800px" transition="" :retain-focus="false">
+          <v-card>
+            <v-card-title class="headline">
+              <v-row>
+                <v-col cols="10">
+                  <v-icon :color="$route.meta.iconColor || 'primary'" class="mr-2">{{ $route.meta.icon }}</v-icon>
+                  이상징후 감지 상세
+                </v-col>
+                <v-col cols="2">
+                  <v-select v-model="$vo.detected.selectedDetected.detectStatus"
+                    :items="['확인전','확인중','조치중', '모니터링중','완료']" dense hide-details
+                    @change="$vo.updateDetectedStatus($event)"></v-select>
+                </v-col>
+              </v-row>
+            </v-card-title>
+            <v-card-text>
+              <v-simple-table dense>
+                <template v-slot:default>
+                  <tbody>
+                    <tr>
+                      <td>규칙 ID</td>
+                      <td>{{ $vo.detected.selectedDetected.ruleId }}</td>
+                      <td>규칙명</td>
+                      <td>{{ $vo.detected.selectedDetected.ruleNm }}</td>
+                    </tr>
+                    <tr>
+
+                      <td>서비스 ID</td>
+                      <td>{{ $vo.detected.selectedDetected.svcId }}</td>
+                      <td>서비스명</td>
+                      <td>{{ $vo.detected.selectedDetected.svcNm }}</td>
+                    </tr>
+                    <tr>
+
+
+                      <td
+                        :class="[$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'border-red' : ''">
+                        이전 서비스 건수</td>
+                      <td
+                        :class="[$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'border-red' : ''">
+                        {{ $vo.detected.selectedDetected.bfSvcCnt }}</td>
+                      <td
+                        :class="[$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'border-red' : ''">
+                        이후 서비스 건수</td>
+                      <td
+                        :class="[$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'border-red' : ''">
+                        {{ $vo.detected.selectedDetected.afSvcCnt }}</td>
+                    </tr>
+
+                    <tr>
+                      <td
+                        :class="[$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'border-red' : ''">
+                        거래량 비율</td>
+                      <td
+                        :class="[$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'border-red' : ''">
+                        {{ $vo.detected.selectedDetected.txRatio }}%</td>
+                      <td
+                        :class="[$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'border-red' : ''">
+                        거래량 감지</td>
+                      <td
+                        :class="[$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'border-red' : ''">
+                        <v-chip
+                          :color=" [$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'red' : 'green'"
+                          small outlined>
+                          {{ [$vo.detected.selectedDetected.txZeroYn,
+                          $vo.detected.selectedDetected.txRatioYn].includes("Y") ? "예" : "아니오" }}
+                        </v-chip>
+                        {{ $vo.detected.selectedDetected.txZeroYn =="Y"?"(거래량 없음)":"" }}
+                        {{ $vo.detected.selectedDetected.txRatioYn =="Y"?`(거래량 비율 ${$vo.detected.selectedDetected.direction} - ${$vo.detected.selectedDetected.duration}분, ${$vo.detected.selectedDetected.threshold}%)`:"" }}
+                      </td>
+                    </tr>
+                    <tr>
+
+                      <td :class="[$vo.detected.selectedDetected.txErrRatioYn].includes('Y') ? 'border-red' : ''">이전 오류
+                        건수</td>
+                      <td :class="[$vo.detected.selectedDetected.txErrRatioYn].includes('Y') ? 'border-red' : ''">{{
+                        $vo.detected.selectedDetected.bfErrCnt }}</td>
+                      <td :class="[$vo.detected.selectedDetected.txErrRatioYn].includes('Y') ? 'border-red' : ''">이후 오류
+                        건수</td>
+                      <td :class="[$vo.detected.selectedDetected.txErrRatioYn].includes('Y') ? 'border-red' : ''">{{
+                        $vo.detected.selectedDetected.afErrCnt }}</td>
+                    </tr>
+                    <tr>
+                      <td :class="[$vo.detected.selectedDetected.txErrRatioYn].includes('Y') ? 'border-red' : ''">오류 비율
+                      </td>
+                      <td :class="[$vo.detected.selectedDetected.txErrRatioYn].includes('Y') ? 'border-red' : ''">{{
+                        $vo.detected.selectedDetected.txErrRatio }}%</td>
+                      <td :class="[$vo.detected.selectedDetected.txErrRatioYn].includes('Y') ? 'border-red' : ''">오류율 감지</td>
+                      <td :class="[$vo.detected.selectedDetected.txErrRatioYn].includes('Y') ? 'border-red' : ''">
+                        <v-chip :color="$vo.detected.selectedDetected.txErrRatioYn == 'Y' ? 'red' : 'green'" small
+                          outlined>
+                          {{ $vo.detected.selectedDetected.txErrRatioYn == 'Y' ? '예' : '아니오' }}
+                        </v-chip>
+                        {{ $vo.detected.selectedDetected.txErrRatioYn == 'Y' ? `(오류율 ${$vo.detected.selectedDetected.direction} - ${$vo.detected.selectedDetected.duration}분, ${$vo.detected.selectedDetected.threshold}%)` : "" }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>이전 감지 일시</td>
+                      <td>{{ $vo.detected.selectedDetected.bfStartdttm }}</td>
+                      <td>이후 감지 일시</td>
+                      <td>{{ $vo.detected.selectedDetected.afStartdttm }}</td>
+                    </tr>
+                    <tr>
+                      <td>유형</td>
+                      <td>{{ $vo.detected.selectedDetected.type }}</td>
+                      <td>기간</td>
+                      <td>{{ $vo.detected.selectedDetected.duration }}분 {{ $vo.detected.selectedDetected.direction }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>임계값</td>
+                      <td>{{ $vo.detected.selectedDetected.threshold }}%</td>
+                      <td>등록 일시</td>
+                      <td>{{ $vo.detected.selectedDetected.regDttm }}</td>
+                    </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="$vo.detected.dialog = false">닫기</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
 
 
 
@@ -662,7 +693,7 @@ const VoPlugin = {
           requestItems: [],
           responseItems: []
         },
-        detected : {
+        detected: {
           dialog: false,
           selectedDetected: {},
         },
@@ -690,7 +721,7 @@ const VoPlugin = {
         async updateDetectedStatus(status) {
           console.log('updateDetectedStatus', status);
           try {
-            const response = await axios.post('/api/rule-detect-update', { id : this.detected.selectedDetected.id+'', detectStatus: status });
+            const response = await axios.post('/api/rule-detect-update', { id: this.detected.selectedDetected.id + '', detectStatus: status });
             console.log('updateDetectedStatus 응답 : ', response);
           } catch (error) {
             console.error('updateDetectedStatus 오류 : ', error);
@@ -798,7 +829,7 @@ const data = {
   rightDrawer: false,
   title: "KI-SQM",
   groupStates: [true, true],
-  alarmCount: 3,
+  alarmCount: 0,
   alarms: [],
   userName: "나형주",
   alarmPopupVisible: false,
@@ -807,6 +838,7 @@ const data = {
   snackbar: false,
   snackbarColor: 'success',
   snackbarText: '',
+  alarmInterval: null,
 };
 
 const comp = (module.exports = {
@@ -916,16 +948,48 @@ const comp = (module.exports = {
       // 새 스타일 추가
       style.id = 'scrollbar-style';
       document.head.appendChild(style);
-    }
+    },
+    async alarmSearch() {
+      try {
+        this.$loading.show('알람 감지 목록을 불러오는 중입니다...');
+        // API 호출 로직 구현
+        const response = await this.$axios.post('/api/rule-detections', {
+          startDate: this.$util.formatDate(),
+          endDate: this.$util.formatDate(),
+          detectStatus : '확인전'
+        });
+        console.log('알람 감지 목록 : ', response);
+        for (let i = 0; i < response.data.length; i++) {
+          response.data[i].afStartdttm = this.$util.formatDttm(response.data[i].afStartdttm, '-', ':');
+          response.data[i].afEnddttm = this.$util.formatDttm(response.data[i].afEnddttm, '-', ':');
+          response.data[i].bfStartdttm = this.$util.formatDttm(response.data[i].bfStartdttm, '-', ':');
+
+          if (!response.data[i].detectStatus) {
+            response.data[i].detectStatus = '확인전';
+          }
+        }
+        //this.ruleDetections = response.data;
+      } catch (error) {
+        console.error('규칙 감지 목록을 불러오는 중 오류가 발생했습니다:', error);
+        //this.ruleDetections = [];
+      } finally {
+        this.$loading.hide();
+      }
+    },
   },
   async mounted() {
     //console.log("App.vue mounted", Object.keys(this.$options.components));
 
     this.drawer = window.innerWidth >= 1264; // Vuetify의 lg 브레이크포인트
+    await this.alarmSearch();
+    this.alarmInterval = setInterval(this.alarmSearch, 10000);
   },
   components: {
     "alarm-popup": loadVue("/component/AlarmPopup"),
     "account-settings": loadVue("/component/AccountSettings"),
+  },
+  beforeDestroy() {
+    clearInterval(this.alarmInterval);
   },
   beforeCreate() {
 
@@ -945,7 +1009,13 @@ const comp = (module.exports = {
 
     { // ===== 테마 설정 =====
       const savedTheme = localStorage.getItem("darkTheme");
-      if (savedTheme !== null) {
+      console.log('savedTheme : ', savedTheme);
+      if( savedTheme == undefined) {
+        console.log('savedTheme undefined : ', savedTheme);
+        this.toggleDarkTheme();
+      }
+
+      if (savedTheme !== null) {        
         const parsedTheme = JSON.parse(savedTheme);
         if (this.isDark !== parsedTheme) {
           this.toggleDarkTheme();
@@ -953,7 +1023,7 @@ const comp = (module.exports = {
       }
     } // end 테마 설정
 
-    
+
 
   },
 });
@@ -968,6 +1038,7 @@ const globalMethods = {
     };
   },
   formatDate(date, sep = '') {
+    if (!date) date = new Date();
     if (date instanceof Date) {
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -978,7 +1049,7 @@ const globalMethods = {
     }
   },
   formatDttm(dttm, sep1 = '', sep2 = '') {
-    if( !dttm ) return '';
+    if (!dttm) return '';
     if (dttm instanceof Date) {
       const year = dttm.getFullYear();
       const month = String(dttm.getMonth() + 1).padStart(2, "0");
@@ -1144,7 +1215,7 @@ Vue.prototype.$util = globalMethods;
 .app-bar-with-border {
 
   border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
-  
+
   /* 라이트 모드 */
 }
 
@@ -1363,9 +1434,9 @@ Vue.prototype.$util = globalMethods;
   color: inherit;
 }
 
-.border-red{
+.border-red {
   background-color: rgba(255, 255, 255, 0.12) !important;
-  
-  
+
+
 }
 </style>
