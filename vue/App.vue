@@ -166,7 +166,7 @@
         </div>
 
         <!-- 메시지 팝업 -->
-        <v-dialog v-if="$msg" v-model="$msg.showMessagePopup" max-width="600px" @keydown.enter="$msg.hide"
+        <v-dialog v-if="$msg" v-model="$msg.showMessagePopup" max-width="700px" @keydown.enter="$msg.hide"
           @keydown.space="$msg.hide">
           <v-card>
             <v-card-title class="headline d-flex justify-space-between align-center">
@@ -414,11 +414,11 @@
                     <td>이후 오류 건수</td>
                     <td>{{ $vo.detected.selectedDetected.afErrCnt }}</td>
                   </tr>
-                  <tr>
-                    <td>거래량 비율</td>
-                    <td>{{ $vo.detected.selectedDetected.txRatio }}%</td>
-                    <td>거래량 감지 여부</td>
-                    <td>
+                  <tr >
+                    <td :class="[$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'border-red' : ''">거래량 비율</td>
+                    <td :class="[$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'border-red' : ''">{{ $vo.detected.selectedDetected.txRatio }}%</td>
+                    <td :class="[$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'border-red' : ''">거래량 감지 여부</td>
+                    <td :class="[$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'border-red' : ''">
                       <v-chip :color=" [$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes('Y') ? 'red' : 'green'" small outlined>
                         {{ [$vo.detected.selectedDetected.txZeroYn, $vo.detected.selectedDetected.txRatioYn].includes("Y") ? "예" : "아니오" }}
                       </v-chip>                      
@@ -625,7 +625,7 @@ const VoPlugin = {
         groupedIncidentDetails: [],
         incidentHeaders: [
           { text: '발생시간', align: 'start', sortable: true, value: 'timestamp' },
-          { text: '서비스ID', value: 'guid' },
+          { text: '서비스ID', value: 'svc_id' },
           { text: '시스템', value: 'system' },
           { text: '심각도', value: 'severity' },
           { text: '서비스내용', value: 'description' },
@@ -978,6 +978,7 @@ const globalMethods = {
     }
   },
   formatDttm(dttm, sep1 = '', sep2 = '') {
+    if( !dttm ) return '';
     if (dttm instanceof Date) {
       const year = dttm.getFullYear();
       const month = String(dttm.getMonth() + 1).padStart(2, "0");
@@ -1360,5 +1361,11 @@ Vue.prototype.$util = globalMethods;
 .text-decoration-none {
   text-decoration: none;
   color: inherit;
+}
+
+.border-red{
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  
+  
 }
 </style>

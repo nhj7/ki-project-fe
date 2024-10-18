@@ -1,4 +1,4 @@
-CREATE DEFINER = `kisb`@`%` PROCEDURE `kisb`.`proc_detect_rule_data`()
+CREATE DEFINER=`kisb`@`%` PROCEDURE `kisb`.`proc_detect_rule_data`()
 BEGIN
     -- RuleSet 테이블에서 데이터를 가져오는 커서 선언
     DECLARE done INT DEFAULT FALSE;
@@ -13,15 +13,15 @@ BEGIN
     DECLARE v_enabled BIT(1);
 
     DECLARE ruleset_cursor CURSOR FOR 
-	SELECT action, direction, duration, name, rule_id, threshold, type, unit, enabled
-	FROM kisb.RuleSet
-	WHERE enabled = 1;
+        SELECT action, direction, duration, name, rule_id, threshold, type, unit, enabled
+        FROM kisb.RuleSet
+        WHERE enabled = 1;
     
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
    
     -- 임시 테이블이 존재할 경우 삭제
     DROP TEMPORARY TABLE IF EXISTS temp;
-	DROP TEMPORARY TABLE IF EXISTS temp_rule;
+   DROP TEMPORARY TABLE IF EXISTS temp_rule;
    
     -- 임시 테이블 생성
     CREATE TEMPORARY TABLE temp (
@@ -45,7 +45,9 @@ BEGIN
 	  `tx_ratio_yn` char(1) DEFAULT NULL,
 	  `tx_err_ratio_yn` char(1) DEFAULT NULL,
 	  `bf_startDttm` varchar(14) DEFAULT NULL,
+	  `bf_endDttm` varchar(14) DEFAULT NULL,
 	  `af_startDttm` varchar(14) DEFAULT NULL,
+	  `af_endDttm` varchar(14) DEFAULT NULL,
 	  `type` varchar(255) DEFAULT NULL,
 	  `duration` varchar(255) DEFAULT NULL,
 	  `direction` varchar(255) DEFAULT NULL,
@@ -98,94 +100,119 @@ BEGIN
 			-- 거래량을 가져오는 쿼리
            
            INSERT INTO temp_rule (
-           		rule_id, rule_nm,
+           rule_id, rule_nm,
 			    svc_id, svc_nm, svc_cnt, bf_svc_cnt, bf_err_cnt, af_svc_cnt, af_err_cnt,
 			    tx_zero_yn, tx_ratio, tx_err_ratio, tx_ratio_yn, tx_err_ratio_yn,
-			    bf_startDttm, af_startDttm, type, duration, direction, threshold
+			    bf_startDttm, bf_endDttm, af_startDttm, af_endDttm, type, duration, direction, threshold
 			)
+			
+           
 			SELECT
-			    v_rule_id as rule_id
+				v_rule_id as rule_id
 			    , v_name as rule_nm
-				, al.svc_id
-				, al.svc_nm
-				, al.svc_cnt
-				, bf.svc_cnt as bf_svc_cnt
-				, bf.err_cnt as bf_err_cnt
-				, af.svc_cnt as af_svc_cnt
-				, af.err_cnt as af_err_cnt
-				, CASE WHEN bf.svc_cnt > 0 AND af.svc_cnt = 0 THEN 'Y' ELSE 'N' END AS tx_zero_yn -- 무거래 적중인 경우 'Y'
-				, case when af.svc_cnt > 0 and bf.svc_cnt  > 0 then ( af.svc_cnt / bf.svc_cnt)*100 else 0 end tx_ratio -- 거래증감율
-				, case when af.err_cnt > 0 and bf.err_cnt  > 0 then ( af.err_cnt / bf.err_cnt)*100 else 0 end tx_err_ratio -- 에러증감율
-				, case when af.svc_cnt > 0 and bf.svc_cnt  > 0 and v_threshold > 0 then 
+				, svc_id
+				, svc_nm
+				, svc_cnt
+				, bf_svc_cnt
+				, bf_err_cnt
+				, af_svc_cnt
+				, af_err_cnt
+				, CASE WHEN bf_svc_cnt > 0 AND af_svc_cnt = 0 and v_type = '거래량' THEN 'Y' ELSE 'N' END AS tx_zero_yn -- 무거래 적중인 경우 'Y'
+				, case when af_svc_cnt > 0 and bf_svc_cnt  > 0 then ( af_svc_cnt / bf_svc_cnt)*100 else 0 end tx_ratio -- 거래증감율
+				, case when af_err_cnt > 0 and bf_err_cnt  > 0 then ( af_err_cnt / bf_err_cnt)*100 else 0 end tx_err_ratio -- 에러증감율
+				
+				, case when v_type = '거래량' and af_svc_cnt > 0 and bf_svc_cnt  > 0 and v_threshold > 0 then 
 					case when v_direction = '증가' then 
-						case when ( af.svc_cnt / bf.svc_cnt)*100 >= v_threshold then 'Y' else 'N' end 
-						else  case when ( af.svc_cnt / bf.svc_cnt)*100 <= v_threshold then 'Y' else 'N' end  end
+						case when ( af_svc_cnt / bf_svc_cnt)*100 >= v_threshold then 'Y' else 'N' end 
+						else  case when ( af_svc_cnt / bf_svc_cnt)*100 <= v_threshold then 'Y' else 'N' end  end
 					else 'N' end as tx_ratio_yn -- 증가나 감소 적중인 경우 'Y'
 				-- 에러증감율에 대한 적중 여부
-				, case when af.err_cnt > 0 and bf.err_cnt  > 0 and v_threshold > 0 then 
+				
+				, case when v_type = '오류율' and af_err_cnt > 0 and bf_err_cnt  > 0 and v_threshold > 0 then 
 				    case when v_direction = '증가' then 
-				        case when ( af.err_cnt / bf.err_cnt)*100 >= v_threshold then 'Y' else 'N' end 
+				        case when ( af_err_cnt / bf_err_cnt) * 100 >= v_threshold then 'Y' else 'N' end 
 				    else 
-				        case when ( af.err_cnt / bf.err_cnt)*100 <= v_threshold then 'Y' else 'N' end  
+				        case when ( af_err_cnt / bf_err_cnt ) * 100 <= v_threshold then 'Y' else 'N' end  
 				    end
 				else 'N' end as tx_err_ratio_yn -- 에러증감율 적중 여부 'Y'	
-				, bf.startDttm as bf_startDttm
-				, af.startDttm as af_startDttm
+				
+				, DATE_FORMAT(DATE_SUB(NOW(), INTERVAL v_duration * 2 MINUTE) , '%Y%m%d%H%i%s') as bf_startDttm
+				, DATE_FORMAT(DATE_SUB(NOW(), INTERVAL v_duration MINUTE), '%Y%m%d%H%i%s') as bf_endDttm
+				, DATE_FORMAT(DATE_SUB(NOW(), INTERVAL v_duration MINUTE), '%Y%m%d%H%i%s') as af_startDttm
+				, DATE_FORMAT(NOW(), '%Y%m%d%H%i%s') as af_endDttm
 				, v_type as type
 				, v_duration as duration
 				, v_direction as direction 
 				, v_threshold as threshold
 			FROM (
 				SELECT
-					'all' as dvcd
-					, svc_id
-					, svc_nm
-					, count(*) as svc_cnt
-					, sum( case when al.res_cd <> 'Succ' then 1 else 0 end ) as err_cnt
-				FROM svcdata al
-				WHERE al.req_dttm BETWEEN DATE_FORMAT(DATE_SUB(NOW(), INTERVAL v_duration * 2 MINUTE) , '%Y%m%d%H%i%s')
-				                   AND DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 0 MINUTE), '%Y%m%d%H%i%s')
-				group by al.svc_id
-			) al
-			LEFT JOIN (
-				SELECT 
-					'bf' as dvcd 
-					, bf.svc_id
-					, count(bf.svc_id) as svc_cnt 
-					, sum( case when bf.res_cd <> 'Succ' then 1 else 0 end ) as err_cnt
-					, DATE_FORMAT(DATE_SUB(NOW(), INTERVAL v_duration* 2 MINUTE) , '%Y%m%d%H%i%s') as startDttm
-					, DATE_FORMAT(DATE_SUB(NOW(), INTERVAL v_duration MINUTE), '%Y%m%d%H%i%s') as endDttm
-				FROM svcdata bf
-				WHERE bf.req_dttm BETWEEN DATE_FORMAT(DATE_SUB(NOW(), INTERVAL v_duration * 2 MINUTE) , '%Y%m%d%H%i%s')
-				                   AND DATE_FORMAT(DATE_SUB(NOW(), INTERVAL v_duration MINUTE), '%Y%m%d%H%i%s')
-				group by bf.svc_id
-			) bf ON al.svc_id = bf.svc_id
-			LEFT JOIN ( 
-				SELECT  
-					'af'
-					, af.svc_id
-					, count(af.svc_id) as svc_cnt
-					, sum( case when af.res_cd <> 'Succ' then 1 else 0 end ) as err_cnt
-					, DATE_FORMAT(DATE_SUB(NOW(), INTERVAL v_duration MINUTE), '%Y%m%d%H%i%s') as startDttm
-					, DATE_FORMAT(NOW(), '%Y%m%d%H%i%s') as endDttm
-				FROM svcdata af 
-				WHERE req_dttm BETWEEN DATE_FORMAT(DATE_SUB(NOW(), INTERVAL v_duration MINUTE), '%Y%m%d%H%i%s')
-				AND DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')
-				GROUP BY af.svc_id 
-			) af ON al.SVC_ID = af.SVC_ID
-			WHERE 1=1;
+				    al.svc_id
+					, al.svc_nm
+					, al.svc_cnt
+					, nvl(bf.svc_cnt,0) as bf_svc_cnt
+					, nvl(bf.err_cnt,0) as bf_err_cnt
+					, nvl(af.svc_cnt,0) as af_svc_cnt
+					, nvl(af.err_cnt,0) as af_err_cnt
+							
+				FROM (
+					SELECT
+						'all' as dvcd
+						, svc_id
+						, svc_nm
+						, nvl(count(*),0) as svc_cnt
+						, nvl(sum( case when al.res_cd <> 'Succ' then 1 else 0 end ),0) as err_cnt
+					FROM svcdata al
+					WHERE al.req_dttm BETWEEN DATE_FORMAT(DATE_SUB(NOW(), INTERVAL v_duration * 2 MINUTE) , '%Y%m%d%H%i%s')
+					                   AND DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 0 MINUTE), '%Y%m%d%H%i%s')
+					group by al.svc_id
+				) al
+				LEFT OUTER JOIN (
+					SELECT 
+						'bf' as dvcd 
+						, bf.svc_id
+						, nvl(count(bf.svc_id),0) as svc_cnt 
+						, nvl(sum( case when bf.res_cd <> 'Succ' then 1 else 0 end ),0) as err_cnt
+						, DATE_FORMAT(DATE_SUB(NOW(), INTERVAL v_duration* 2 MINUTE) , '%Y%m%d%H%i%s') as startDttm
+						, DATE_FORMAT(DATE_SUB(NOW(), INTERVAL v_duration MINUTE), '%Y%m%d%H%i%s') as endDttm
+					FROM svcdata bf
+					WHERE bf.req_dttm BETWEEN DATE_FORMAT(DATE_SUB(NOW(), INTERVAL v_duration * 2 MINUTE) , '%Y%m%d%H%i%s')
+					                   AND DATE_FORMAT(DATE_SUB(NOW(), INTERVAL v_duration MINUTE), '%Y%m%d%H%i%s')
+					group by bf.svc_id
+				) bf ON al.svc_id = bf.svc_id
+				LEFT OUTER JOIN ( 
+					SELECT  
+						'af'
+						, af.svc_id
+						, nvl(count(af.svc_id),0) as svc_cnt
+						, nvl(sum( case when af.res_cd <> 'Succ' then 1 else 0 end ),0) as err_cnt
+						, DATE_FORMAT(DATE_SUB(NOW(), INTERVAL v_duration MINUTE), '%Y%m%d%H%i%s') as startDttm
+						, DATE_FORMAT(NOW(), '%Y%m%d%H%i%s') as endDttm
+					FROM svcdata af 
+					WHERE req_dttm BETWEEN DATE_FORMAT(DATE_SUB(NOW(), INTERVAL v_duration MINUTE), '%Y%m%d%H%i%s')
+					AND DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')
+					GROUP BY af.svc_id 
+				) af ON al.SVC_ID = af.SVC_ID
+				WHERE 1=1
+			) TMP WHERE 1=1;
+		
+            	
+            
+            
         
-        END IF; -- 거래량 처리        
+        END IF; -- 거래량 처리
+        
     END LOOP;
     
     -- 커서 닫기
     CLOSE ruleset_cursor;
    
+    
+   
     INSERT INTO kisb.ruledata
-	(rule_id, rule_nm, svc_id, svc_nm, svc_cnt, bf_svc_cnt, bf_err_cnt, af_svc_cnt, af_err_cnt, tx_zero_yn, tx_ratio, tx_err_ratio, tx_ratio_yn, tx_err_ratio_yn, bf_startDttm, af_startDttm, `type`, duration, direction, threshold)
+	(rule_id, rule_nm, svc_id, svc_nm, svc_cnt, bf_svc_cnt, bf_err_cnt, af_svc_cnt, af_err_cnt, tx_zero_yn, tx_ratio, tx_err_ratio, tx_ratio_yn, tx_err_ratio_yn, bf_startDttm, af_startDttm, `type`, duration, direction, threshold, detect_status)
     
 	select 
-    	rule_id, rule_nm, svc_id, svc_nm, svc_cnt, bf_svc_cnt, bf_err_cnt, af_svc_cnt, af_err_cnt, tx_zero_yn, tx_ratio, tx_err_ratio, tx_ratio_yn, tx_err_ratio_yn, bf_startDttm, af_startDttm, `type`, duration, direction, threshold 
+    	rule_id, rule_nm, svc_id, svc_nm, svc_cnt, bf_svc_cnt, bf_err_cnt, af_svc_cnt, af_err_cnt, tx_zero_yn, tx_ratio, tx_err_ratio, tx_ratio_yn, tx_err_ratio_yn, bf_startDttm, af_startDttm, `type`, duration, direction, threshold , '확인전'
     from temp_rule
     where 1=1
     and 1 = case 

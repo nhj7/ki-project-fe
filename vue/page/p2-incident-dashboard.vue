@@ -274,6 +274,7 @@ const comp = module.exports = {
                     if (response.data) {
                         this.incidents = response.data.map(incident => ({
                             guid : incident.guid,
+                            svc_id : incident.svc_id,
                             timestamp: this.$util.formatDttm(incident.req_dttm, '-', ':'),
                             system: incident.system_cd,
                             severity: incident.res_cd == 'Succ' ? '정상' : '오류', // API 응답에 심각도 정보가 없어 임의로 설정

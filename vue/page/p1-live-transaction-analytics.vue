@@ -298,11 +298,8 @@ const comp = (module.exports = {
   methods: {
     async toggleSimulator(){
       try{
-        console.log("simulatorOn", this.simulatorOn);
-        let simulatorUrl = "/simulator/on";
-        if( !this.simulatorOn ){
-          simulatorUrl = "/simulator/off";
-        }
+        console.log("simulatorOn", this.simulatorOn ? "/simulator/on" : "/simulator/off" );
+        let simulatorUrl = this.simulatorOn ? "/simulator/on" : "/simulator/off";        
         const response = await this.$axios.get(simulatorUrl);
         if (response.data.status === "Y") {
           this.simulatorOn = true;
@@ -510,7 +507,6 @@ const comp = (module.exports = {
           }
         }
       });
-
       // 데이터 정렬 및 오래된 데이터 제거
       for (let i = 0; i < 2; i++) {
         this.transactionFlowOption.series[i].data.sort((a, b) => a[0] - b[0]);
@@ -530,24 +526,19 @@ const comp = (module.exports = {
      * @returns 새로운 데이터
      */
     async fetchNewData() {
-      try {
-        // 실제로는 서버에서 데이터를 가져와야 합니다.
-        // gettxdata API를 사용하여 최근 5분간의 거래 데이터를 가져옵니다.
+      try {        
+        // gettxdata API를 사용하여 최근 5초간의 거래 데이터를 가져옵니다.
         const endDttm = this.$util.getDateTime(new Date());
         const startDttm = this.$util.getDateTime(
           new Date(Date.now() - 5 * 1000)
         );
-
         const response = await this.$axios.post("/api/gettxdata", {
           startDttm: startDttm,
           endDttm: endDttm,
         });
         const transactions = response.data.txDataList;
-
         this.updateChartData(transactions);
-
         this.updateAnomalyTransactions(transactions);
-
         transactions.sort((a, b) => b.id - a.id);
         transactions.forEach((tx, idx) =>
           setTimeout(() => {
@@ -732,7 +723,7 @@ const comp = (module.exports = {
     const initialData = await this.generateInitialData();
     this.updateChartData(initialData);
     this.updateAnomalyTransactions(initialData);
-    this.fetchServiceData(); // 초기 데이터 로드 (가상 데이터 사용)
+    this.fetchServiceData(); // 초기 데이터 로드
     ///this.updateSummaryItems(initialData);
     const response = await axios.get("/simulator/status");
     //console.log("response", response);

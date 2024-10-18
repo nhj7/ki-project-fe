@@ -32,6 +32,10 @@
                                 <v-select v-model="filters.ruleId" :items="ruleIds" item-text="text" item-value="value"
                                     label="규칙 ID" dense hide-details></v-select>
                             </v-col>
+                            <v-col cols="12" sm="4" md="3">
+                                <v-select v-model="filters.detectStatus" :items="['전체', '확인전','확인중','조치중','모니터링중','완료']" item-text="text" item-value="value"
+                                    label="감지상태" dense hide-details></v-select>
+                            </v-col>
                             <v-col cols="12" sm="12" md="12" class="d-flex justify-end align-center">
                                 <v-btn :color="$config.color_btn" @click="search" small dense>조회</v-btn>
                             </v-col>
@@ -40,14 +44,15 @@
                 </v-card>
 
                 <!-- 규칙 감지 목록 -->
-                <v-data-table :headers="headers" :items="ruleDetections" :items-per-page="10"
-                    class="elevation-1 custom-table" :mobile-breakpoint="0" @click:row="$vo.openDetectedDialog" 
-                    >
-                    <template v-slot:[`item.txRatioYn`]="{ item }">
-                        {{ item.txRatioYn == 'Y' ? '예' : '아니오' }}
+                <v-data-table :headers="headers" :items="ruleDetections" :items-per-page="10" class="elevation-1 custom-table" :mobile-breakpoint="0" @click:row="$vo.openDetectedDialog">
+                    <template v-slot:[`item.txRatio`]="{ item }">
+                        {{ item.txRatio == 'Y' ? '예' : '아니오' }}
                     </template>
                     <template v-slot:[`item.txErrRatioYn`]="{ item }">
                         {{ item.txErrRatioYn == 'Y' ? '예' : '아니오' }}
+                    </template>
+                    <template v-slot:[`item.detectStatus`]="{ item }">
+                        fffff
                     </template>
                     <template v-slot:[`item.actions`]="{ item }">
                         <v-btn small @click="$vo.openDetectedDialog(item)">상세</v-btn>
@@ -69,6 +74,7 @@ const comp = module.exports = {
                 startDate: '',
                 endDate: '',
                 ruleId: '전체',
+                detectStatus : '전체',
             },
             ruleIds: [],
             ruleDetections: [{
@@ -82,16 +88,17 @@ const comp = module.exports = {
                 txErrRatioYn: 'Y',
             }],
             headers: [
-                { text: '규칙 ID', value: 'ruleId' },
-                { text: '규칙명', value: 'ruleNm' },
                 { text: '서비스 ID', value: 'svcId' },
                 { text: '서비스명', value: 'svcNm' },
-                { text: '거래량 비율', value: 'txRatio' },
-                { text: '거래감지', value: 'txRatioYn' },
-                { text: '오류율', value: 'txErrRatio' },
-                { text: '오류감지', value: 'txErrRatioYn' },
-                { text: '감지 시작 시간', value: 'afStartdttm' },
-                { text: '상태', value: 'detectStatus' },
+                { text: '규칙 ID', value: 'ruleId' },
+                { text: '규칙명', value: 'ruleNm' },
+                
+                { text: '거래증감율(%)', value: 'txRatio' },
+                
+                { text: '오류증감율(%)', value: 'txErrRatio' },
+                
+                { text: '감지시간', value: 'afEnddttm' },
+                { text: '상태', value: 'detectStatus', sortable: false },
                 { text: '액션', value: 'actions', sortable: false },
             ],
         };
@@ -104,11 +111,14 @@ const comp = module.exports = {
                 const response = await this.$axios.post('/api/rule-detections', {
                     startDate: this.filters.startDate.replace(/-/g, ''),
                     endDate: this.filters.endDate.replace(/-/g, ''),
+                    
                     ...(this.filters.ruleId !== '전체' ? { ruleId: this.filters.ruleId } : {}),
+                    ...(this.filters.detectStatus !== '전체' ? { detectStatus: this.filters.detectStatus } : {}),
                 });
                 console.log('규칙 감지 목록 : ', response);
                 for (let i = 0; i < response.data.length; i++) {
                     response.data[i].afStartdttm = this.$util.formatDttm(response.data[i].afStartdttm, '-', ':');
+                    response.data[i].afEnddttm = this.$util.formatDttm(response.data[i].afEnddttm, '-', ':');
                     response.data[i].bfStartdttm = this.$util.formatDttm(response.data[i].bfStartdttm, '-', ':');
                     
                     if(!response.data[i].detectStatus){
@@ -148,7 +158,7 @@ const comp = module.exports = {
     },
     created() {
         const dates = this.$util.setLastWeekDates();
-        this.filters.startDate = dates.startDate;
+        this.filters.startDate = dates.endDate;
         this.filters.endDate = dates.endDate;
 
         //console.log("app.vue created", this.$router);

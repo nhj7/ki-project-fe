@@ -77,33 +77,52 @@ const comp = module.exports = {
   methods: {
     async submitTransfer() {
       if (this.$refs.form.validate()) {
-        // 이체 데이터를 처리하는 로직을 여기에 추가합니다.
-        console.log('이체 데이터:', { header : { 
-          prg_id : 'P11',
-          prg_name : '간편이체',
-          tx_id : 'T11',
-          tx_name : '간편이체',
-          tx_time : new Date().toISOString(),
-          user_id : this.$session.userId,
-          user_name : this.$session.userName,
-          
-        }, body : {
-          ...this.transferData
-        } });
+        let response = null;
+        try {
+          const data = { header : { 
+            prg_id : 'P11',
+            prg_name : '간편이체',
+            tx_id : 'T11',
+            tx_name : '간편이체',
+            tx_time : new Date().toISOString(),
+            user_id : this.$session.userId,
+            user_name : this.$session.userName,
+            
+          }, body : {
+            ...this.transferData
+          } }
+
+          // 이체 데이터를 처리하는 로직을 여기에 추가합니다.
+          console.log('이체 데이터:', data);
 
 
-        this.$loading.show('간편 이체 처리 중입니다.');
-        await this.$util.sleep(this.transferData.txSecond * 1000);
-        this.$loading.hide();
+          this.$loading.show('간편 이체 처리 중입니다.');
+          //await this.$util.sleep(this.transferData.txSecond * 1000);
+
+          response = await axios.post('/api/transfer', data);
+
+          console.log('transfer.response',response);
+        } catch (error) {
+          console.error('간편이체 처리 에러 : ',error);
+        } finally{
+          this.$loading.hide();
+          this.$msg.show({
+            messageTitle: '모바일뱅킹 간편 이체',
+            messageCode: this.transferData.txStatus === '처리완료' ? '0000' : '9999',
+            messageContent: this.transferData.txStatus === '처리완료' ? '이체가 완료되었습니다.' : '이체가 실패하였습니다.',
+            isError: this.transferData.txStatus === '처리오류',
+            showErrorDetails: this.transferData.txStatus === '처리오류',
+            errorDetails: this.transferData.txStatus === '처리오류' ? response.data.Header.resultMessag : ''
+          });
+        }
+
+
+        
+
+
+        
         //alert('이체가 완료되었습니다.');
-        this.$msg.show({
-          messageTitle: '모바일뱅킹 간편 이체',
-          messageCode: this.transferData.txStatus === '처리완료' ? '0000' : '9999',
-          messageContent: this.transferData.txStatus === '처리완료' ? '이체가 완료되었습니다.' : '이체가 실패하였습니다.',
-          isError: this.transferData.txStatus === '처리오류',
-          showErrorDetails: this.transferData.txStatus === '처리오류',
-          errorDetails: this.transferData.txStatus === '처리오류' ? '처리 중 알수 없는 오류가 발생하였습니다.' : ''
-        });
+        
       }
     },
     updateAmount(value) {

@@ -132,7 +132,7 @@ const comp = module.exports = {
             curlExample: '',
             paramValues: {},
             isFormValid: true,
-            selectedApi: 'updateRuleDetectData',
+            selectedApi: 'transfer',
             apiList: [
             
                 { text: '감지 상태 업데이트', value: 'updateRuleDetectData' },
@@ -531,7 +531,7 @@ const comp = module.exports = {
                     description: '간편 이체를 처리합니다.',
                     requestHeader: true,
                     parameters: [
-                        { name: 'sender', type: 'String', required: true, default: '김남구', description: '보내는 사람' },
+                        { name: 'sender', type: 'String', required: true, default: '나형주', description: '보내는 사람' },
                         { name: 'receiver', type: 'String', required: true, default: '이민호', description: '받는 사람' },
                         { name: 'amount', type: 'String', required: true, default: '100000000', description: '이체 금액' },
                         { name: 'date', type: 'String', required: true, default: this.$util.formatDate(new Date()), description: '이체 날짜 (YYYY-MM-DD 형식)' },
