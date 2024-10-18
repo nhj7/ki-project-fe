@@ -115,10 +115,10 @@ const comp = (module.exports = {
           name: "거래시간(초)",
         },
         grid: {
-          top: 5,
+          top: 10,
           left: "3%",
           right: "4%",
-          bottom: "3%",
+          bottom: "10%",
           
         },
         series: [
