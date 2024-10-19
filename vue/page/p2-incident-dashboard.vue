@@ -106,9 +106,9 @@
                                 </v-select-->
 
                             </v-col>
-                            <v-col cols="12" sm="3" md="2" >
+                            <!--v-col cols="12" sm="3" md="2" >
                                 <v-checkbox v-model="filters.useOnlyDate" label="일자조회" dense hide-details @change="changeUseOnlyDate"></v-checkbox>
-                            </v-col>
+                            </v-col-->
                             <v-col cols="12" sm="12" md="12" class="d-flex justify-end align-center">
                                 <v-btn :color="$config.color_btn" @click="search" small dense>조회</v-btn>
                             </v-col>
@@ -196,7 +196,7 @@ const comp = module.exports = {
                 endTimeFormatted: '',
                 startTimeMinute: '',
                 endTimeMinute: '',
-                useOnlyDate: true,
+                useOnlyDate: false,
             },            
             incidents: [],
             totalIncidents: 0,
@@ -229,7 +229,7 @@ const comp = module.exports = {
         },
         changeSeverity() {
             console.log('changeSeverity : ', this.filters.severities);
-            this.filters.useOnlyDate = ['오류', '감지'].includes(this.filters.severities);
+            //this.filters.useOnlyDate = ['오류', '감지'].includes(this.filters.severities);
         },
         formatTimeInput(value, dataId) {
             //console.log('replaceNumber', value, dataId)
@@ -265,7 +265,7 @@ const comp = module.exports = {
                     const requestData = {
                         startDttm: this.filters.startDate.replace(/-/g, '') + this.filters.startTime + this.filters.startTimeMinute + '00',
                         endDttm: this.filters.endDate.replace(/-/g, '') + this.filters.endTime + this.filters.endTimeMinute + '00',
-                        status: '', // this.filters.status
+                        status: this.filters.severities, // 확인전, 조치중, 모니터링중, 완료
                     };                    
                     this.$loading.show('인시던트 목록을 불러오는 중입니다...');
                     

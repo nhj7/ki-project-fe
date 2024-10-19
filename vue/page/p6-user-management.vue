@@ -172,7 +172,7 @@ const comp = module.exports = {
       } else {
         // 새 사용자 등록
 
-        const res = await request("/api/login-signup", "POST", {
+        const res = await axios.post("/api/login-signup", {
           name: this.editedItem.userName,
           username: this.editedItem.userId,          
           password: this.editedItem.password,
