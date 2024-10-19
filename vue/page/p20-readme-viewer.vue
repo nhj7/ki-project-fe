@@ -64,7 +64,8 @@ h2 {
     margin-bottom: 0.75em;
 }
 
-h3 {        
+h3 {
+    margin-top: 0.5em;
     margin-bottom: 0.5em;
 }
 
