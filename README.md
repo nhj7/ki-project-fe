@@ -99,10 +99,6 @@ Vue.js 를 초기화하고 라우팅 설정, Vuetify 테마 구성을 포함합�
   - `p12-mobile-banking-loan.vue`: 모바일 뱅킹 대출 페이지
   - `p13-toss-loan.vue`: 토스 비교금리 페이지
 
-### 5.2 서버 구조
-
-- `src/main/java/com/ki/sqm/`: 서버 소스 폴더
-
 ## 6. 프론트 엔드 개발 및 배포 가이드
 
 ### 6.1 개발 환경 설정
@@ -172,7 +168,7 @@ Vue.js 를 초기화하고 라우팅 설정, Vuetify 테마 구성을 포함합�
       ```
 
 ### 7.2 서버 프로그램 목록
-
+- 아래 서버 API의 스펙은 https://ki-sqm.netlify.app/#/api-list 에서 확인 및 테스트 가능.
 - 실시간 서비스 모니터링 및 서비스, 전문 관련 API
   - `/getMetric`	실시간 서비스 모니터링 메트릭 정보 조회
   - `/gettxdata`	전문 상세 내역 조회
@@ -196,9 +192,6 @@ Vue.js 를 초기화하고 라우팅 설정, Vuetify 테마 구성을 포함합�
   - `/loan-apply`	서비스 테스트 센터 - 비교 금리
   - `/loan-limit`	서비스 테스트 센터 - 대출신청
   - `/transfer`	서비스 테스트 센터 - 간편이체
-
-&nbsp;
-&nbsp;
 
 ## 8. 팀 소개 및 역할
 
