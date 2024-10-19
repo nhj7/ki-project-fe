@@ -54,12 +54,17 @@ const comp = module.exports = {
 /* 마크다운 스타일링 */
 h1 {
     font-size: 1.7em;
-    margin-bottom: 0.5em;
+    margin-bottom: 1em;
+    margin-top: 0.5em;
 }
 
 h2 {
     font-size: 1.5em;
-    margin-top: 1em;
+    margin-top: 2em;
+    margin-bottom: 0.75em;
+}
+
+h3 {        
     margin-bottom: 0.5em;
 }
 
@@ -92,6 +97,10 @@ pre {
 
 .theme--dark pre {
     background-color: #302d2d;
+}
+
+img {
+    width: 50%;
 }
 
 
