@@ -117,7 +117,7 @@
       </v-btn>
       <v-btn icon @click="showAlarmPopup">
         <v-badge :content="alarmCount" :value="alarmCount > 0" color="error" overlap>
-          <v-icon>mdi-bell</v-icon>
+          <v-icon>mdi-bell{{this.alarmPopupVisible ? '' : '-outline'}}</v-icon>
         </v-badge>
       </v-btn>
       <v-btn icon @click="toggleDarkTheme">
@@ -891,31 +891,7 @@ const comp = (module.exports = {
     showAlarmPopup() {      
       this.alarmPopupVisible = true;
     },
-    fetchAlarms() {
-      // 여기서 실제 알람 데이터를 가져오는 API 호출을 수행해야 합니다.
-      // 예시 데이터:
-      this.alarms = [
-        {
-          timestamp: "2023-05-10 14:30:00",
-          system: "소비자금융시스템",
-          severity: "심각",
-          description: "대출 한도조회 오류",
-        },
-        {
-          timestamp: "2023-05-10 15:15:00",
-          system: "일반여신시스템",
-          severity: "심각",
-          description: "스크래핑 오류",
-        },
-        {
-          timestamp: "2023-05-10 16:00:00",
-          system: "모바일앱",
-          severity: "심각",
-          description: "1원 인증 오류",
-        },
-      ];
-      this.alarmCount = this.alarms.length;
-    },
+    
     updateScrollbarColor(isDark) {
       const style = document.createElement('style');
       const color = isDark ? 'grey' : 'darkgray';
@@ -968,6 +944,14 @@ const comp = (module.exports = {
           }
         }
         if( response.data.length > 0) {
+          
+          
+          if( response.data.length > this.alarmCount) {
+            for(let i = 0; i < response.data.length - this.alarmCount; i++) {
+              response.data[i].isNew = true;
+            }
+            this.showAlarmPopup();
+          }
           this.alarmCount = response.data.length;
           this.alarms = response.data;
         }
@@ -985,7 +969,7 @@ const comp = (module.exports = {
 
     this.drawer = window.innerWidth >= 1264; // Vuetify의 lg 브레이크포인트
     await this.alarmSearch();
-    this.alarmInterval = setInterval(this.alarmSearch, 60 * 1000);
+    this.alarmInterval = setInterval(this.alarmSearch, 30 * 1000);
   },
   components: {
     "alarm-popup": loadVue("/component/AlarmPopup"),

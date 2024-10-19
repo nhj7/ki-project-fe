@@ -15,6 +15,9 @@
             class="elevation-1"
             @click:row="$vo.openDetectedDialog"
           >
+            <template v-slot:[`item.isnew`]="{ item }">
+              <v-icon v-if="item.isNew" color="red">mdi-new-box</v-icon>
+            </template>
             <template v-slot:[`item.severity`]="{ item }">
               <v-chip :color="getSeverityColor(item.severity)" small dark>
                 {{ item.severity }}
@@ -40,8 +43,8 @@
           { text: '발생시간', value: 'afEnddttm' },
           { text: '규칙ID', value: 'ruleId' },
           { text: '규칙명', value: 'ruleNm' },
-          { text: '서비스명', value: 'svcNm' },
-          
+          { text: '서비스명', value: 'svcNm' },          
+          { text: '', value: 'isnew' }
         ]
       };
     },
@@ -51,6 +54,13 @@
       },
       dialog(newValue) {
         this.$emit('input', newValue);
+        console.log('dialog : ', newValue);
+
+        if(!newValue){
+          for(let i = 0; i < this.alarms.length; i++){
+            this.alarms[i].isNew = false;
+          }
+        }
       },
     },
     methods: {

@@ -282,7 +282,7 @@ const comp = (module.exports = {
             color: primaryColor,
             formatter: (value) => {
               const date = new Date(value);
-              return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+              return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
             },
           },
           min: this.transactionFlowOption.xAxis.min,
@@ -593,8 +593,15 @@ const comp = (module.exports = {
      * @param none
      * @returns none
      */
-    startUpdating: function () {
+    startUpdating() {
       this.updateInterval = setInterval(this.fetchNewData, 5000); // 5초마다 업데이트
+      this.updateSimulatorInterval = setInterval(this.getSimulatorStatus, 5000); // 5초마다 업데이트            
+    },
+
+    getSimulatorStatus() {
+      this.$axios.get("/simulator/status").then(response => {
+        this.simulatorOn = response.data.status === "Y";
+      });
     },
     /**
      * 숫자를 입력받아 단위를 붙여 반환하는 함수
@@ -616,6 +623,7 @@ const comp = (module.exports = {
      */
     stopUpdating: function () {
       clearInterval(this.updateInterval);
+      clearInterval(this.updateSimulatorInterval);
       clearInterval(this.realChartData.updateInterval);
       clearInterval(this.transactionFlowUpdateInterval);
     },
@@ -744,13 +752,7 @@ const comp = (module.exports = {
     this.updateAnomalyTransactions(initialData);
     this.fetchServiceData(); // 초기 데이터 로드
     ///this.updateSummaryItems(initialData);
-    const response = await axios.get("/simulator/status");
-    //console.log("response", response);
-    if(response.data.status==="Y"){
-      this.simulatorOn = true;
-    }else if(response.data.status==="N"){
-      this.simulatorOn = false;
-    }
+    this.getSimulatorStatus();
     //this.simulatorOn = response.data.simulatorOn;
   },
   async mounted() {
