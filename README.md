@@ -2,11 +2,11 @@
 
 이 프로젝트는 금융 서비스 모니터링 및 관리를 위한 한국투자 파이썬 경진대회 프로젝트 참가용 프로젝트의 프론트엔드 부분입니다.
 
-## 프로젝트 개요
+## 1. 프로젝트 개요
 
 이 프로젝트는 실시간 거래 분석, 오류탐지, 탐지 규칙 설정 등 다양한 기능을 제공하여 금융 거래의 안전성과 효율성을 높이는 것을 목표로 합니다.
 
-## 주요 기능
+## 2. 주요 기능
 
 1. 실시간 거래 분석
 
@@ -36,22 +36,28 @@
    - cURL 명령어 자동 생성
    - 응답 데이터 시각화 및 포맷팅
 
-## 기술 스택
+&nbsp;
+&nbsp;
 
-### Frontend
+## 3. 기술 스택
+
+### 3.1 Frontend
 
 - Vue.js : 프론트엔드 프레임워크
 - Vuetify : UI 컴포넌트 라이브러리
 - D3.js: 데이터 시각화
 - ECharts: 고급 차트 및 그래프 생성
 
-### Backend
+### 3.2 Backend
 
 - Spring Cloud Gateway
 - Spring Security
 - Spring Data JPA
 
-## 프로젝트 구조
+&nbsp;
+&nbsp;
+
+## 4. 프로젝트 구조
 
 - `index.html` : 이 파일은 전체 애플리케이션의 구조와 동작을 결정하는 중요한 설정들을 포함하고 있습니다. 프로젝트 진입점으로, 주요 스크립트와 스타일시트를 로드합니다. Vue.js 애플리케이션을 초기화하고 라우팅 설정, Vuetify 테마 구성, 전역 믹스인 등을 포함합니다. 주요 특징은 다음과 같습니다:
 
@@ -79,9 +85,12 @@
   - `p12-mobile-banking-loan.vue`: 모바일 뱅킹 대출 페이지
   - `p13-toss-loan.vue`: 토스 비교금리 페이지
 
-## 프론트 엔드 개발 및 배포 가이드
+&nbsp;
+&nbsp;
 
-### 1. 개발 환경 설정
+## 5. 프론트 엔드 개발 및 배포 가이드
+
+### 5.1 개발 환경 설정
 
 1. 프로젝트 클론:
 
@@ -101,7 +110,7 @@
 
      (npm은 Node.js의 패키지 관리자, live-server는 로컬 개발 서버입니다.)
 
-### 2. 프로젝트 실행
+### 5.2 프로젝트 실행
 
 1. 프로젝트 폴더로 이동
 2. 다음 명령어로 서버 실행:
@@ -113,29 +122,66 @@
 
 
 
-### 3. 배포 프로세스
+### 5.3 배포 프로세스
 
 - GitLab에 코드를 push하면 자동으로 Netlify에 배포됩니다.
 - 배포 사이트: https://ki-sqm.netlify.app/
 
-### 4. 테스트 접속
+&nbsp;
+&nbsp;
 
-- 데모 계정:
-  - ID: demo_user
-  - PW: demo_password
-    (실제 계정 정보는 보안상의 이유로 별도 전달)
+## 6. 서버 개발 및 배포 가이드
 
-### 5. 문제 해결
+### 6.1 프로젝트 환경
 
-- 오류 1: Node.js 버전 불일치
-  해결: Node.js 최신 LTS 버전으로 업데이트
-- 오류 2: live-server 실행 실패
-  해결: 관리자 권한으로 명령 프롬프트 실행 후 재시도
+- 언어: Java(JDK 17)
+- 프레임워크: Spring Boot
+- 빌드 도구: Gradle
+- 데이터베이스: MySQL 또는 MariaDB (선택)
+- 캐싱: Spring Cache
+
+
+- DB Container 실행
+  - MariaDB 컨테이너 실행
+      ```   
+      sudo docker run -d \
+      --name kkk \
+      -p 53306:3306 \
+      -v ./data:/var/lib/mysql \
+      -v /etc/localtime:/etc/localtime:ro \
+      -e MARIADB_ROOT_PASSWORD=패스워드 \
+      ```
+  - 컨테이너 목록 확인
+      ```
+      sudo docker ps
+      ```
+&nbsp;
+
+### 6.2 프로그램 목록
+
+- `/gettxdata`	전문 상세 내역 조회
+- `/loan-apply`	품질 테스트 비교 금리
+- `/loan-limit`	품질 테스트 대출신청
+- `/login-check`	사용자 상태 체크
+- `/login-signin`	사용자 로그인
+- `/login-signup`	사용자 등록
+- `/rule-detect-update`	이상 감지 목록 상태 업데이트
+- `/rule-detections`	이상 감지 목록 조회
+- `/rule-list`	감지 룰 목록 조회
+- `/rule-save`	감지 룰 등록
+- `/transfer`	품질 테스트 간편이체
+- `/user-list`	사용자 목록 조회
+- `/getGuidData`	GUID 별 전문 상세 내역 조회
+- `/incident`	서비스 내역 조회
+- `/getMetric`	실시간 서비스 모니터링 메트릭 정보 조회
+- `/simulator/off`	시뮬레이터 OFF
+- `/simulator/on`	시뮬레이터 ON
+- `/simulator/status`	시뮬레이터 상태 조회
 
 &nbsp;
 &nbsp;
 
-## 팀 소개 및 역할
+## 7. 팀 소개 및 역할
 
 - 프로젝트 기획 및 문서 작성 : IT전략기획팀 한경록
 - 화면 기획 및 프론트엔드 개발 : IT개발팀 나형주
