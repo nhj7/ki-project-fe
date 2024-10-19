@@ -926,7 +926,7 @@ const comp = (module.exports = {
     },
     async alarmSearch() {
       try {
-        this.$loading.show('알람 감지 목록을 불러오는 중입니다...');
+        //this.$loading.show('알람 감지 목록을 불러오는 중입니다...');
         // API 호출 로직 구현
         const response = await this.$axios.post('/api/rule-detections', {
           startDate: this.$util.formatDate(),
@@ -944,13 +944,13 @@ const comp = (module.exports = {
           }
         }
         if( response.data.length > 0) {
-          
-          
           if( response.data.length > this.alarmCount) {
             for(let i = 0; i < response.data.length - this.alarmCount; i++) {
               response.data[i].isNew = true;
             }
-            this.showAlarmPopup();
+            if( this.$route.path === '/p1-live-transaction-analytics') {
+              this.showAlarmPopup();
+            }
           }
           this.alarmCount = response.data.length;
           this.alarms = response.data;
@@ -960,7 +960,7 @@ const comp = (module.exports = {
         console.error('규칙 감지 목록을 불러오는 중 오류가 발생했습니다:', error);
         //this.ruleDetections = [];
       } finally {
-        this.$loading.hide();
+        //this.$loading.hide();
       }
     },
   },

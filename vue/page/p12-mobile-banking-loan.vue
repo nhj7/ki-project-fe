@@ -95,16 +95,19 @@ const comp = module.exports = {
         // 한도 조회 로직을 여기에 추가합니다.
         console.log('한도 조회 데이터:', this.loanData);
         this.$loading.show();
-        await this.$util.sleep(this.loanData.txSecond * 1000);
+        //await this.$util.sleep(this.loanData.txSecond * 1000);
+        const response = await axios.post('/api/loan-limit', this.loanData);
+        console.log('한도 조회 응답 : ', response);
+
         this.$loading.hide();
         this.$msg.show({
-          messageTitle: '모바일뱅킹 대출신청',
-          messageCode: '0000',
-          messageContent: '한도 조회가 완료되었습니다.',
-          isError: false,
-          showErrorDetails: false,
-          errorDetails: ''
-        });
+            messageTitle: '모바일뱅킹 대출신청',
+            messageCode: this.loanData.txStatus === '처리완료' ? '0000' : '9999',
+            messageContent: this.loanData.txStatus === '처리완료' ? '한도 조회가 완료되었습니다.' : '한도조회가 실패하였습니다.',
+            isError: this.loanData.txStatus === '처리오류',
+            showErrorDetails: this.loanData.txStatus === '처리오류',
+            errorDetails: this.loanData.txStatus === '처리오류' ? response.data.Header.resultMessag : ''
+          });
       }
     }
   }

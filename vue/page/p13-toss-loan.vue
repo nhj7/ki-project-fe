@@ -146,29 +146,32 @@ const comp = module.exports = {
             // 실제 라우팅 로직 구현
             console.log('Navigating to:', route);
             this.$msg.show({
-                    messageTitle: '토스 비교금리 조회',
-                    messageCode: '0000',
-                    messageContent: `테스트용 페이지입니다. '신용대출 한도 확인하기'로 테스트를 진행해주세요.`,
-                    isError: false,
-                    showErrorDetails: false,
-                    errorDetails: ''
-                });
+                messageTitle: '토스 비교금리 조회',
+                messageCode: '0000',
+                messageContent: `테스트용 페이지입니다. '신용대출 한도 확인하기'로 테스트를 진행해주세요.`,
+                isError: false,
+                showErrorDetails: false,
+                errorDetails: ''
+            });
         },
         async checkLoanLimit() {
             //if (this.$refs.form.validate()) {
-                // 한도 조회 로직을 여기에 추가합니다.
-                console.log('한도 조회 데이터:', this.loanData);
-                this.$loading.show();
-                await this.$util.sleep(this.loanData.txSecond * 1000);
-                this.$loading.hide();
-                this.$msg.show({
-                    messageTitle: '토스 비교금리 조회',
-                    messageCode: '0000',
-                    messageContent: '토스 비교금리 조회가 완료되었습니다.',
-                    isError: false,
-                    showErrorDetails: false,
-                    errorDetails: ''
-                });
+            // 한도 조회 로직을 여기에 추가합니다.
+            console.log('한도 조회 데이터:', this.loanData);
+            this.$loading.show();
+            //await this.$util.sleep(this.loanData.txSecond * 1000);
+            const response = await axios.post('/api/loan-limit', this.loanData);
+            console.log('한도 조회 응답 : ', response);
+            this.$loading.hide();
+            this.$msg.show({
+                messageTitle: '토스 비교금리 조회',
+                messageCode: this.loanData.txStatus === '처리완료' ? '0000' : '9999',
+                messageContent: this.loanData.txStatus === '처리완료' ? '토스 비교금리 조회가 완료되었습니다.' : '토스 비교금리 조회가 실패하였습니다.',
+                isError: this.loanData.txStatus === '처리오류',
+                showErrorDetails: this.loanData.txStatus === '처리오류',
+                errorDetails: this.loanData.txStatus === '처리오류' ? response.data.Header.resultMessag : ''
+            });
+
             //}
         }
     },
