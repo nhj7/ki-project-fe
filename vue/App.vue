@@ -952,9 +952,9 @@ const comp = (module.exports = {
               this.showAlarmPopup();
             }
           }
-          this.alarmCount = response.data.length;
-          this.alarms = response.data;
         }
+        this.alarms = response.data;
+        this.alarmCount = response.data.length;
         //this.ruleDetections = response.data;
       } catch (error) {
         console.error('규칙 감지 목록을 불러오는 중 오류가 발생했습니다:', error);
