@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta name="google-site-verification" content="8XhC5hbHttvu-_NyuPBkh6aMFaeI01XHYGSIghYU_Ac" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv="cache-control" content="no-store" />
+    <meta http-equiv="expires" content="-1" />
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta name="msapplication-TileColor" content="#FFFFFF">
+    <link rel="icon" href="/assets/ci.png" type="image/x-icon">
+    <title>KI-SQM</title>    
+    <link href="/css/vuetify.min.css" rel="stylesheet">    
+    <link href="/css/materialdesignicons.min.css" rel="stylesheet">    
+    <script src="/js/vue.min.js"></script>    
+    <script src="/js/vuetify.min.js"></script>    
+    <script src="/js/http-vue-loader.js"></script>    
+    <script src="/js/vue-router.js"></script>    
+    <script src="/js/apexcharts.js"></script>    
+    <script src="/js/vue-apexcharts.js"></script>    
+    <script src="/js/echarts.js"></script>    
+    <script src="/js/vue-echarts.js"></script>    
+    <script src="/js/echarts-gl.min.js"></script>    
+    <script src="/js/echarts-liquidfill.min.js"></script>    
+    <script src="/js/d3.v7.min.js"></script>    
+    <script src="/js/axios.min.js"></script>    
+    <script src="/js/marked.min.js"></script>
+
+    <!--link href="https://cdn.jsdelivr.net/npm/vuetify@2/dist/vuetify.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2/dist/vuetify.min.js"></script>
+    <script src="https://unpkg.com/http-vue-loader"></script>
+    <script src="https://unpkg.com/vue-router@2/dist/vue-router.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-apexcharts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-echarts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-liquidfill@3.1.0/dist/echarts-liquidfill.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/14.1.2/marked.min.js" integrity="sha512-bXyBT2/sYjZg1D7ykDS6eJSE4DFDVPJHvbRAfdfYKr6IusrCz7wAmSm36vz9G8zMob25Rvqu90vft3JI71ygcQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script-->
+
+
+    <style id="scrollbar-style">
+        html ::-webkit-scrollbar {
+            width: 14px; /* 스크롤바 전체 너비 */
+        }
+        html ::-webkit-scrollbar-track {
+            background: transparent; /* 트랙 배경을 투명하게 */
+        }
+        html ::-webkit-scrollbar-thumb {
+            background-color: darkgray; /* 스크롤바 색상 */
+            border-radius: 8px; /* 스크롤바 모서리 둥글게 */
+            border: 4px solid transparent; /* 테두리를 투명하게 하여 실제 스크롤바 너비 조절 */
+            background-clip: content-box;
+        }
+        html ::-webkit-scrollbar-thumb:hover {
+            background-color: grey; /* 호버 시 색상 변경 */
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <App />
+    </div>
+    <script>
+
+        Vue.prototype.$config = {
+            endpoint_url: 'https://ki.iinfo.kr:18080',
+            color_btn : 'secondary'
+        }
+        axios.defaults.baseURL = Vue.prototype.$config.endpoint_url;
+        Vue.prototype.$axios = axios;
+        Vue.prototype.$session = {
+            userId: null,
+            userName: null,
+            userType: null,
+            userStatus: null,
+            loginStatus: null,
+            lastLoginDate: null,
+            expiredDate: null,
+            accessToken: null,
+            refreshToken: null,
+            clear() {
+                this.userId = null;
+                this.userName = null;
+                this.userType = null;
+                this.userStatus = null;
+                this.loginStatus = null;
+                this.lastLoginDate = null;
+                this.expiredDate = null;
+                this.accessToken = null;
+                this.refreshToken = null;
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("refreshToken");
+            },
+        };
+
+        const loadVue = (vueName) => {
+            return httpVueLoader('./vue/' + vueName + '.vue');
+        }
+
+        const data = {
+            currentView: ''
+            , message: '@nhj12311'
+            , data1: 'data22'
+        }
+
+        const vuetifyOptions = {
+            defaults: {
+                VSelect: {
+                    hideDetails: true,
+                    "hide-details": true,
+                    dense: true,
+                    density: "compact",
+                }
+                , VTextField: {
+                    hideDetails: true,
+                    dense: true,
+                }
+                , VBtn: {
+                    dense: true,
+                }
+            },
+            theme: {
+                dark: false
+                , options: { customProperties: true }
+                , themes: {
+                    light: {
+                        accent: "#82B1FF"
+                        , error: "#FF5252"
+                        , info: "#2196F3"
+                        , primary: "#1976D2"
+                        , secondary: "#424242"
+                        , success: "#4CAF50"
+                        , warning: "#FB8C00"
+                        , skyBlue: '#4FC3F7',  // 연한 하늘색
+                    }, dark: {
+                        accent: "#FF4081"
+                        , error: "#FF5252"
+                        , info: "#2196F3"
+                        , primary: "#2196F3"
+                        , secondary: "#424242"
+                        , success: "#4CAF50"
+                        , warning: "#FB8C00"
+                        , grey: {
+                            base: '#9E9E9E',
+                            lighten5: '#FAFAFA',
+                            lighten4: '#F5F5F5',
+                            lighten3: '#EEEEEE',
+                            lighten2: '#E0E0E0',
+                            lighten1: '#BDBDBD',
+                            darken1: '#757575',
+                            darken2: '#616161',
+                            darken3: '#424242',
+                            darken4: '#212121',
+                        }
+                    }, ocean: {
+                        primary: '#0277bd', // 파란색 계열                        
+                        secondary: '#26c6da', // 밝은 파란색
+                        accent: '#00acc1', // 청록색 계열
+                        error: '#c62828', // 어두운 빨간색
+                        info: '#0288d1', // 파란색 계열
+                        success: '#2e7d32', // 초록색 계열
+                        warning: '#f57c00', // 오렌지색 계열
+                    }, sunset: {
+                        primary: '#ff7043', // 주황색 계열
+                        secondary: '#ffccbc', // 밝은 주황색
+                        accent: '#ff5722', // 강한 주황색
+                        error: '#d32f2f', // 어두운 빨간색
+                        info: '#ffb74d', // 노란색 계열
+                        success: '#66bb6a', // 초록색 계열
+                        warning: '#ffa726', // 노란 주황색
+                    },
+                }
+            },
+
+        };
+        const vuetify = new Vuetify(vuetifyOptions);
+
+        Vue.mixin({
+            beforeCreate() {
+                this.$vuetify.preset = {
+                    VTextField: { dense: true, hideDetails: true },
+                    VSelect: { dense: true, hideDetails: true },
+                    VTextarea: { dense: true, hideDetails: true },
+                    VCombobox: { dense: true, hideDetails: true },
+                    // 필요한 다른 컴포넌트들에 대해서도 같은 방식으로 추가
+                }
+            }
+        });
+
+        // 믹스인 정의
+        const denseMixin = {
+            props: {
+                dense: {
+                    type: Boolean,
+                    default: true
+                },
+                hideDetails: {
+                    type: Boolean,
+                    default: true
+                }
+            }
+        };
+
+        // 믹스인 전역 등록
+        Vue.mixin(denseMixin);
+
+
+        vuetify.framework.theme.themes.ocean = {
+            primary: '#0277bd', // 파란색 계열                        
+            secondary: '#26c6da', // 밝은 파란색
+            accent: '#00acc1', // 청록색 계열
+            error: '#c62828', // 어두운 빨간색
+            info: '#0288d1', // 파란색 계열
+            success: '#2e7d32', // 초록색 계열
+            warning: '#f57c00', // 오렌지색 계열
+        }
+
+        const Home = { component: loadVue('./page/p10-welcome-page') }
+
+
+        const router = new VueRouter({
+            mode: 'hash',
+            routes: [
+                {
+                    path: '/live-transaction-analytics', name: 'live-transaction-analytics', component: loadVue('./page/p1-live-transaction-analytics'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-chart-timeline-variant-shimmer",
+                        iconColor: "green",
+                        title: "실시간 서비스 모니터링",
+                        description: '실시간으로 서비스 트랜잭션을 모니터링하고 분석합니다. 거래량, 오류율, 처리 시간 등을 한눈에 확인할 수 있습니다.'
+                    }
+                }
+                , {
+                    path: '/rule-detected-list', name: 'rule-detected-list', component: loadVue('./page/p8-rule-detected-list'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-shield-sync-outline",
+                        iconColor: "green",
+                        title: "서비스 이상 감지 목록",
+                        description: '설정된 규칙에 따라 감지된 서비스 이상 징후 목록을 확인할 수 있습니다. 거래량 비율, 오류율 등을 모니터링합니다.'
+                    }
+                }
+                , {
+                    path: '/rule-configuration', name: 'rule-configuration', component: loadVue('./page/p3-rule-configuration'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-shield-star-outline",
+                        iconColor: "green",
+                        title: "이상 징후 감지 정책 설정",
+                        description: '서비스 모니터링을 위한 이상 징후 감지 정책을 설정합니다. 다양한 조건으로 규칙을 생성하고 관리할 수 있습니다.'
+                    }
+                }
+                , {
+                    path: '/incident-dashboard', name: 'incident-dashboard', component: loadVue('./page/p2-incident-dashboard'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-database-search",
+                        iconColor: "orange",
+                        title: "서비스 거래 이력 조회",
+                        description: '서비스 거래 이력을 조회할 수 있습니다. 거래량, 오류율, 처리 시간 등을 한눈에 확인할 수 있습니다.'
+                    }
+                }
+                , {
+                    path: '/tx-history-view', name: 'tx-history-view', component: loadVue('./page/p7-tx-history-view'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-database-search",
+                        iconColor: "orange",
+                        title: "전문 상세 내역 조회",
+                        description: '서비스 거래 안의 연계 전문 거래를 조회합니다. 요청/응답 데이터, 처리 시간 등 상세 정보를 확인할 수 있습니다.'
+                    }
+                }
+                
+
+                , {
+                    path: '/rule-condition-builder', name: 'rule-condition-builder', component: loadVue('./page/p4-rule-condition-builder'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-clipboard-check-outline",
+                        iconColor: "green",
+                        title: "규칙 조건 빌더",
+                    }
+                }
+
+                , {
+                    path: '/service-manager', name: 'service-manager', component: loadVue('./page/p9-service-manager'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-clipboard-check",
+                        iconColor: "orange",
+                        title: "서비스 관리",
+                        description: '관리되고 있는 서비스들을 확인 할 수 있습니다. 서비스 이름, 설명, 세부 내역을 확인할 수 있습니다.'
+                    }
+                }
+                
+
+                , {
+                    path: '/user-management', name: 'user-management', component: loadVue('./page/p6-user-management'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-account-multiple",
+                        iconColor: "purple",
+                        title: "사용자 관리",
+                        description: '사용자 관리를 위한 설정을 할 수 있습니다. 사용자 이름, 설명, 상태 등을 관리할 수 있습니다.'
+                    }
+                }
+
+                , {
+                    path: '/api-list', name: 'api-list', component: loadVue('./page/p5-api-list'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-dev-to",
+                        iconColor: "purple",
+                        title: "API 명세",
+                        description: '시스템에서 제공하는 API 목록과 상세 명세를 확인할 수 있습니다. API 테스트도 가능합니다.'
+                    }
+                }
+
+
+                , {
+                    path: '/logo-generator', name: 'logo-generator', component: loadVue('./page/page4-logo-generator'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-dev-to",
+                        iconColor: "info",
+                        title: "로고 생성기",
+                    }
+
+                }
+
+                , {
+                    path: '/toss-loan', name: 'toss-loan', component: loadVue('./page/p13-toss-loan'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-infinity",
+                        iconColor: "info",
+                        title: "토스 비교금리 대출",
+                    }
+                }
+                , {
+                    path: '/login', name: 'login', component: loadVue('./page/p0-login'), meta: {
+                        showInMenu: false,
+                        title: "로그인",
+                        icon: "mdi-login",
+                    }
+                }
+                , {
+                    path: '/simulator-control', name: 'simulator-control', component: loadVue('./page/p14-simulator-control'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-cog-play-outline",
+                        iconColor: "info",
+                        title: "서비스 거래 시뮬레이터 제어",
+                    }
+                }
+                
+                , {
+                    path: '/readme-viewer', name: 'readme-viewer', component: loadVue('./page/p20-readme-viewer'), meta: {
+                        showInMenu: true,
+                        icon: "mdi-file-document-outline",
+                        iconColor: "purple",
+                        title: "프로젝트 소개(README)",
+                        description: '프로젝트 개요, 주요 기능, 기술스택, 구조, 팀 소개 등을 확인할 수 있습니다.'
+                    }
+                },
+
+                {
+                    path: '/', name: 'Home', component: loadVue('./page/p10-welcome-page'), meta: {
+                        showInMenu: true,
+                        hideInWelcom:true,
+                        title: "Welcome KI-SQM",
+                        icon: "mdi-home",
+                        iconColor: "purple",
+                        description: '웰컴페이지.'
+                    }
+                }
+
+                
+                
+                , {
+                    path: '#1', name: 'test', meta: {
+                        showInMenu: true,
+                        icon: "mdi-view-dashboard",
+                        title: "서비스 품질 테스트 센터",
+                        isGroupOpen: false,
+                        hideInWelcom:true,
+                    }, subRoutes: [                        
+                        {
+                            path: '/mobile-banking-transfer'
+                        }
+                        , {
+                            path: '/mobile-banking-loan'
+                        }
+                        , {
+                            path: '/toss-loan'
+                        }
+                    ]
+                }
+
+                , {
+                    path: '#', name: 'sample', meta: {
+                        showInMenu: false,
+                        icon: "mdi-view-dashboard-outline",
+                        title: "샘플 페이지",
+                        isGroupOpen: false,
+                    }, subRoutes: [
+                        {
+                            path: '/login'
+                        }
+                        ,
+                        {
+                            path: '/sample-apexcharts'
+                        }
+                        , {
+                            path: '/sample-echarts'
+                        }                        
+                        , {
+                            path: '/sample-d3'
+                        }
+                        , {
+                            path: '/sample-transaction-flow'
+                        }
+                        , {
+                            path: '/sample-chat'
+                        }
+                        , {
+                            path: '/test-automation'
+                        }
+                        , {
+                            path: '/logo-generator'
+                        }
+                    ]
+                }
+
+                , {
+                    path: '/sample-apexcharts', name: 'sample-apexcharts', component: loadVue('./page/page5-sample-apexcharts'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-chart-line",
+                        title: "대시보드(샘플-apexcharts)",
+                    }
+                }
+                , {
+                    path: '/sample-echarts', name: 'sample-echarts', component: loadVue('./page/page6-sample-echarts'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-chart-line",
+                        title: "대시보드(샘플-echarts)",
+                    }
+                }
+                , {
+                    path: '/sample-transaction-flow', name: 'sample-transaction-flow', component: loadVue('./page/page7-sample-transaction-flow'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-monitor",
+                        title: "모니터링(샘플-echarts)",
+                    }
+                }
+                , {
+                    path: '/sample-chat', name: 'sample-chat', component: loadVue('./page/page10-chat'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-chat-processing",
+                        title: "대화형 보고서 생성",
+                    }
+                }
+                , {
+                    path: '/test-automation', name: 'test-automation', component: loadVue('./page/page3-test-automation'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-clipboard-check-outline",
+                        iconColor: "green",
+                        title: "테스트 자동화 수행 현황",
+                    }
+                }
+                , {
+                    path: '/sample-d3', name: 'sample-d3', component: loadVue('./page/page8-sample-d3'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-chart-line",
+                        title: "대시보드(샘플-d3)",
+                    }
+                }
+                , {
+                    path: '/mobile-banking-transfer', name: 'mobile-banking-transfer', component: loadVue('./page/p11-mobile-banking-transfer'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-bank-transfer",
+                        iconColor: "red",
+                        title: "모바일뱅킹 간편이체",
+                    }
+                }
+                , {
+                    path: '/mobile-banking-loan', name: 'mobile-banking-loan', component: loadVue('./page/p12-mobile-banking-loan'), meta: {
+                        showInMenu: false,
+                        icon: "mdi-checkbook",
+                        iconColor: "red",
+                        title: "모바일뱅킹 대출신청",
+                    }
+                }
+            ]
+        });
+
+
+        function fnIsLoggedIn() {
+            return Vue.prototype.$session.userId != null;
+            //return true;
+        }
+        
+
+        // 로그인 상태를 체크하는 함수
+        async function checkLoginStatus() {
+
+            console.log('현재 주소:', window.location.href);
+            const currentHash = window.location.hash.substring(1);
+            console.log('현재 해시 주소:', currentHash);
+            const accessToken = localStorage.getItem("accessToken");
+            const refreshToken = localStorage.getItem("refreshToken");
+            if (accessToken && refreshToken) {
+                try {
+                    const response = await axios.post("/api/login-check", { accessToken, refreshToken });
+                    if (response?.data?.header?.resultCode === "0000") {
+                        localStorage.setItem("accessToken", response.data.body.accessToken);
+                        localStorage.setItem("refreshToken", response.data.body.refreshToken);
+                        return {
+                            isLoggedIn: true,
+                            userData: response.data.body,
+                            redirectUrl: currentHash
+                        };
+                    }
+                } catch (error) {
+                    console.error("Login check failed:", error);
+                }
+            }
+            return { isLoggedIn: true , redirectUrl: currentHash};
+        }
+
+        // 로그인 상태 체크 후 Vue 인스턴스 생성
+        checkLoginStatus().then(({ isLoggedIn, userData, redirectUrl }) => {
+
+            if(!isLoggedIn){
+                // 전역 네비게이션 가드 추가
+                router.beforeEach((to, from, next) => {
+                    
+                    console.log('beforeEach', to, from, next);
+                    if(to.path == '/login'){
+                        next();
+                    }
+                    // 이 라우트는 인증이 필요하며 로그인 여부를 확인합니다.
+                    else if (!fnIsLoggedIn()) {
+                        // 로그인하지 않은 경우 로그인 페이지로 리다이렉션합니다.
+                        next({
+                            path: '/login',
+                            query: { redirect: to.fullPath }
+                        });
+                    } else {
+                        next();
+                    }            
+                });
+            }
+
+            const app = new Vue({
+                el: '#app',
+                vuetify,
+                router,
+                data() {
+                    return {
+                        currentView: '',
+                        message: '@nhj12311',
+                        data1: 'data22',
+                        isLoggedIn,
+                        userData
+                    };
+                },
+                components: {
+                    'App': loadVue('App')
+                },
+                methods: {
+                    changeTheme(themeName) {
+                        this.$vuetify.theme.themes.light = this.$vuetify.theme.themes[themeName];
+                        this.$vuetify.theme.dark = false;
+                    },
+                },
+                created() {
+                    if (this.isLoggedIn) {
+                        Object.assign(this.$session, this.userData);
+
+                        console.log("this.$route.path", this.$route.path);
+                        // 현재 경로가 루트("/") 또는 "/login"인 경우 대시보드로 리다이렉트
+                        if (["/", "/login"].includes(this.$route.path)) {
+                            this.$router.push("/");
+                        }
+                        if(redirectUrl){
+                            this.$router.push(redirectUrl);
+                        }
+                    } else if (this.$route.path !== "/login") {
+                        this.$router.push("/login");
+                    }
+                },
+                mounted() {
+                    // ... 기존 mounted 로직 ...
+                }
+            });
+        });
+
+        
+
+        
+        
+        //hljs.registerLanguage("curl", window.hljsDefineCurl);
+        //hljs.highlightAll();
+        
+        //hljs.registerLanguage("vue", window.hljsDefineVue);
+        //hljs.initHighlightingOnLoad();
+        
+        
+        
+    </script>
+
+</body>
+
+</html>
