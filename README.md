@@ -64,9 +64,9 @@
 - `vue/page/`: 주요 페이지 컴포넌트 포함
 
   - `p0-login.vue`: 로그인 페이지
-  - `p1-live-transaction-analytics.vue`: 실시간 거래 분석 페이지
-  - `p8-rule-detected-list.vue`: 규칙 감지 목록 페이지
-  - `p3-rule-configuration.vue`: 규칙 설정 페이지
+  - `p1-live-transaction-analytics.vue`: 실시간 서비스 모니터링 페이지
+  - `p8-rule-detected-list.vue`: 서비스 이상 감지 목록 페이지
+  - `p3-rule-configuration.vue`: 이상 징후 감지 정책 설정 페이지
   - `p2-incident-dashboard.vue`: 서비스 내역 페이지
   - `p7-tx-history.vue`: 전문 상세 내역 페이지
   - `p9-service-manager.vue`: 서비스 관리 페이지
@@ -79,18 +79,64 @@
   - `p12-mobile-banking-loan.vue`: 모바일 뱅킹 대출 페이지
   - `p13-toss-loan.vue`: 토스 비교금리 페이지
 
-## 프론트 엔드 개발 및 배포
+## 프론트 엔드 개발 및 배포 가이드
 
-- 개발 환경 설정 방법 : git clone https://gitlab.com/hj.na/ki-project-fe
-- 빌드 및 배포 프로세스 : 별도 빌드 과정 없이 웹 프로젝트로 구성되어 있어 gitlab에 배포 하면 netlify에 배포 됩니다.
-- 테스트 실행 방법 : vscode open live server를 이용하거나 로컬환경의 웹 프로젝트로 구동할수 있으면 가능.
-- 배포 사이트 : https://ki-sqm.netlify.app/
-- 관리자 계정 : admin / admin
+### 1. 개발 환경 설정
+
+1. 프로젝트 클론:
+
+   ```
+   git clone https://gitlab.com/hj.na/ki-project-fe
+   ```
+
+   (Git은 코드 버전 관리 시스템입니다.)
+2. 웹 환경 구성:
+
+   - Node.js 설치: https://nodejs.org/ 에서 다운로드 및 설치
+     (Node.js는 자바스크립트 실행 환경입니다.)
+   - live-server 설치:
+     ```
+     npm install -g live-server
+     ```
+
+     (npm은 Node.js의 패키지 관리자, live-server는 로컬 개발 서버입니다.)
+
+### 2. 프로젝트 실행
+
+1. 프로젝트 폴더로 이동
+2. 다음 명령어로 서버 실행:
+   ```
+   live-server --port=5500
+   ```
+3. 브라우저에서 `http://localhost:5500` 접속
+
+
+
+
+### 3. 배포 프로세스
+
+- GitLab에 코드를 push하면 자동으로 Netlify에 배포됩니다.
+- 배포 사이트: https://ki-sqm.netlify.app/
+
+### 4. 테스트 접속
+
+- 데모 계정:
+  - ID: demo_user
+  - PW: demo_password
+    (실제 계정 정보는 보안상의 이유로 별도 전달)
+
+### 5. 문제 해결
+
+- 오류 1: Node.js 버전 불일치
+  해결: Node.js 최신 LTS 버전으로 업데이트
+- 오류 2: live-server 실행 실패
+  해결: 관리자 권한으로 명령 프롬프트 실행 후 재시도
+
+&nbsp;
+&nbsp;
 
 ## 팀 소개 및 역할
 
 - 프로젝트 기획 및 문서 작성 : IT전략기획팀 한경록
 - 화면 기획 및 프론트엔드 개발 : IT개발팀 나형주
 - 서버 개발 및 데이터 모델링 : IT전략기획팀 이민호
-
-이 프로젝트는 트렌드에 맞는 최신 웹 기술을 활용하여 구성되었으며 사용자 친화적이고 효율적인 금융 거래 모니터링 솔루션을 제공합니다.

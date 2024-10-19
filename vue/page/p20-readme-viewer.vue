@@ -89,4 +89,8 @@ pre {
     border-radius: 5px;
     overflow-x: auto;
 }
+
+.theme--dark pre {
+    background-color: #302d2d;
+}
 </style>
