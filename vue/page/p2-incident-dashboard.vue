@@ -186,7 +186,7 @@ const comp = module.exports = {
             status: status,
             filters: {
                 systems: systems,
-                severities: '오류',
+                severities: '전체',
                 status: status,
                 startDate: '',
                 endDate: '',
