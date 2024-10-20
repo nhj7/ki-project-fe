@@ -162,7 +162,7 @@ Vue.js 를 초기화하고 라우팅 설정, Vuetify 테마 구성을 포함합�
       ```
 
 ### 6.2 서버 프로그램 목록
-- 아래 서버 API의 스펙은 https://ki-sqm.netlify.app/#/api-list 에서 확인 및 테스트 가능.
+- 아래 서버 API의 스펙은 API 명세(https://ki-sqm.netlify.app/#/api-list) 에서 확인 및 테스트 가능.
 - 실시간 서비스 모니터링 및 서비스, 전문 관련 API
   - `/getMetric`	실시간 서비스 모니터링 메트릭 정보 조회
   - `/gettxdata`	전문 상세 내역 조회

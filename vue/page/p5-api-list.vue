@@ -139,8 +139,7 @@ const comp = module.exports = {
                 { text: '감지 목록 조회', value: 'getRuleDetections' },
                 { text: '시뮬레이터 상태 확인', value: 'getSimulatorStatus' },
                 { text: '시뮬레이터 켜기', value: 'onSimulator' },
-                { text: '시뮬레이터 끄기', value: 'offSimulator' },
-                { text: '서비스 목록 조회', value: 'getServices' },                
+                { text: '시뮬레이터 끄기', value: 'offSimulator' },                           
                 { text: '서비스 지표 목록', value: 'getMetric' },
                 { text: '서비스 거래 목록 조회', value: 'getIncidents' },
                 { text: '서비스 내역 조회', value: 'getGuidData' },
@@ -148,7 +147,7 @@ const comp = module.exports = {
                 { text: '간편 이체', value: 'transfer' },
                 { text: '대출 신청', value: 'applyLoan', todo : true },
                 { text: '한도 조회', value: 'checkLoanLimit' , todo : true},
-                { text: '알람 목록 조회', value: 'getAlarms' },
+                // { text: '알람 목록 조회', value: 'getAlarms' },
                 { text: '룰셋 조회', value: 'getRules' },
                 { text: '거래 데이터 조회', value: 'getTxData' },
                 { text: '로그인', value: 'loginSignin' },
@@ -166,7 +165,7 @@ const comp = module.exports = {
                     parameters: [
                         { name: 'startDttm', type: 'String', required: true, default: this.$util.getDate() + this.$util.getTime(-1, 0), description: '조회 시작 날짜 (yyyymmddhh24miss 형식)' },
                         { name: 'endDttm', type: 'String', required: true, default: this.$util.getDate() + this.$util.getTime(0, 0), description: '조회 종료 날짜 (yyyymmddhh24miss 형식)' },
-                        { name: 'status', type: 'String', required: false, default: '', description: '인시던트 상태 (예: "오류,정상")' }
+                        { name: 'status', type: 'String', required: false, default: '정상', description: '인시던트 상태 (예: "오류,정상")' }
                     ],
                     responseSampleHtml: '',
                     responseSample: {
@@ -361,13 +360,19 @@ const comp = module.exports = {
                         creditScore: 850
                     },
                     responseFormat: [
-                        { name: 'customerId', type: 'String', required: true, description: '고객 ID' },
-                        { name: 'loanLimit', type: 'Number', required: true, description: '대출 가능 한도' },
-                        { name: 'creditScore', type: 'Number', required: true, description: '신용 점수' },
-                        { name: 'lastUpdateDate', type: 'String', required: true, description: '마지막 업데이트 일시 (yyyymmddhh24miss 형식)' },
-                        { name: 'factors', type: 'Array', required: false, description: '한도 결정 요인 목록' },
-                        { name: 'factors[].name', type: 'String', required: true, description: '요인 이름' },
-                        { name: 'factors[].impact', type: 'String', required: true, description: '영향도 (예: 높음, 중간, 낮음)' }
+                        { name: 'Header', type: 'Object', required: true, description: '응답 헤더' },
+                        { name: 'Header.resultCode', type: 'String', required: true, description: '결과 코드' },
+                        { name: 'Header.resultMessag', type: 'String', required: true, description: '결과 메시지' },
+                        { name: 'Result', type: 'Object', required: true, description: '응답 결과' },
+                        { name: 'Result.id', type: 'Number', required: true, description: '거래 ID' },
+                        { name: 'Result.guid', type: 'String', required: true, description: '고유 식별자' },
+                        { name: 'Result.svc_id', type: 'String', required: true, description: '서비스 ID' },
+                        { name: 'Result.svc_nm', type: 'String', required: true, description: '서비스 이름' },
+                        { name: 'Result.system_cd', type: 'String', required: true, description: '시스템 코드' },
+                        { name: 'Result.svc_status', type: 'String', required: true, description: '서비스 상태' },
+                        { name: 'Result.req_dttm', type: 'String', required: true, description: '요청 일시 (yyyyMMddHHmmss 형식)' },
+                        { name: 'Result.res_cd', type: 'String', required: true, description: '응답 코드' },
+                        { name: 'Result.elapsed', type: 'String', required: true, description: '소요 시간 (밀리초)' }
                     ],
                 },
                 loginCheck: {
