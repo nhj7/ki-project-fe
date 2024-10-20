@@ -3,7 +3,7 @@
       <v-card>
         <v-card-title>
           <span class="headline">
-            <v-icon>mdi-bell</v-icon>
+            <v-icon color="red">mdi-bell</v-icon>
             &nbsp;&nbsp;알람 목록
           </span>
         </v-card-title>
