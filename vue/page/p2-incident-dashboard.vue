@@ -171,8 +171,8 @@
 
 
 const systems = ['소비자여신시스템', '일반여신시스템', '모바일앱', '통합웹'];
-const severities = ['전체', '정상', '감지', '오류'];
-const severities_color = ['blue', 'green', 'orange', 'red' ];
+const severities = ['전체', '정상', '오류'];
+const severities_color = ['blue', 'green', 'red' ];
 const status = ['확인전', '조치중', '모니터링중', '완료'];
 
 const comp = module.exports = {
@@ -343,7 +343,7 @@ const comp = module.exports = {
             if (!status) return 'grey';
             switch (status) {                
                 case '정상': return 'green';
-                default: return 'orange';
+                default: return 'red';
             }
         },
         toggleAll(filterType) {
