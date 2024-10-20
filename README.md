@@ -71,9 +71,46 @@
 - Spring Data JPA: 데이터베이스 접근을 위한 ORM 기술
 
 
-## 5. 프로젝트 구조
+## 5. 프론트 엔드 개발 및 배포 가이드
 
-### 5.1 프론트엔드 구조
+### 5.1 개발 환경 설정
+
+1. 프로젝트 클론:
+
+   ```
+   git clone https://gitlab.com/hj.na/ki-project-fe
+   ```
+
+   (Git은 코드 버전 관리 시스템입니다.)
+2. 웹 환경 구성:
+
+   - Node.js 설치: https://nodejs.org/ 에서 다운로드 및 설치
+     (Node.js는 자바스크립트 실행 환경입니다.)
+   - live-server 설치:
+     ```
+     npm install -g live-server
+     ```
+
+     (npm은 Node.js의 패키지 관리자, live-server는 로컬 개발 서버입니다.)
+
+3. 개발IDE: VSCode 권장
+
+### 5.2 프로젝트 실행
+
+1. 프로젝트 폴더로 이동
+2. 다음 명령어로 서버 실행:
+   ```
+   live-server --port=5500
+   ```
+3. 브라우저에서 http://127.0.0.1:5500 접속, 해당 주소가 아니면 서버 통신 불가(CORS 문제)
+
+### 5.3 배포 프로세스
+
+- GitLab에 코드를 push하면 자동으로 Netlify*에 배포됩니다.
+- **Netlify**: 프론트엔드 웹사이트의 빌드, 배포 및 호스팅을 자동화하는 플랫폼입니다.
+- 배포 사이트: https://ki-sqm.netlify.app/
+
+### 5.4 프로젝트 파일 구조
 
 - `index.html` : 이 파일은 전체 구조와 동작을 결정하는 설정들을 포함합니다. 웹 프로젝트 진입점으로, 주요 스크립트와 스타일시트를 로드합니다. \
 Vue.js 를 초기화하고 라우팅 설정, Vuetify 테마 구성을 포함합니다. 
@@ -99,59 +136,16 @@ Vue.js 를 초기화하고 라우팅 설정, Vuetify 테마 구성을 포함합�
   - `p12-mobile-banking-loan.vue`: 모바일 뱅킹 대출 페이지
   - `p13-toss-loan.vue`: 토스 비교금리 페이지
 
-## 6. 프론트 엔드 개발 및 배포 가이드
+## 6. 서버 개발 및 배포 가이드
 
-### 6.1 개발 환경 설정
-
-1. 프로젝트 클론:
-
-   ```
-   git clone https://gitlab.com/hj.na/ki-project-fe
-   ```
-
-   (Git은 코드 버전 관리 시스템입니다.)
-2. 웹 환경 구성:
-
-   - Node.js 설치: https://nodejs.org/ 에서 다운로드 및 설치
-     (Node.js는 자바스크립트 실행 환경입니다.)
-   - live-server 설치:
-     ```
-     npm install -g live-server
-     ```
-
-     (npm은 Node.js의 패키지 관리자, live-server는 로컬 개발 서버입니다.)
-
-### 6.2 프로젝트 실행
-
-1. 프로젝트 폴더로 이동
-2. 다음 명령어로 서버 실행:
-   ```
-   live-server --port=5500
-   ```
-3. 브라우저에서 http://127.0.0.1:5500 접속, 해당 주소가 아니면 서버 통신 불가(CORS 문제)
-
-
-
-
-### 6.3 배포 프로세스
-
-- GitLab에 코드를 push하면 자동으로 Netlify*에 배포됩니다.
-- **Netlify**: 프론트엔드 웹사이트의 빌드, 배포 및 호스팅을 자동화하는 플랫폼입니다.
-- 배포 사이트: https://ki-sqm.netlify.app/
-
-
-
-## 7. 서버 개발 및 배포 가이드
-
-### 7.1 프로젝트 환경
+### 6.1 프로젝트 환경
 
 - 언어: Java(JDK 17)
 - 프레임워크: Spring Boot
 - 빌드 도구: Gradle
 - 데이터베이스: MySQL 또는 MariaDB (선택)
 - 캐싱: Spring Cache
-
-
+- 개발 IDE: IntelliJ IDEA, Eclipse 권장
 - DB Container 실행
   - MariaDB 컨테이너 실행
       ```   
@@ -167,7 +161,7 @@ Vue.js 를 초기화하고 라우팅 설정, Vuetify 테마 구성을 포함합�
       sudo docker ps
       ```
 
-### 7.2 서버 프로그램 목록
+### 6.2 서버 프로그램 목록
 - 아래 서버 API의 스펙은 https://ki-sqm.netlify.app/#/api-list 에서 확인 및 테스트 가능.
 - 실시간 서비스 모니터링 및 서비스, 전문 관련 API
   - `/getMetric`	실시간 서비스 모니터링 메트릭 정보 조회
@@ -193,7 +187,19 @@ Vue.js 를 초기화하고 라우팅 설정, Vuetify 테마 구성을 포함합�
   - `/loan-limit`	서비스 테스트 센터 - 대출신청
   - `/transfer`	서비스 테스트 센터 - 간편이체
 
-## 8. 팀 소개 및 역할
+### 6.3 데이터베이스 구조
+
+- `TxData` 전문 데이터 테이블
+- `SvcMng` 서비스 관리 테이블
+- `SvcData` 서비스 거래 이력 데이터
+- `RuleSet` 이상 징후 감지 규칙 테이블
+- `RuleData` 감지 이력 테이블
+- `proc_detect_rule_data` 룰기반 감지 프로시저
+- `Proc_log` 감지 로그 테이블
+- `simulator` 시뮬레이터 동작 관리 테이블
+- `member` 사용자 테이블
+
+## 7. 팀 소개 및 역할
 
 - 프로젝트 기획 및 문서 작성 : IT전략기획팀 한경록(driver989@naver.com)
 - 화면 기획 및 프론트엔드 개발 : IT개발팀 나형주(nhj7@naver.com)
