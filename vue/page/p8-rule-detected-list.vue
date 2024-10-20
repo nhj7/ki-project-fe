@@ -45,7 +45,7 @@
 
                 
                 <v-data-table :headers="headers" :items="ruleDetections" :items-per-page="10" 
-                class="elevation-1 custom-table" :mobile-breakpoint="0" @click:row="$vo.openDetectedDialog">
+                class="elevation-1 custom-table"  @click:row="$vo.openDetectedDialog">
                     <template v-slot:[`header.select`]>
                         <v-checkbox
                             v-model="selectAll"

@@ -144,7 +144,7 @@
 
                 <!-- 장애 목록 -->
                 <v-data-table :headers="$vo.incidentHeaders" :items="incidents" :items-per-page="10"
-                    class="elevation-1 custom-table" :mobile-breakpoint="0" @click:row="showDetails">
+                    class="elevation-1 custom-table" @click:row="showDetails">
                     <template v-slot:[`item.severity`]="{ item }">
                         <v-chip :text-color="getSeverityColor(item.severity)" outlined small >
                             {{ item.severity }}
