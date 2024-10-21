@@ -100,9 +100,8 @@ pre {
     background-color: #302d2d;
 }
 
-img {
-    width: 50%;
+img{
+    width: 100%; /* xs 사이즈 (기본값) */
+    max-width: 860px !important;
 }
-
-
 </style>
