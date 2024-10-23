@@ -196,7 +196,7 @@ const comp = (module.exports = {
         svg: null,
         width: "90%",
         height: 40,
-        barHeight: 35,
+        barHeight: 30,
         barWidth: 800,
         ellipseRx: 7, // 가로 반지름
         ellipseRy: 7, // 세로 반지름
