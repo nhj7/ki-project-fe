@@ -58,7 +58,7 @@
             <v-list-item v-for="subItem in route.subRoutes" :key="subItem.path" :to="subItem.path" link
               class="lnb-subItem rounded-lg pl-4">
               <v-list-item-action dense>
-                <v-icon>{{ findRouteByPath(subItem.path).meta.icon }}</v-icon>
+                <v-icon :color="$route?.path === subItem?.path ? findRouteByPath(subItem.path).meta.iconColor : ''">{{ findRouteByPath(subItem.path).meta.icon }}</v-icon>
               </v-list-item-action>
               <v-list-item-content dense>
                 <v-list-item-title>{{
@@ -70,7 +70,7 @@
 
           <v-list-item v-else :key="route.path" :to="route.path" class="lnb-item rounded-lg" dense>
             <v-list-item-action>
-              <v-icon>{{ route.meta.icon }}</v-icon>
+              <v-icon :color="$route?.path === route?.path ? route.meta.iconColor : ''">{{ route.meta.icon }}</v-icon>
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-title>
