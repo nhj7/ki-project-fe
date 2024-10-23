@@ -715,7 +715,7 @@ const comp = (module.exports = {
             yesterdayTransactions: this.formatNumber(
               service.previousDayCnt
             ), // 전일 거래량
-            lastWeekTransactions: this.$util.numberWithComma(
+            lastWeekTransactions: this.formatNumber(
               service.previousWeekCnt
             ), // 전주 거래량
             compareTrend: service.errDiffPer >= 0 ? "up" : "down", // 오류율 증감 추이
