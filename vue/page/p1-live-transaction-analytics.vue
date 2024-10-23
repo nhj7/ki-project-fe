@@ -198,7 +198,7 @@ const comp = (module.exports = {
         height: 40,
         barHeight: 35,
         barWidth: 800,
-        ellipseRx: 13, // 가로 반지름
+        ellipseRx: 7, // 가로 반지름
         ellipseRy: 7, // 세로 반지름
         colors: [
           "red",
