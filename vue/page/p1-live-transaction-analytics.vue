@@ -338,8 +338,8 @@ const comp = (module.exports = {
     },
     // 오류율에 따른 색상 반환
     getRateColor(rate) {
-      if (rate < 5) return "green";
-      if (rate < 10) return "orange";
+      if (rate < 5) return "orange";
+      if (rate < 10) return "red";
       return "red";
     },
 
