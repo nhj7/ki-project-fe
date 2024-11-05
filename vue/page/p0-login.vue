@@ -7,9 +7,9 @@
           <v-card-text>
             <v-form ref="form" v-model="valid" lazy-validation>
               <v-text-field ref="userId" v-model="userId" :rules="userIdRules" label="아이디"
-                validate-on-blur data-test="userId-input" hint="제공받은 아이디를 입력해주세요." clearable @input="userIdRules = []"></v-text-field>
+                validate-on-blur data-test="userId-input" hint="제공받은 아이디(admin)를 입력해주세요." clearable @input="userIdRules = []"></v-text-field>
               <v-text-field v-model="password" :rules="passwordRules" label="패스워드" type="password"
-                @keypress.enter="login" :validate-on-blur="false" autocomplete="current-password" data-test="password-input" hint="제공받은 패스워드를 입력해주세요." clearable @input="passwordRules = []"></v-text-field>
+                @keypress.enter="login" :validate-on-blur="false" autocomplete="current-password" data-test="password-input" hint="제공받은 패스워드(admin)를 입력해주세요." clearable @input="passwordRules = []"></v-text-field>
               <v-btn :color="$config.color_btn" @click="login" data-test="login-button" class="mt-4">로그인</v-btn>
             </v-form>
 
