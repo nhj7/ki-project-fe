@@ -87,7 +87,8 @@
       <!--v-img src="/assets/ci4.jpg" :width="150" @click.stop="drawer = !drawer" /-->
       <router-link to="/" class="text-decoration-none">
         <v-toolbar-title class="text-h6 cursor-pointer d-flex align-center flex-row">
-          <v-img src="/assets/ci0.png" :width="100" cover style="top: -7px;"></v-img>
+          <v-img v-if="isDark" src="/assets/ci0_bright.png" :width="100" cover style="top: -7px;"></v-img>
+          <v-img v-else src="/assets/ci0.png" :width="100" cover style="top: -7px;"></v-img>
           <span>한국투자</span>
         </v-toolbar-title>
       </router-link>
