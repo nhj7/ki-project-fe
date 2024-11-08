@@ -69,7 +69,7 @@
                         'text-green': item.compareTrend === 'down',
                         'text-red': item.compareTrend === 'up',
                       }">
-                      <v-icon small>
+                      <v-icon small :color="item.compareTrend === 'up' ? 'red' : 'green'">
                         {{
                         item.compareTrend === "up"
                         ? "mdi-trending-up"

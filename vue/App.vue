@@ -494,7 +494,7 @@
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="$vo.detected.dialog = false">닫기</v-btn>
+              <v-btn :color="$config.color_btn" small @click="$vo.detected.dialog = false">닫기</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
