@@ -86,7 +86,10 @@
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <!--v-img src="/assets/ci4.jpg" :width="150" @click.stop="drawer = !drawer" /-->
       <router-link to="/" class="text-decoration-none">
-        <v-toolbar-title class="text-h6 cursor-pointer">한국투자</v-toolbar-title>
+        <v-toolbar-title class="text-h6 cursor-pointer d-flex align-center flex-row">
+          <v-img src="/assets/ci0.png" :width="100" cover style="top: -7px;"></v-img>
+          <span>한국투자</span>
+        </v-toolbar-title>
       </router-link>
       <v-spacer></v-spacer>
       <!--v-btn icon @click.stop="rightDrawer = !rightDrawer">
