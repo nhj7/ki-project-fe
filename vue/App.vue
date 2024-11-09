@@ -541,7 +541,7 @@
     <v-footer absolute fixed inset padless>
       <v-spacer></v-spacer>
       <span class="text-center">
-        &copy; {{ new Date().getFullYear() }} 한국투자 {{ title }}. All rights reserved.
+        &copy; {{ new Date().getFullYear() }} 한국투자. All rights reserved.
       </span>
       <v-spacer></v-spacer>
     </v-footer>
