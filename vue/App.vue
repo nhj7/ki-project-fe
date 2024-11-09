@@ -1426,7 +1426,7 @@ Vue.prototype.$util = globalMethods;
 }
 
 .border-red {
-  background-color: var(--v-accent-lighten3) !important;
+  background-color: rgba(237, 237, 237, 0.75) !important;
 }
 
 .theme--dark .border-red {
