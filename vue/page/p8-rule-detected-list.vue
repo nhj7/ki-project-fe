@@ -228,7 +228,7 @@ const comp = module.exports = {
         },
     },
     created() {        
-        this.filters.startDate = this.$util.getDate(0, '-');
+        this.filters.startDate = this.$util.getDate(-1, '-');
         this.filters.endDate = this.$util.getDate(0, '-');
 
         //console.log("app.vue created", this.$router);
