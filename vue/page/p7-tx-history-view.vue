@@ -148,13 +148,19 @@ const comp = module.exports = {
       try {
         this.$loading.show('서비스 호출 내역을 조회 중입니다...')
 
-        this.startDttm = this.startDate.replace(/-/g, '') + this.startTime
-        this.endDttm = this.endDate.replace(/-/g, '') + this.endTime
-        const response = await this.$axios.post('/api/gettxdata', {
-          startDttm: this.startDttm,
+        this.startDttm = this.startDate.replace(/-/g, '') + this.startTime;
+        this.endDttm = this.endDate.replace(/-/g, '') + this.endTime;
+
+        let response;
+        if( this.$config.isSimulator) {
+          response = this.$vo.getTxDataList(24);
+        } else {
+          response = await this.$axios.post('/api/gettxdata', {
+            startDttm: this.startDttm,
           endDttm: this.endDttm,
-          ...this.detailSearch,
-        })
+            ...this.detailSearch,
+          })
+        }
         this.transactions = response.data.txDataList
       } catch (error) {
         console.error('트랜잭션 조회 중 오류 발생:', error)

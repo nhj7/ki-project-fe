@@ -473,35 +473,7 @@ const comp = (module.exports = {
 
     },
 
-    getTxDataList(length) {       
-      const reqDt = this.$util.getDate();
-      const response = { data: { txDataList: Array.from({length: length}, (_, idx) => {
-            const reqTm = this.$util.getTime( 0, -(idx/5) );
-            const reqDttm = reqDt + reqTm;
-            
-            const resDttm = reqDt + this.$util.getTime(-idx+ Math.floor(Math.random() * 10));
-            return {
-              id: Math.floor(Math.random() * 10000),
-              guid: Math.random().toString(36).substr(2,9),
-              tx_id: 'TX' + Math.random().toString(36).substr(2,9),
-              if_id: 'IF' + Math.floor(Math.random() * 100),
-              prg_nm: 'PRG' + Math.floor(Math.random() * 100),
-              system_cd: 'SYS' + Math.floor(Math.random() * 10),
-              tx_status: Math.random() > 0.97 ? '오류' : '정상',
-              req_dt: reqDt,
-              req_tm: reqTm,
-              req_dttm: reqDttm,
-              res_dttm: resDttm,
-              res_cd: Math.random() > 0.98 ? 'ERR' : '0000',
-              res_msg: Math.random() > 0.98 ? '오류가 발생했습니다' : '정상처리되었습니다',
-              tx_biz_id: ['입금','출금','조회'][Math.floor(Math.random()*3)],
-              req_json: '{"key":"value"}',
-              res_json: '{"result":"success"}',
-              elapsed: Math.floor(Math.random() * 7700)
-            }
-          })}}
-      return response;
-    },
+    
 
     /**
      * 초기 데이터를 가져오는 함수
@@ -517,7 +489,7 @@ const comp = (module.exports = {
       try {
         let response;
         if (this.$config.isSimulator) {
-          response = this.getTxDataList(1000);
+          response = this.$vo.getTxDataList(1000);
         } else {
           response = await this.$axios.post("/api/gettxdata", {
             startDttm: startDttm,
@@ -589,7 +561,7 @@ const comp = (module.exports = {
 
         let response;
         if (this.$config.isSimulator) {
-          response = this.getTxDataList(24);
+          response = this.$vo.getTxDataList(24);
         } else {
           response = await this.$axios.post("/api/gettxdata", {
             startDttm: startDttm,
