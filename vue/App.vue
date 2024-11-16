@@ -812,6 +812,147 @@ const VoPlugin = {
           ];
           */
         },
+
+        getRuleDetectionsResponse( length = 10) {
+          const response = { data: Array.from({length: length}, (_, i) => {
+            const ruleId = `RULE-${String(i+1).padStart(3,'0')}`;
+            const svcId = `SVC-${String(i+1).padStart(3,'0')}`;
+            const bfSvcCnt = Math.floor(Math.random() * 1000) + 500;
+            const afSvcCnt = Math.floor(Math.random() * 1000) + bfSvcCnt;
+            const txRatio = Math.floor((afSvcCnt / bfSvcCnt) * 100);
+            const bfErrCnt = Math.floor(Math.random() * 20);
+            const afErrCnt = Math.floor(Math.random() * 20);
+            const txErrRatio = parseFloat((afErrCnt / bfErrCnt).toFixed(2));
+            
+            return {
+              ruleId,
+              ruleNm: ['거래량 급증 감지', '거래량 급감 감지', '오류율 급증 감지'][i % 3],
+              detect_status: ['확인전', '확인중','조치중','모니터링중', '확인완료'][i % 5],
+              svcId, 
+              svcNm: ['계좌이체 서비스', '대출신청 서비스', '카드발급 서비스', '예금조회 서비스'][i % 4],
+              svcCnt: afSvcCnt,
+              bfSvcCnt,
+              bfErrCnt,
+              afSvcCnt,
+              afErrCnt,
+              txZeroYn: afSvcCnt === 0 ? 'Y' : 'N',
+              txRatio,
+              txErrRatio,
+              txRatioYn: Math.abs(100 - txRatio) > 30 ? 'Y' : 'N',
+              txErrRatioYn: txErrRatio > 1.5 ? 'Y' : 'N',
+              bfStartdttm: this.$util.getDateTime(new Date(), '', ''),
+              afStartdttm: this.$util.getDateTime(new Date(), '', ''),
+              afEnddttm: this.$util.getDateTime(new Date(), '', ''),
+              type: '거래량',
+              duration: '1시간',
+              direction: txRatio > 100 ? '증가' : '감소',
+              threshold: 30,
+              unit: '%',
+              action: '알림 발송',
+              enabled: 'Y',
+              reg_dt: '20230501',
+              reg_dttm: '20230501010000'
+            };
+          })}
+          console.log('getRuleDetectionsResponse', response);
+          return response;
+        },
+        getRuleListResponse() {
+          return { data: { body: { rules: 
+            [
+                    // 여기에 기존의 rules 데이터를 넣으세요
+                    {
+                        id: 'RULE-001',
+                        name: '1시간 무거래 탐지',
+                        condition: {
+                            type: '거래량',
+                            direction: '무거래',
+                            duration: '1',
+                            unit: '시간',
+                        },
+                        action: '시스템 관리자에게 알림 발송',
+                        enabled: true
+                    },
+                    {
+                        id: 'RULE-002',
+                        name: '시간당 오류율 급증',
+                        condition: {
+                            type: '오류율',
+                            direction: '증가',
+                            duration: '1',
+                            unit: '시간',
+                            threshold: 50,
+                        },
+                        action: '담당자 호출 및 로그 분석 시작',
+                        enabled: true
+                    },
+                    {
+                        id: 'RULE-003',
+                        name: '일일 오류율 이상',
+                        condition: {
+                            type: '오류율',
+                            direction: '증가',
+                            duration: '1',
+                            unit: '일',
+                            threshold: 50,
+                        },
+                        action: '일일 리포트에 포함 및 원인 분석 요청',
+                        enabled: true
+                    },
+                    {
+                        id: 'RULE-004',
+                        name: '주간 거래량 감소',
+                        condition: {
+                            type: '거래량',
+                            direction: '감소',
+                            duration: '1',
+                            unit: '주',
+                            threshold: 50,
+                        },
+                        action: '비즈니스 팀에 보고 및 마케팅 활동 검토',
+                        enabled: true
+                    },                    
+                    {
+                        id: 'RULE-005',
+                        name: '거래 처리 응답 지연',
+                        condition: {
+                            type: '응답시간',
+                            direction: '증가',
+                            duration: '1',
+                            unit: '시간',
+                            threshold: 60,
+                        },
+                        action: '시스템 리소스 점검 및 데이터베이스 쿼리 최적화 검토',
+                        enabled: true
+                    },
+                    {
+                        id: 'RULE-006',
+                        name: '갑작스러운 거래량 증가',
+                        condition: {
+                            type: '거래량',
+                            direction: '증가',
+                            duration: '10',
+                            unit: '분',
+                            threshold: 200,
+                        },
+                        action: '자동 스케일 아웃 트리거 및 마케팅팀에 확인',
+                        enabled: true
+                    },                    
+                    {
+                        id: 'RULE-007',
+                        name: '동일 서비스 반복 시도',
+                        condition: {
+                            type: '반복수행',
+                            duration: '1',
+                            unit: '분',
+                            threshold: 10,
+                        },
+                        action: '해당 사용자 알림',
+                        enabled: true
+                    }
+                ]
+          } } };
+        }
       }
     });
 
@@ -928,15 +1069,24 @@ const comp = (module.exports = {
       style.id = 'scrollbar-style';
       document.head.appendChild(style);
     },
+
+    
+
     async alarmSearch() {
       try {
         //this.$loading.show('알람 감지 목록을 불러오는 중입니다...');
         // API 호출 로직 구현
-        const response = await this.$axios.post('/api/rule-detections', {
-          startDate: this.$util.formatDate(),
-          endDate: this.$util.formatDate(),
-          detectStatus : '확인전'
-        });
+        let response;
+        if( this.$config.isSimulator) { 
+          response = this.$vo.getRuleDetectionsResponse();
+        } else {
+          response = await this.$axios.post('/api/rule-detections', {
+            startDate: this.$util.formatDate(),
+            endDate: this.$util.formatDate(),
+            detectStatus : '확인전'
+          });
+        }
+        
         console.log('알람 감지 목록 : ', response);
         for (let i = 0; i < response.data.length; i++) {
           response.data[i].afStartdttm = this.$util.formatDttm(response.data[i].afStartdttm, '-', ':');

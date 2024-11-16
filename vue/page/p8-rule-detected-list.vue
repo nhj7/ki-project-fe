@@ -170,13 +170,18 @@ const comp = module.exports = {
             try {
                 this.$loading.show('규칙 감지 목록을 불러오는 중입니다...');
                 // API 호출 로직 구현
-                const response = await this.$axios.post('/api/rule-detections', {
-                    startDate: this.filters.startDate.replace(/-/g, ''),
-                    endDate: this.filters.endDate.replace(/-/g, ''),
-                    
-                    ...(this.filters.ruleId !== '전체' ? { ruleId: this.filters.ruleId } : {}),
-                    ...(this.filters.detectStatus !== '전체' ? { detectStatus: this.filters.detectStatus } : {}),
-                });
+                let response;
+                if( this.$config.isSimulator) {
+                    response = this.$vo.getRuleDetectionsResponse();
+                } else {
+                    response = await this.$axios.post('/api/rule-detections', {
+                        startDate: this.filters.startDate.replace(/-/g, ''),
+                        endDate: this.filters.endDate.replace(/-/g, ''),
+                        
+                        ...(this.filters.ruleId !== '전체' ? { ruleId: this.filters.ruleId } : {}),
+                        ...(this.filters.detectStatus !== '전체' ? { detectStatus: this.filters.detectStatus } : {}),
+                    });
+                }
                 console.log('규칙 감지 목록 : ', response);
                 for (let i = 0; i < response.data.length; i++) {
                     response.data[i].afStartdttm = this.$util.formatDttm(response.data[i].afStartdttm, '-', ':');
@@ -204,7 +209,12 @@ const comp = module.exports = {
         },
         async fetchRuleIds() {
             try {
-                const response = await this.$axios.post('/api/rule-list');
+
+                if( this.$config.isSimulator) {
+                    response = this.$vo.getRuleListResponse();
+                } else {
+                    response = await this.$axios.post('/api/rule-list');
+                }
                 console.log('규칙 ID 목록 조회 응답 : ', response);
                 this.ruleIds = ['전체', ...response.data.body.rules.map(rule => {
                     return {

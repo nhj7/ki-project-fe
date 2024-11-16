@@ -73,7 +73,8 @@
 
         Vue.prototype.$config = {
             endpoint_url: 'https://ki.iinfo.kr:18080',
-            color_btn : 'secondary'
+            color_btn : 'secondary',
+            isSimulator: true,
         }
         axios.defaults.baseURL = Vue.prototype.$config.endpoint_url;
         Vue.prototype.$axios = axios;

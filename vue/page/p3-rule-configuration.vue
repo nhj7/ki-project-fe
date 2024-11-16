@@ -169,7 +169,12 @@ const comp = module.exports = {
                 // 여기서는 가상의 트랜잭션을 사용합니다.
                 //await new Promise(resolve => setTimeout(resolve, 250));
                 try {
-                    const response = await this.$axios.post('/api/rule-list');
+                    let response;
+                    if( this.$config.isSimulator) {
+                        response = this.$vo.getRuleListResponse();
+                    } else {
+                        response = await this.$axios.post('/api/rule-list');
+                    }
                     console.log('룰셋 조회 응답 : ', response);
                     if (response.data && response.data.body && response.data.body.rules) {
                         this.rules = response.data.body.rules;
@@ -181,98 +186,7 @@ const comp = module.exports = {
                 }
 
                 /*
-                this.rules = [
-                    // 여기에 기존의 rules 데이터를 넣으세요
-                    {
-                        id: 'RULE-001',
-                        name: '1시간 무거래 탐지',
-                        condition: {
-                            type: '거래량',
-                            direction: '무거래',
-                            duration: '1',
-                            unit: '시간',
-                        },
-                        action: '시스템 관리자에게 알림 발송',
-                        enabled: true
-                    },
-                    {
-                        id: 'RULE-002',
-                        name: '시간당 오류율 급증',
-                        condition: {
-                            type: '오류율',
-                            direction: '증가',
-                            duration: '1',
-                            unit: '시간',
-                            threshold: 50,
-                        },
-                        action: '담당자 호출 및 로그 분석 시작',
-                        enabled: true
-                    },
-                    {
-                        id: 'RULE-003',
-                        name: '일일 오류율 이상',
-                        condition: {
-                            type: '오류율',
-                            direction: '증가',
-                            duration: '1',
-                            unit: '일',
-                            threshold: 50,
-                        },
-                        action: '일일 리포트에 포함 및 원인 분석 요청',
-                        enabled: true
-                    },
-                    {
-                        id: 'RULE-004',
-                        name: '주간 거래량 감소',
-                        condition: {
-                            type: '거래량',
-                            direction: '감소',
-                            duration: '1',
-                            unit: '주',
-                            threshold: 50,
-                        },
-                        action: '비즈니스 팀에 보고 및 마케팅 활동 검토',
-                        enabled: true
-                    },                    
-                    {
-                        id: 'RULE-005',
-                        name: '거래 처리 응답 지연',
-                        condition: {
-                            type: '응답시간',
-                            direction: '증가',
-                            duration: '1',
-                            unit: '시간',
-                            threshold: 60,
-                        },
-                        action: '시스템 리소스 점검 및 데이터베이스 쿼리 최적화 검토',
-                        enabled: true
-                    },
-                    {
-                        id: 'RULE-006',
-                        name: '갑작스러운 거래량 증가',
-                        condition: {
-                            type: '거래량',
-                            direction: '증가',
-                            duration: '10',
-                            unit: '분',
-                            threshold: 200,
-                        },
-                        action: '자동 스케일 아웃 트리거 및 마케팅팀에 확인',
-                        enabled: true
-                    },                    
-                    {
-                        id: 'RULE-007',
-                        name: '동일 서비스 반복 시도',
-                        condition: {
-                            type: '반복수행',
-                            duration: '1',
-                            unit: '분',
-                            threshold: 10,
-                        },
-                        action: '해당 사용자 알림',
-                        enabled: true
-                    }
-                ];
+                this.rules = 
                 */
 
             } catch (error) {

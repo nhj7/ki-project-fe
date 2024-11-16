@@ -146,7 +146,7 @@ const comp = (module.exports = {
             type: "scatter",
             smooth: true,
             data: [],
-            symbolSize: 4,
+            symbolSize: 5,
             symbol: "circle",
             itemStyle: {
               color: "dodgerblue",
@@ -157,7 +157,7 @@ const comp = (module.exports = {
             type: "scatter",
             smooth: true,
             data: [],
-            symbolSize: 4,
+            symbolSize: 5,
             symbol: "circle",
             itemStyle: {
               color: "red",
@@ -473,6 +473,36 @@ const comp = (module.exports = {
 
     },
 
+    getTxDataList(length) {       
+      const reqDt = this.$util.getDate();
+      const response = { data: { txDataList: Array.from({length: length}, (_, idx) => {
+            const reqTm = this.$util.getTime( 0, -(idx/5) );
+            const reqDttm = reqDt + reqTm;
+            
+            const resDttm = reqDt + this.$util.getTime(-idx+ Math.floor(Math.random() * 10));
+            return {
+              id: Math.floor(Math.random() * 10000),
+              guid: Math.random().toString(36).substr(2,9),
+              tx_id: 'TX' + Math.random().toString(36).substr(2,9),
+              if_id: 'IF' + Math.floor(Math.random() * 100),
+              prg_nm: 'PRG' + Math.floor(Math.random() * 100),
+              system_cd: 'SYS' + Math.floor(Math.random() * 10),
+              tx_status: Math.random() > 0.97 ? '오류' : '정상',
+              req_dt: reqDt,
+              req_tm: reqTm,
+              req_dttm: reqDttm,
+              res_dttm: resDttm,
+              res_cd: Math.random() > 0.98 ? 'ERR' : '0000',
+              res_msg: Math.random() > 0.98 ? '오류가 발생했습니다' : '정상처리되었습니다',
+              tx_biz_id: ['입금','출금','조회'][Math.floor(Math.random()*3)],
+              req_json: '{"key":"value"}',
+              res_json: '{"result":"success"}',
+              elapsed: Math.floor(Math.random() * 7700)
+            }
+          })}}
+      return response;
+    },
+
     /**
      * 초기 데이터를 가져오는 함수
      * @returns 초기 데이터
@@ -485,11 +515,16 @@ const comp = (module.exports = {
       const endDttm = this.$util.getDateTime(now);
       const startDttm = this.$util.getDateTime(minutesAgo);
       try {
-        const response = await this.$axios.post("/api/gettxdata", {
-          startDttm: startDttm,
-          endDttm: endDttm,
-        });
-        return response.data.txDataList;
+        let response;
+        if (this.$config.isSimulator) {
+          response = this.getTxDataList(1000);
+        } else {
+          response = await this.$axios.post("/api/gettxdata", {
+            startDttm: startDttm,
+            endDttm: endDttm,
+          }); 
+        }
+        return response.data.txDataList;  
       } catch (error) {
         console.error("초기 데이터를 가져오는 중 오류가 발생했습니다:", error);
         return [];
@@ -551,10 +586,17 @@ const comp = (module.exports = {
         const startDttm = this.$util.getDateTime(
           new Date(Date.now() - 5 * 1000)
         );
-        const response = await this.$axios.post("/api/gettxdata", {
-          startDttm: startDttm,
-          endDttm: endDttm,
-        });
+
+        let response;
+        if (this.$config.isSimulator) {
+          response = this.getTxDataList(24);
+        } else {
+          response = await this.$axios.post("/api/gettxdata", {
+            startDttm: startDttm,
+            endDttm: endDttm,
+          });
+        }
+        //console.log('response', response);
         const transactions = response.data.txDataList;
         this.updateChartData(transactions);
         this.updateAnomalyTransactions(transactions);
@@ -599,9 +641,13 @@ const comp = (module.exports = {
     },
 
     getSimulatorStatus() {
-      this.$axios.get("/simulator/status").then(response => {
-        this.simulatorOn = response.data.status === "Y";
-      });
+      if (this.$config.isSimulator) {
+        //this.simulatorOn = true;
+      }else{
+        this.$axios.get("/simulator/status").then(response => {
+          this.simulatorOn = response.data.status === "Y";
+        });
+      }
     },
     /**
      * 숫자를 입력받아 단위를 붙여 반환하는 함수
@@ -703,7 +749,25 @@ const comp = (module.exports = {
             */
 
       try {
-        const response = await this.$axios.get("/incident/getMetric"); // 서비스
+        let response;
+        if (this.$config.isSimulator) {
+          response = { data: Array.from({length: 5}, (_, i) => {
+            return {
+              svcNm: ['대출신청', '한도조회', '스크래핑', '모바일뱅킹 로그인', '모바일뱅킹 송금'][i % 5],
+              todayCnt: Math.floor(Math.random() * 10000),
+              errPer: (Math.random() * 10).toFixed(2),
+              tps: (Math.random() * 100).toFixed(2),
+              currentCnt: Math.floor(Math.random() * 1000),
+              previousDayCnt: Math.floor(Math.random() * 10000),
+              previousWeekCnt: Math.floor(Math.random() * 50000),
+              errDiffPer: (Math.random() * 10 - 5).toFixed(2) // -5 ~ +5 사이 랜덤값
+            }
+          })};
+        } else {
+          response = await this.$axios.get("/incident/getMetric"); // 서비스
+        }
+
+        //console.log('response', response);
         if (response.data && response.data) {
           this.serviceTransactions = response.data.map((service) => ({
             serviceName: service.svcNm, // 서비스명
